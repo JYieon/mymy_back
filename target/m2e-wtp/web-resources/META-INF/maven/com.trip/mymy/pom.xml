@@ -199,6 +199,13 @@
 		    <version>${org.springframework-version}</version>
 		    <scope>test</scope>
 		</dependency>
+		<!-- Lombok 의존성 -->
+	    <dependency>
+	        <groupId>org.projectlombok</groupId>
+	        <artifactId>lombok</artifactId>
+	        <version>1.18.22</version>
+	        <scope>provided</scope>
+	    </dependency>
 	</dependencies>
     <build>
         <plugins>

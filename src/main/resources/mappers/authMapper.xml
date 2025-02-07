@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trip.mymy.mybatis.AuthMapper">
+    <resultMap type="com.trip.mymy.dto.MemberDTO" id="member">
+    	<id property="id" column="MEMBER_ID_PK" />
+    	<result property="pwd" column="MEMBER_PWD" />
+    	<result property="name" column="MEMBER_NAME" />
+    	<result property="nick" column="MEMBER_NICK" />
+    	<result property="phone" column="MEMBER_PHONE" />
+    	<result property="email" column="MEMBER_EMAIL" />
+    	<result property="level" column="MEMBER_LEVEL" />
+    	<result property="bank" column="MEMBER_BANK" />
+    	<result property="profile"  column="MEMBER_PROFILE" />
+    </resultMap>
+    <select id="getUser" resultMap="member">
+    	select * from MEMBER_TB where MEMBER_ID_PK = #{id}
+    </select>
+</mapper>
