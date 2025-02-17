@@ -4,13 +4,16 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.trip.mymy.dto.LoginReqDTO;
 import com.trip.mymy.dto.MemberDTO;
+import com.trip.mymy.dto.TokenDTO;
 import com.trip.mymy.service.AuthServiceImpl;
 
 @RestController
@@ -20,12 +23,18 @@ public class AuthController {
 	@Autowired AuthServiceImpl ls;
 	
 	@PostMapping("/login")
-	public ResponseEntity<MemberDTO> loginCheck(@RequestBody Map<String, String> loginData) {
+	public ResponseEntity<TokenDTO> loginCheck(@RequestBody LoginReqDTO loginData) {
 		
 		return ResponseEntity.ok(ls.loginCheck(loginData));
 
 	}
 	
-	
+	@PostMapping("/signup")
+	public int signup(@RequestBody MemberDTO signupData){
+		//String msg = ls.insertUser(signupData);
+		
+		return ls.insertUser(signupData);
+//		return ResponseEntity.ok(ls.insertUser(signupData));
+	}
 	
 }

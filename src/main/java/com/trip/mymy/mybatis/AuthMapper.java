@@ -7,4 +7,5 @@ import com.trip.mymy.dto.MemberDTO;
 @Mapper
 public interface AuthMapper {
 	public MemberDTO getUser(String id);
+	public int insertUser(MemberDTO dto);
 }

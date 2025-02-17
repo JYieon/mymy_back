@@ -1,7 +1,27 @@
 package com.trip.mymy.dto;
 
+import java.util.List;
+import java.util.ArrayList;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class MemberDTO {
 	String id, pwd, name, nick, phone, email, level, bank, profile;
+	
+	@Builder.Default
+	private List<GrantedAuthority> authorities = new ArrayList<>();
+	
+	public void setGuestAuthority() {
+		this.authorities = List.of(new SimpleGrantedAuthority("ROLE_GUEST"));
+	}
 
 	public String getId() {
 		return id;
@@ -73,5 +93,13 @@ public class MemberDTO {
 
 	public void setProfile(String profile) {
 		this.profile = profile;
+	}
+
+	public List<GrantedAuthority> getAuthorities() {
+		return authorities;
+	}
+
+	public void setAuthorities(List<GrantedAuthority> authorities) {
+		this.authorities = authorities;
 	}
 }
