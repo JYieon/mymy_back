@@ -20,10 +20,9 @@ public class AuthServiceImpl implements AuthService {
 	@Autowired AuthMapper mapper;
 	@Autowired TokenProvider tp;
 	
-	public TokenDTO loginCheck(LoginReqDTO loginData) {
+	public MemberDTO loginCheck(LoginReqDTO loginData) {
 		MemberDTO dto = mapper.getUser(loginData.getId());
-		Authentication authentication = new UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
-		return tp.generateTokenDto(authentication);
+		return dto;
 	}
 	
 	public int insertUser(MemberDTO data) {

@@ -7,6 +7,6 @@ import com.trip.mymy.dto.MemberDTO;
 import com.trip.mymy.dto.TokenDTO;
 
 public interface AuthService {
-	public TokenDTO loginCheck(LoginReqDTO loginData);
+	public MemberDTO loginCheck(LoginReqDTO loginData);
 	public int insertUser(MemberDTO data);
 }
