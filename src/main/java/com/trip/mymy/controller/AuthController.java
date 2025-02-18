@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.trip.mymy.common.jwt.TokenProvider;
@@ -40,7 +41,17 @@ public class AuthController {
 		Authentication authentication = new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
 	    
 	    return ResponseEntity.ok(tp.generateTokenDto(authentication)); // 로그인 성공, 토큰 반환
-
+	}
+	
+	@PostMapping("/find_id")
+	public ResponseEntity<String> findId(@RequestParam String name, String email) {
+		
+		return ResponseEntity.ok(ls.findId(name, email));
+	}
+	
+	@PostMapping("/find_pwd")
+	public ResponseEntity<Integer> findPwd(@RequestParam String id, String email) {
+		return ResponseEntity.ok(ls.findPwd(id, email));
 	}
 	
 	@PostMapping("/signup")

@@ -58,6 +58,30 @@ public class TestAuth {
 	}
 	
 	@Test
+	public void testId() throws Exception{
+		 mock.perform(post("/find_id")
+		 	.param("name", "테스트")
+		 	.param("email", "dkcl.8642@gmail.com"))
+		    .andDo(print())
+		    .andExpect(status().isOk());
+	}
+	
+	@Test
+	public void testPwd() throws Exception{
+		mock.perform(post("/find_pwd")
+			 	.param("id", "test")
+			 	.param("email", "dkcl.8642@gmail.com"))
+			    .andDo(print())
+			    .andExpect(status().isOk());
+	}
+	
+	@Test
+	public void testEmail() throws Exception{
+		as.sendMail("dkcl.8642@gmail.com");
+		
+	}
+	
+	@Test
 	public void Testsignup(){
 		MemberDTO dto = new MemberDTO();
 		dto.setId("test");

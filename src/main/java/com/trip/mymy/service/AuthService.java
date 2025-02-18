@@ -9,4 +9,7 @@ import com.trip.mymy.dto.TokenDTO;
 public interface AuthService {
 	public MemberDTO loginCheck(LoginReqDTO loginData);
 	public int insertUser(MemberDTO data);
+	public String findId(String name, String email);
+	public int findPwd(String id, String email);
+	public int sendMail(String toEmail);
 }
