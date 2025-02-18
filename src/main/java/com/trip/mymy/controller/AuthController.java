@@ -45,13 +45,18 @@ public class AuthController {
 	
 	@PostMapping("/find_id")
 	public ResponseEntity<String> findId(@RequestParam String name, String email) {
-		
+		System.out.println(name + email);
 		return ResponseEntity.ok(ls.findId(name, email));
 	}
 	
 	@PostMapping("/find_pwd")
 	public ResponseEntity<Integer> findPwd(@RequestParam String id, String email) {
 		return ResponseEntity.ok(ls.findPwd(id, email));
+	}
+	
+	@PostMapping("/reset_pwd")
+	public void resetPwd(@RequestParam String id, String pwd) {
+		ls.resetPwd(id, pwd);
 	}
 	
 	@PostMapping("/signup")

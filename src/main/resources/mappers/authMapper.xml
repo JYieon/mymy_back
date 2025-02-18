@@ -24,6 +24,9 @@
     <select id="findPwd" resultMap="member">
     	select * from Member_TB where MEMBER_ID_PK = #{id} AND MEMBER_EMAIL = #{email}
     </select>
+    <update id="resetPwd">
+    	update MEMBER_TB set MEMBER_PWD = #{pwd} where MEMBER_ID_PK = #{id}
+    </update>
     <insert id="insertUser">
     	insert into MEMBER_TB (MEMBER_ID_PK, MEMBER_PWD, MEMBER_NAME, MEMBER_NICK, MEMBER_PHONE, MEMBER_EMAIL)
     		values(#{id}, #{pwd}, #{name}, #{nick}, #{phone}, #{email})

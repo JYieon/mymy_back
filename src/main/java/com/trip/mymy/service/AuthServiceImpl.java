@@ -66,6 +66,12 @@ public class AuthServiceImpl implements AuthService {
 		return (int)authNum;
 	}
 	
+	public int resetPwd(String id, String pwd) {
+		int result = mapper.resetPwd(id, pwd);
+		System.out.println(result);
+		return result;
+	}
+	
 	public int insertUser(MemberDTO data) {
 		
 		int result = mapper.insertUser(data);

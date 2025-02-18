@@ -12,4 +12,5 @@ public interface AuthService {
 	public String findId(String name, String email);
 	public int findPwd(String id, String email);
 	public int sendMail(String toEmail);
+	public int resetPwd(String id, String pwd);
 }
