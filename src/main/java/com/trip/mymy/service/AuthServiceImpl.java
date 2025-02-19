@@ -39,43 +39,47 @@ public class AuthServiceImpl implements AuthService {
 	
 	public int findPwd(String id, String email) {
 		MemberDTO dto = mapper.findPwd(id, email);
+		makeAuthNum();
+		
+		String subject = "Mymy 비밀번호 설정";
+		String text = "비밀번호 설정 인증번호: " + authNum;
 		
 		if(dto == null) {
 			return 0;
 		}else {
-			int authMailNum = sendMail(email);
+			int authMailNum = sendAuthMail(email, subject, text);
 			return authMailNum;
-		}
-		
+		}	
 	}
 	
-	public int sendMail(String toEmail) {
-		MimeMessage message = mailSender.createMimeMessage();
+	public void makeAuthNum() {
 		authNum = (int)(Math.random() * 9000) + 1000;
+	}
+	
+	public void sendMail(String toEmail, String subject, String text) {
+		MimeMessage message = mailSender.createMimeMessage();
 		
 		try {
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-			helper.setSubject("Mymy 비밀번호 설정");
+			helper.setSubject(subject);
 			helper.setTo(toEmail);
-			helper.setText("비밀번호 설정 인증번호: " + authNum);
+			helper.setText(text);
 			mailSender.send(message);
 		}catch(Exception e) {
 			System.out.println("이메일 전송 실패");
 			e.printStackTrace();
 		}
-		
-		return (int)authNum;
 	}
 	
-	public boolean authPwd(String userAuth) {
+	public int sendAuthMail(String toEmail, String subject, String text) {
+		sendMail(toEmail, subject, text);
+		
+		return authNum;
+	}
+	
+	public boolean authMail(String userAuth) {
 		
 		return (String.valueOf(authNum).equals(userAuth));
-		
-//		if(String.valueOf(authNum).equals(userAuth)) {
-//			return true;
-//		}else {
-//			return false;
-//		}
 	}
 	
 	public int resetPwd(String id, String pwd) {
@@ -85,9 +89,8 @@ public class AuthServiceImpl implements AuthService {
 	}
 	
 	public MemberDTO checkId(String id) {
+		
 		return mapper.getUser(id);
-		
-		
 	}
 	
 	public int insertUser(MemberDTO data) {
@@ -96,6 +99,20 @@ public class AuthServiceImpl implements AuthService {
 		System.out.println(result);
 		
 		return result;
+	}
+	
+	public int sendSignupAuth(String toEmail) {
+		makeAuthNum();
+		String subject = "Mymy 회원가입 인증번호";
+		String text = "회원가입 이메일 인증번호 : " + authNum;
+		
+		sendAuthMail(toEmail, subject, text);
+		
+		return authNum;
+	}
+	
+	public MemberDTO checkEmail(String email) {
+		return mapper.checkEmail(email);
 	}
 
 }

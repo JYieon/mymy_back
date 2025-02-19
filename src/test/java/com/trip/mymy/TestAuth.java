@@ -77,8 +77,7 @@ public class TestAuth {
 	
 	@Test
 	public void testEmail() throws Exception{
-		as.sendMail("dkcl.8642@gmail.com");
-		
+		as.sendAuthMail("dkcl.8642@gmail.com");
 	}
 	
 	@Test

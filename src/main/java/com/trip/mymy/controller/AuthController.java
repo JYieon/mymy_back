@@ -54,9 +54,9 @@ public class AuthController {
 		return ResponseEntity.ok(ls.findPwd(id, email));
 	}
 	
-	@PostMapping("/find_pwd/auth")
-	public ResponseEntity<String> authPwd(@RequestParam String userAuth, String id) {
-		if(ls.authPwd(userAuth)) {
+	@PostMapping("/mail_auth")
+	public ResponseEntity<String> authMail(@RequestParam String userAuth, String id) {
+		if(ls.authMail(userAuth)) {
 			String resetToken = tp.generateResetToken(id);
 			return ResponseEntity.ok(resetToken);
 		}else {
@@ -69,16 +69,37 @@ public class AuthController {
 		ls.resetPwd(id, pwd);
 	}
 	
-	@PostMapping("/id_check")
-	public ResponseEntity<MemberDTO> checkId(@RequestParam String id) {
-		return ResponseEntity.ok(ls.checkId(id));
-	}
-	
 	@PostMapping("/signup")
 	public ResponseEntity<Integer> signup(@RequestBody MemberDTO signupData){
 		//String msg = ls.insertUser(signupData);
+		System.out.println(signupData);
 		
 		return ResponseEntity.ok(ls.insertUser(signupData));
+	}
+	
+	@PostMapping("/id_check")
+	public ResponseEntity<?> checkId(@RequestParam String id) {
+	    MemberDTO dto = ls.checkId(id);
+	    
+	    if (dto == null) {
+	        return ResponseEntity.ok().body("사용 가능한 아이디입니다."); 
+	    } else {
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 아이디입니다."); 
+	    }
+	}
+	
+	@PostMapping("/signup_email_send")
+	public ResponseEntity<Integer> signupEmailAuth(@RequestParam String toEmail) {
+		MemberDTO mailDto = ls.checkEmail(toEmail);
+		
+		if(mailDto == null) {
+			return ResponseEntity.ok(ls.sendSignupAuth(toEmail));
+		}else {
+			return ResponseEntity.ok(0);
+		}
+		
+		
+		
 	}
 	
 }

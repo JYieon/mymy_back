@@ -11,8 +11,10 @@ public interface AuthService {
 	public int insertUser(MemberDTO data);
 	public String findId(String name, String email);
 	public int findPwd(String id, String email);
-	public int sendMail(String toEmail);
+	public int sendAuthMail(String toEmail, String subject, String text);
 	public int resetPwd(String id, String pwd);
-	public boolean authPwd(String userAuth);
+	public boolean authMail(String userAuth);
 	public MemberDTO checkId(String id);
+	public int sendSignupAuth(String toEmail);
+	public MemberDTO checkEmail(String email);
 }
