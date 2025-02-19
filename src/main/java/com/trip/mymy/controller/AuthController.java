@@ -69,12 +69,16 @@ public class AuthController {
 		ls.resetPwd(id, pwd);
 	}
 	
+	@PostMapping("/id_check")
+	public ResponseEntity<MemberDTO> checkId(@RequestParam String id) {
+		return ResponseEntity.ok(ls.checkId(id));
+	}
+	
 	@PostMapping("/signup")
-	public int signup(@RequestBody MemberDTO signupData){
+	public ResponseEntity<Integer> signup(@RequestBody MemberDTO signupData){
 		//String msg = ls.insertUser(signupData);
 		
-		return ls.insertUser(signupData);
-//		return ResponseEntity.ok(ls.insertUser(signupData));
+		return ResponseEntity.ok(ls.insertUser(signupData));
 	}
 	
 }

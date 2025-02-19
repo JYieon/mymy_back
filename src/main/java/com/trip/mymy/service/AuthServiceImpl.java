@@ -84,6 +84,12 @@ public class AuthServiceImpl implements AuthService {
 		return result;
 	}
 	
+	public MemberDTO checkId(String id) {
+		return mapper.getUser(id);
+		
+		
+	}
+	
 	public int insertUser(MemberDTO data) {
 		
 		int result = mapper.insertUser(data);

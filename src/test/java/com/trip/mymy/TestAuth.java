@@ -82,18 +82,29 @@ public class TestAuth {
 	}
 	
 	@Test
-	public void Testsignup(){
+	public void testSignup() throws Exception{
 		MemberDTO dto = new MemberDTO();
-		dto.setId("test");
-		dto.setPwd("test123");
-		dto.setName("테스트");
-		dto.setEmail("dkcl.8642@gmail.com");
-		dto.setNick("테스트");
+		dto.setId("rkskel");
+		dto.setPwd("rkskel");
+		dto.setName("가나디");
+		dto.setEmail("a1085547549@naver.com");
+		dto.setNick("가나디");
 		dto.setPhone("01012345678");
 		
-		int result = am.insertUser(dto);
-		
-		System.out.println("result : " + result);
-		assertEquals(1, result);
+		String jsonRequest = new ObjectMapper().writeValueAsString(dto);
+
+	    mock.perform(post("/signup")
+	            .contentType(MediaType.APPLICATION_JSON)  // JSON 요청 설정
+	            .content(jsonRequest))  // 변환된 JSON 전달
+	            .andDo(print())
+	            .andExpect(status().isOk());
+	}
+	
+	@Test
+	public void TestIdCheck() throws Exception{
+		mock.perform(post("/id_check")
+			 	.param("id", "choi"))
+			    .andDo(print())
+			    .andExpect(status().isOk());
 	}
 }
