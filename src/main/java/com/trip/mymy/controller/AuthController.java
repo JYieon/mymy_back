@@ -39,7 +39,6 @@ public class AuthController {
 	    
 	    // 로그인 성공 시 토큰 생성
 		Authentication authentication = new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
-	    
 	    return ResponseEntity.ok(tp.generateTokenDto(authentication)); // 로그인 성공, 토큰 반환
 	}
 	
@@ -51,7 +50,18 @@ public class AuthController {
 	
 	@PostMapping("/find_pwd")
 	public ResponseEntity<Integer> findPwd(@RequestParam String id, String email) {
+		
 		return ResponseEntity.ok(ls.findPwd(id, email));
+	}
+	
+	@PostMapping("/find_pwd/auth")
+	public ResponseEntity<String> authPwd(@RequestParam String userAuth, String id) {
+		if(ls.authPwd(userAuth)) {
+			String resetToken = tp.generateResetToken(id);
+			return ResponseEntity.ok(resetToken);
+		}else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증실패");
+		}
 	}
 	
 	@PostMapping("/reset_pwd")

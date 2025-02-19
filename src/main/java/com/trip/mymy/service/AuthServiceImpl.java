@@ -23,6 +23,7 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Autowired AuthMapper mapper;
 	@Autowired TokenProvider tp;
+	int authNum = 0;
 	
 	@Autowired JavaMailSender mailSender;
 	
@@ -50,13 +51,13 @@ public class AuthServiceImpl implements AuthService {
 	
 	public int sendMail(String toEmail) {
 		MimeMessage message = mailSender.createMimeMessage();
-		double authNum = Math.random() * 9000 + 1000;
+		authNum = (int)(Math.random() * 9000) + 1000;
 		
 		try {
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 			helper.setSubject("Mymy 비밀번호 설정");
 			helper.setTo(toEmail);
-			helper.setText("비밀번호 설정 인증번호: " + (int)authNum);
+			helper.setText("비밀번호 설정 인증번호: " + authNum);
 			mailSender.send(message);
 		}catch(Exception e) {
 			System.out.println("이메일 전송 실패");
@@ -64,6 +65,17 @@ public class AuthServiceImpl implements AuthService {
 		}
 		
 		return (int)authNum;
+	}
+	
+	public boolean authPwd(String userAuth) {
+		
+		return (String.valueOf(authNum).equals(userAuth));
+		
+//		if(String.valueOf(authNum).equals(userAuth)) {
+//			return true;
+//		}else {
+//			return false;
+//		}
 	}
 	
 	public int resetPwd(String id, String pwd) {
