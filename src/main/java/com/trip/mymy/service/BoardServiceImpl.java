@@ -44,36 +44,43 @@ public class BoardServiceImpl implements BoardService {
         mapper.addReply(replyDTO);
     }
 
-    // 게시글의 댓글 가져오기
+//    // 게시글의 댓글 가져오기
+//    @Override
+//    public List<BoardRepDTO> getRepliesByBoardNo(int boardNo) {
+//        List<BoardRepDTO> replies = mapper.getRepData(boardNo);
+//
+//        // 부모 댓글을 기준으로 계층적으로 정렬
+//        List<BoardRepDTO> sortedReplies = new ArrayList<>();
+//        Map<Integer, List<BoardRepDTO>> replyMap = new HashMap<>();
+//
+//        // parentNo 기준으로 그룹화
+//        for (BoardRepDTO reply : replies) {
+//            replyMap.computeIfAbsent(reply.getParentNo(), k -> new ArrayList<>()).add(reply);
+//        }
+//
+//        // 계층적으로 정렬된 댓글 리스트 생성 (JSP에서 depth를 계산할 수 있도록 순서만 정렬)
+//        sortReplies(sortedReplies, replyMap, 0);
+//
+//        return sortedReplies;
+//    }
+//    
+//    // 부모 → 자식 순서대로 정렬
+//    private void sortReplies(List<BoardRepDTO> sortedReplies, Map<Integer, List<BoardRepDTO>> replyMap, int parentNo) {
+//        if (!replyMap.containsKey(parentNo)) return;
+//
+//        for (BoardRepDTO reply : replyMap.get(parentNo)) {
+//            sortedReplies.add(reply);
+//            sortReplies(sortedReplies, replyMap, reply.getRepNo()); // 자식 댓글도 정렬
+//        }
+//    }
+ // ✅ 댓글 목록 조회
     @Override
     public List<BoardRepDTO> getRepliesByBoardNo(int boardNo) {
         List<BoardRepDTO> replies = mapper.getRepData(boardNo);
-
-        // 부모 댓글을 기준으로 계층적으로 정렬
-        List<BoardRepDTO> sortedReplies = new ArrayList<>();
-        Map<Integer, List<BoardRepDTO>> replyMap = new HashMap<>();
-
-        // parentNo 기준으로 그룹화
-        for (BoardRepDTO reply : replies) {
-            replyMap.computeIfAbsent(reply.getParentNo(), k -> new ArrayList<>()).add(reply);
-        }
-
-        // 계층적으로 정렬된 댓글 리스트 생성 (JSP에서 depth를 계산할 수 있도록 순서만 정렬)
-        sortReplies(sortedReplies, replyMap, 0);
-
-        return sortedReplies;
+        System.out.println("📥 Service 댓글 조회 결과: " + replies);
+        return replies;
     }
-
-    // 부모 → 자식 순서대로 정렬
-    private void sortReplies(List<BoardRepDTO> sortedReplies, Map<Integer, List<BoardRepDTO>> replyMap, int parentNo) {
-        if (!replyMap.containsKey(parentNo)) return;
-
-        for (BoardRepDTO reply : replyMap.get(parentNo)) {
-            sortedReplies.add(reply);
-            sortReplies(sortedReplies, replyMap, reply.getRepNo()); // 자식 댓글도 정렬
-        }
-    }
-
+        
     // 댓글 삭제 (대댓글 포함)
     @Transactional
     @Override
@@ -99,6 +106,12 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public int getLikes(int boardNo) {
         return mapper.getLikes(boardNo);
+    }
+    public void increaseLike(int boardNo) {
+        mapper.increaseLike(boardNo);
+    }
+    public void decreaseLike(int boardNo) {
+        mapper.decreaseLike(boardNo);
     }
 
     // 게시글 목록 조회

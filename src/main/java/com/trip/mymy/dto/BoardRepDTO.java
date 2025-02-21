@@ -23,7 +23,7 @@ public class BoardRepDTO {
 		return repDate;
 	}
 	public void setRepDate(Timestamp repDate) {
-		 SimpleDateFormat sdf = new SimpleDateFormat("YYYY년 MM월 dd일 HH시 mm분 ss초");
+		 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	        this.repDate = sdf.format(repDate);
 	}
 	public int getRepNo() {

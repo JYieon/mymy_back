@@ -40,15 +40,12 @@ public class BookmarkController {
 	
 	//사용자 북마크 목록 조회
 	@GetMapping("/list")
-	public String getBookmarkList(@RequestParam(defaultValue = "a") String id, Model model) {
-	    List<BoardDTO> BookmarkList = bookmarkService.getBookmarkList(id);
-        
-       // System.out.println("사용자 ID: " + id);
-       // System.out.println("북마크한 게시글 수: " + BookmarkList.size());
-        
-        model.addAttribute("bookmarkList", BookmarkList);
-        return "board/bookmarkList"; // "board/bookmarkList.jsp"로 이동
-    }
+	@ResponseBody
+	public ResponseEntity<List<BoardDTO>> getBookmarkList(@RequestParam(defaultValue = "a") String id) {
+	    List<BoardDTO> bookmarkList = bookmarkService.getBookmarkList(id);
+	    return ResponseEntity.ok(bookmarkList); // ✅ JSON으로 반환
+	}
+
 	
 	 @GetMapping("/check")
 	    @ResponseBody
