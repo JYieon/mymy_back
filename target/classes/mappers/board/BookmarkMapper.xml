@@ -15,7 +15,7 @@
 		<result property="status" column="STATUS" />		
 	</resultMap>
 	
-	<!-- ✅ BoardDTO와 매핑되는 resultMap 추가 -->
+	<!-- BoardDTO와 매핑되는 resultMap 추가 -->
     <resultMap id="BOARD_TB" type="com.trip.mymy.dto.BoardDTO">
         <id property="boardNo" column="BOARD_NO_PK"/>
         <result property="id" column="MEMBER_ID_PK"/>

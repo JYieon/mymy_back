@@ -19,234 +19,246 @@ import com.trip.mymy.dto.BoardRepDTO;
 import com.trip.mymy.mybatis.BoardMapper;
 
 @Service
+@Transactional
 public class BoardServiceImpl implements BoardService {
-    
-    @Autowired BoardMapper mapper;
-    
-    // 댓글 저장
-    @Transactional
-    @Override
-    public void addReply(BoardRepDTO replyDTO) {
-        // 1️⃣ PARENT_NO가 NULL이면 기본값 0 설정
-        if (replyDTO.getParentNo() == null) {
-            replyDTO.setParentNo(0);
-        }
 
-        // 2️⃣ PARENT_NO가 0보다 크면 부모 댓글이 존재하는지 확인
-        if (replyDTO.getParentNo() > 0) {
-            int parentExists = mapper.checkParentExists(replyDTO.getParentNo());
-            if (parentExists == 0) {
-                throw new RuntimeException("부모 댓글이 존재하지 않습니다! (잘못된 parentNo: " + replyDTO.getParentNo() + ")");
-            }
-        }
+	@Autowired BoardMapper mapper;
 
-        // 3️⃣ 댓글을 추가
-        mapper.addReply(replyDTO);
-    }
+	// 댓글 저장
+	@Override
+	public void addReply(BoardRepDTO replyDTO) {
+		// PARENT_NO가 NULL이면 기본값 0 설정
+		if (replyDTO.getParentNo() == null) {
+			replyDTO.setParentNo(0);
+		}
 
-//    // 게시글의 댓글 가져오기
-//    @Override
-//    public List<BoardRepDTO> getRepliesByBoardNo(int boardNo) {
-//        List<BoardRepDTO> replies = mapper.getRepData(boardNo);
-//
-//        // 부모 댓글을 기준으로 계층적으로 정렬
-//        List<BoardRepDTO> sortedReplies = new ArrayList<>();
-//        Map<Integer, List<BoardRepDTO>> replyMap = new HashMap<>();
-//
-//        // parentNo 기준으로 그룹화
-//        for (BoardRepDTO reply : replies) {
-//            replyMap.computeIfAbsent(reply.getParentNo(), k -> new ArrayList<>()).add(reply);
-//        }
-//
-//        // 계층적으로 정렬된 댓글 리스트 생성 (JSP에서 depth를 계산할 수 있도록 순서만 정렬)
-//        sortReplies(sortedReplies, replyMap, 0);
-//
-//        return sortedReplies;
-//    }
-//    
-//    // 부모 → 자식 순서대로 정렬
-//    private void sortReplies(List<BoardRepDTO> sortedReplies, Map<Integer, List<BoardRepDTO>> replyMap, int parentNo) {
-//        if (!replyMap.containsKey(parentNo)) return;
-//
-//        for (BoardRepDTO reply : replyMap.get(parentNo)) {
-//            sortedReplies.add(reply);
-//            sortReplies(sortedReplies, replyMap, reply.getRepNo()); // 자식 댓글도 정렬
-//        }
-//    }
- // ✅ 댓글 목록 조회
-    @Override
-    public List<BoardRepDTO> getRepliesByBoardNo(int boardNo) {
-        List<BoardRepDTO> replies = mapper.getRepData(boardNo);
-        System.out.println("📥 Service 댓글 조회 결과: " + replies);
-        return replies;
-    }
-        
-    // 댓글 삭제 (대댓글 포함)
-    @Transactional
-    @Override
-    public String deleteReply(int replyNo, String path) {
-    	   int result = mapper.deleteReply(replyNo);
-    	   return (result == 1) ? "댓글이 성공적으로 삭제되었습니다." : "댓글 삭제에 실패했습니다.";
-    	}
-    
-    //게시글 좋아요
-    @Transactional
-    public void toggleLike(int boardNo) {
-        // 현재 좋아요 개수 가져오기
-        int currentLikes = mapper.getLikes(boardNo);
+		// PARENT_NO가 0보다 크면 부모 댓글이 존재하는지 확인
+		if (replyDTO.getParentNo() > 0) {
+			int parentExists = mapper.checkParentExists(replyDTO.getParentNo());
+			if (parentExists == 0) {
+				throw new RuntimeException("부모 댓글이 존재하지 않습니다! (잘못된 parentNo: " + replyDTO.getParentNo() + ")");
+			}
+		}
 
-        // 좋아요 개수가 0이면 증가, 아니면 감소
-        if (currentLikes == 0) {
-            mapper.increaseLike(boardNo);
-        } else {
-            mapper.decreaseLike(boardNo);
-        }
-    }
+		// 댓글 추가
+		mapper.addReply(replyDTO);
+	}
 
-    @Transactional
-    public int getLikes(int boardNo) {
-        return mapper.getLikes(boardNo);
-    }
-    public void increaseLike(int boardNo) {
-        mapper.increaseLike(boardNo);
-    }
-    public void decreaseLike(int boardNo) {
-        mapper.decreaseLike(boardNo);
-    }
+	// 댓글 목록 조회
+	public List<BoardRepDTO> getRepliesByBoardNo(int boardNo) {
+		List<BoardRepDTO> replies = mapper.getRepData(boardNo);
+		// System.out.println("Service 댓글 조회 결과: " + replies);
+		return replies;
+	}
 
-    // 게시글 목록 조회
-    @Override
-    public List<BoardDTO> getBoardList(int page) {
-        int limit = 6; // 한 페이지당 6개씩 표시
-        int offset = (page - 1) * limit; // 페이지에 맞는 시작점 계산
+	// 댓글 삭제 (대댓글 포함)
+	public String deleteReply(int replyNo, String path) {
+		int result = mapper.deleteReply(replyNo);
+		return (result == 1) ? "댓글이 성공적으로 삭제되었습니다." : "댓글 삭제에 실패했습니다.";
+	}
 
-        // ✅ offset과 limit을 Map에 담아 전달
-        Map<String, Integer> params = new HashMap<>();
-        params.put("offset", offset);
-        params.put("limit", limit);
+	//게시글 좋아요
+	public void toggleLike(int boardNo) {
+		// 현재 좋아요 개수 가져오기
+		int currentLikes = mapper.getLikes(boardNo);
 
-        List<BoardDTO> boardList = mapper.getBoardList(params);
+		// 좋아요 개수가 0이면 증가, 아니면 감소
+		if (currentLikes == 0) {
+			mapper.increaseLike(boardNo);
+		} else {
+			mapper.decreaseLike(boardNo);
+		}
+	}
 
-        // 각 게시글에서 첫 번째 이미지 태그를 추출하여 썸네일로 설정
-        for (BoardDTO post : boardList) {
-            String content = post.getContent();
-            if (content != null) {
-                Document doc = Jsoup.parse(content);
-                Element imgTag = doc.selectFirst("img"); // 첫 번째 이미지 찾기
-                if (imgTag != null) {
-                    post.setContent(imgTag.outerHtml()); // 첫 번째 이미지 태그만 content에 설정
-                } else {
-                    post.setContent("<img src='http://localhost:8080/mymy/resources/images/default-thumbnail.jpg' alt='기본 썸네일'>"); // 기본 썸네일
-                }
-            }
-        }
-        return boardList;
-    }
-    //전체 게시글 수
-    public int getTotalPosts() {
-        return mapper.getTotalPosts();
-    }
-    //게시글 조회수 증가
-    private void boardCnt(int boardNo) {
-    	try {
+	public int getLikes(int boardNo) {
+		return mapper.getLikes(boardNo);
+	}
+	public void increaseLike(int boardNo) {
+		mapper.increaseLike(boardNo);
+	}
+	public void decreaseLike(int boardNo) {
+		mapper.decreaseLike(boardNo);
+	}
+
+	// 게시글 목록 조회
+	public List<Map<String, Object>> getBoardList(int page) {
+		int limit = 6;
+		int offset = (page - 1) * limit;
+
+		Map<String, Integer> params = new HashMap<>();
+		params.put("offset", offset);
+		params.put("limit", limit);
+
+		List<BoardDTO> boardList = mapper.getBoardList(params);
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (BoardDTO post : boardList) {
+			Map<String, Object> postMap = new HashMap<>();
+			postMap.put("boardNo", post.getBoardNo());
+			postMap.put("title", post.getTitle());
+			postMap.put("id", post.getId());
+			postMap.put("boardCnt", post.getBoardCnt());
+			postMap.put("boardLikes", post.getBoardLikes());
+			postMap.put("boardOpen", post.getBoardOpen());
+
+			// 첫 번째 이미지 추출
+			String content = post.getContent();
+			if (content != null) {
+				Document doc = Jsoup.parse(content);
+				Element imgTag = doc.selectFirst("img");
+				String thumbnail = (imgTag != null) 
+						? imgTag.attr("src") 
+								: "http://localhost:8080/mymy/resources/images/default-thumbnail.jpg";
+				postMap.put("thumbnail", thumbnail); // 썸네일만 Map에 추가
+			}
+
+			responseList.add(postMap);
+		}
+
+		return responseList;
+	}
+	//전체 게시글 수
+	public int getTotalPosts() {
+		return mapper.getTotalPosts();
+	}
+	//게시글 조회수 증가
+	private void boardCnt(int boardNo) {
+		try {
 			mapper.boardCnt(boardNo);
 		} catch (Exception e) {
-			
+
 		}
-    }
-    
-    // 게시글 상세 조회 (줄바꿈 처리)
-    public BoardDTO getPost(int boardNo) {
-    	mapper.boardCnt(boardNo);
-        BoardDTO post = mapper.getPost(boardNo);
-        if (post != null) {
-            // 🟢 웹페이지에서 보일 때 다시 `<br>` 태그로 변환
-            post.setContent(post.getContent().replace("\n", "<br>"));
-        }
-        return post;
-    }
+	}
 
-    // 게시글 저장 (HTML 정리 + 첫 번째 이미지 자동 추출)
-    @Override
-    public String writeSave(BoardDTO dto) {
-        if (dto.getBoardOpen() == 0 || dto.getBoardOpen() == 1) {
-            // 정상적인 값이 들어왔으면 그대로 사용
-        } else {
-            dto.setBoardOpen(1); // 기본값 1 (공개) 설정
-        }
+	// 게시글 상세 조회 (줄바꿈 처리)
+	public BoardDTO getPost(int boardNo) {
+		mapper.boardCnt(boardNo); //조회수 증가
+		BoardDTO post = mapper.getPost(boardNo);
+		if (post != null) {
+			post.setHashtags(tagList(boardNo));  // 해시태그 조회 및 설정
+			// 웹페이지에서 보일 때 다시 `<br>` 태그로 변환
+			post.setContent(post.getContent().replace("\n", "<br>"));
+		}
+		return post;
+	}
 
-        String msg;
-        int result = 0;
+	// 게시글 저장 (HTML 정리 + 첫 번째 이미지 자동 추출)
+	public boolean writeSave(BoardDTO dto) {
+		//	공개 범위 기본값 설정
+		if (dto.getBoardOpen() == 0 || dto.getBoardOpen() == 1) {
+		} else {
+			dto.setBoardOpen(1); // 기본값 1 (공개) 설정
+		}
 
-        try {
-            // HTML 내용 분석
-            Document doc = Jsoup.parse(dto.getContent());
-            doc.select("script, style").remove();
+		try {
+			// HTML 내용 정리
+			Document doc = Jsoup.parse(dto.getContent());
+			doc.select("script, style").remove();
 
-            // <br> 태그를 줄바꿈 문자(\n)로 변환
-            String formattedContent = doc.body().html().replace("<br>", "\n").replace("<br/>", "\n");
+			// <br> 태그를 (\n)로 변환
+			String formattedContent = doc.body().html().replace("<br>", "\n").replace("<br/>", "\n");
 
-            // <img> 태그는 유지하고 나머지 HTML 태그 정리
-            formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
+			// <img> 태그만 유지
+			formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
+			dto.setContent(formattedContent); // 변경된 내용을 DTO에 적용
 
-            dto.setContent(formattedContent); // 변경된 내용을 DTO에 적용
+			// DB에 저장
+			int result = mapper.writeSave(dto);
 
-            // 데이터베이스에 저장
-            result = mapper.writeSave(dto);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+			// 해시태그 저장
+	        if (result == 1 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+	            addTags(dto.getBoardNo(), dto.getHashtags());
+	        }
+	        return result == 1;
 
-        // 결과에 따라 메시지 설정
-        if (result == 1) {
-            msg = "게시글이 성공적으로 저장되었습니다!";
-        } else {
-            msg = "게시글 저장에 실패했습니다!";
-        }
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false; // 실패 시 false 반환
+		}
+	}
 
-        return msg;
-    }
+	// 게시글 수정 (태그 포함)
+	public boolean modify(BoardDTO dto) {
+		try {
+			// 게시글 수정
+			int result = mapper.modify(dto);
+
+			// 태그 재등록
+			if (result == 1) {
+				deleteTags(dto.getBoardNo());
+				if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+					addTags(dto.getBoardNo(), dto.getHashtags());
+				}
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	// 게시글 삭제
+	@Transactional
+	public boolean delete(int boardNo) {
+	    try {
+	        // 1️ 해시태그 연결 데이터 삭제
+	        deleteTags(boardNo);
+
+	        // 2️ 게시글과 연결된 모든 데이터 삭제
+	        mapper.deleteAllByBoardNo(boardNo);
+	        
+	       // System.out.println("모든 데이터 삭제 완료! (게시글 번호: " + boardNo + ")");
+	        return true;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        // System.out.println("게시글 삭제 중 오류 발생: " + e.getMessage());
+	        return false;
+	    }
+	}
+
+	// 특정 게시글과 연결된 해시태그 삭제
+	public void deleteTags(int boardNo) {
+		mapper.deleteBoardTags(boardNo);
+	}
+
+	// 게시글과 연결된 해시태그 추가
+	public void addTags(int boardNo, List<String> tags) {
+	    if (tags != null && !tags.isEmpty()) {
+	        for (String tag : tags) {
+	            if (tag != null && !tag.trim().isEmpty()) {
+	                try {
+	                    // 태그 삽입 (중복 방지)
+	                    mapper.insertTag(tag.trim());
+
+	                    // 게시글과 태그 연결
+	                    Map<String, Object> params = new HashMap<>();
+	                    params.put("boardNo", boardNo);
+	                    params.put("tagName", tag.trim());
+	                    mapper.insertBoardTag(params);
+
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	    }
+	}
+
+	// 특정 게시글의 해시태그 조회
+	public List<String> tagList(int boardNo) {
+	    List<String> tags = mapper.getTagsByBoardNo(boardNo);
+	    // System.out.println("가져온 해시태그: " + tags);
+	    return tags;
+	}
+
+	@Override
+	public void updateTags(int boardNo, List<String> tags) {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 
-    // 게시글 수정
-    @Override
-    public String modify(BoardDTO dto, String path) {
-        int result = mapper.modify(dto);
-        String msg = "";
-        String url = "";
-        
-        if (result == 1) {
-            msg = "게시글이 성공적으로 수정되었습니다!";
-            url = path + "/board/detail?boardNo=" + dto.getBoardNo(); // 수정 성공 시 상세 페이지로 이동
-        } else {
-            msg = "게시글 수정에 실패했습니다!";
-            url = path + "/board/modifyForm?boardNo=" + dto.getBoardNo(); // 수정 실패 시 수정 페이지로 이동
-        }
 
-        return getMessage(msg, url); 
-    }
 
-    // 게시글 삭제
-    public String delete(int boardNo, String path) {
-        int result = mapper.delete(boardNo);
-        String msg = "";
-        String url = "";
-        
-        if (result == 1) {
-            msg = "게시글이 성공적으로 삭제되었습니다!";
-            url = path + "/board/list"; // 삭제 성공 시 목록 페이지로 이동
-        } else {
-            msg = "게시글 삭제에 실패했습니다!";
-            url = path + "/board/detail?boardNo=" + boardNo; // 삭제 실패 시 다시 상세 페이지로 이동
-        }
-
-        return getMessage(msg, url);
-    }
-
-    // 메시지 출력 함수 (재사용 가능)
-    private String getMessage(String msg, String url) {
-        return "<script>alert('" + msg + "'); location.href='" + url + "';</script>";
-    }
-    
 }

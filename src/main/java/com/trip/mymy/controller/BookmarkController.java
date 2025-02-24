@@ -23,36 +23,30 @@ import com.trip.mymy.service.BookmarkService;
 @RequestMapping("/board/bookmark")
 public class BookmarkController {
 	@Autowired BookmarkService bookmarkService;
-	
-	//북마크 추가,삭제 토글
+
+	// 북마크 추가,삭제 토글
 	@PostMapping("/toggle")
-    public ResponseEntity<String> toggleBookmark(@RequestParam(defaultValue = "a") String id, @RequestParam int boardNo) {
-        boolean isBookmarked = bookmarkService.toggleBookmark(id, boardNo);
-        return ResponseEntity.ok(isBookmarked ? "북마크 추가" : "북마크 삭제");
-    }
-	
-//	// 북마크 추가, 삭제 후 별도 메시지 없이 성공 응답만 반환
-//	@PostMapping("/toggle")
-//	public ResponseEntity<Void> toggleBookmark(@RequestParam(defaultValue = "a") String id, @RequestParam int boardNo) {
-//	    bookmarkService.toggleBookmark(id, boardNo);
-//	    return ResponseEntity.ok().build(); // ✅ HTTP 200 응답만 반환 (메시지 없음)
-//	}
-	
-	//사용자 북마크 목록 조회
+	public ResponseEntity<String> toggleBookmark(@RequestParam(defaultValue = "a") String id, @RequestParam int boardNo) {
+		boolean isBookmarked = bookmarkService.toggleBookmark(id, boardNo);
+		return ResponseEntity.ok(isBookmarked ? "북마크 추가" : "북마크 삭제");
+	}
+
+
+	// 사용자 북마크 목록 조회
 	@GetMapping("/list")
 	@ResponseBody
 	public ResponseEntity<List<BoardDTO>> getBookmarkList(@RequestParam(defaultValue = "a") String id) {
-	    List<BoardDTO> bookmarkList = bookmarkService.getBookmarkList(id);
-	    return ResponseEntity.ok(bookmarkList); // ✅ JSON으로 반환
+		List<BoardDTO> bookmarkList = bookmarkService.getBookmarkList(id);
+		return ResponseEntity.ok(bookmarkList); // ✅ JSON으로 반환
 	}
 
-	
-	 @GetMapping("/check")
-	    @ResponseBody
-	    public ResponseEntity<Boolean> checkBookmark(@RequestParam("id") String id, 
-	                                                 @RequestParam("boardNo") int boardNo) {
-	        boolean isBookmarked = bookmarkService.isBookmarked(id, boardNo);
-	        return ResponseEntity.ok(isBookmarked);
-	    }
-	
+	// 북마크 상태 확인
+	@GetMapping("/check")
+	@ResponseBody
+	public ResponseEntity<Boolean> checkBookmark(@RequestParam("id") String id, 
+			@RequestParam("boardNo") int boardNo) {
+		boolean isBookmarked = bookmarkService.isBookmarked(id, boardNo);
+		return ResponseEntity.ok(isBookmarked);
+	}
+
 }

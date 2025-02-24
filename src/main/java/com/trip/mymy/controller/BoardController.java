@@ -40,50 +40,27 @@ import com.trip.mymy.service.BoardService;
 public class BoardController {
 	@Autowired BoardService bs;
 
-	@GetMapping("/writeForm")
-	public String writeForm() {
-		return "board/writeForm"; // writeForm.jsp를 반환
-	}
+	// 게시글 작성
 	@PostMapping("/writeSave")
-	public ResponseEntity<Map<String, Object>> writeSave(@RequestBody BoardDTO dto) {
+	public ResponseEntity<String> writeSave(@RequestBody BoardDTO dto) {
 		dto.setId("a"); // 기본 ID 설정
 		dto.setBoardCategory(1); // 기본 카테고리 설정
 
-		String result = bs.writeSave(dto);
-		Map<String, Object> response = new HashMap<>();
-
-		if (result.contains("성공")) {
-			response.put("message", result);
-			response.put("boardNo", dto.getBoardNo());
-			return ResponseEntity.ok(response);
-		} else {
-			response.put("message", result);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-		}
+		System.out.println("받은 해시태그: " + dto.getHashtags());
+		
+		boolean success = bs.writeSave(dto);
+		  if (success) {
+			  if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+		            bs.addTags(dto.getBoardNo(), dto.getHashtags());
+		        }
+		        return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
+		    } else {
+		        return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
+		    }
 	}
 
-
-	//	@PostMapping("/writeSave")
-	//	public void writeSave(BoardDTO dto, HttpServletRequest request, HttpServletResponse res) throws IOException {
-	//	    dto.setId("a"); // 테스트용 아이디 설정
-	//	    dto.setBoardCategory(1);
-	//
-	//	    String path = request.getContextPath();
-	//
-	//	    // `boardOpen` 값이 null이면 기본값(1: 공개)으로 설정
-	//	    if (dto.getBoardOpen() == null) {
-	//	        dto.setBoardOpen(1);
-	//	    }
-	//
-	//	    // 게시글 저장
-	//	    String msg = bs.writeSave(dto, path);
-	//
-	//	    res.setContentType("text/html; charset=utf-8");
-	//	    PrintWriter out = res.getWriter();
-	//	    out.print(msg);
-	//	}
 	// 이미지 업로드 처리uploadSummernoteImageFile
-	@PostMapping(  "/uploadSummernoteImageFile")
+	@PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
 	public Map<String, String> uploadSummernoteImageFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		Map<String, String> response = new HashMap<>();
@@ -116,131 +93,73 @@ public class BoardController {
 		}
 		return response;
 	}
+	
+	// 게시글 목록
 	@GetMapping("/list")
 	public ResponseEntity<Map<String, Object>> list(@RequestParam(value = "page", defaultValue = "1") int page) {
-		int totalPosts = bs.getTotalPosts();
-		int pageSize = 6;
-		int totalPages = (totalPosts + pageSize - 1) / pageSize;
+	    int totalPosts = bs.getTotalPosts();
+	    int pageSize = 6;
+	    int totalPages = (totalPosts + pageSize - 1) / pageSize;
 
-		if (totalPages == 0) totalPages = 1;
+	    if (totalPages == 0) totalPages = 1;
 
-		List<BoardDTO> boardList = bs.getBoardList(page);
+	    // BoardDTO 대신 Map 형태로 데이터를 반환
+	    List<Map<String, Object>> boardList = bs.getBoardList(page);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("boardList", boardList);
-		response.put("currentPage", page);
-		response.put("totalPages", totalPages);
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("boardList", boardList);  // 게시글 데이터
+	    response.put("currentPage", page); //현재 페이지
+	    response.put("totalPages", totalPages); // 전체 페이지 수
 
-		return ResponseEntity.ok(response);
+	    return ResponseEntity.ok(response);
 	}
-
-	//    @GetMapping("/list")
-	//    public String list(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
-	//        int totalPosts = bs.getTotalPosts(); // 전체 게시글 수 가져오기
-	//        int pageSize = 6; // 한 페이지당 게시글 6개
-	//        int totalPages = (totalPosts + pageSize - 1) / pageSize; // 전체 페이지 계산
-	//
-	//        if (totalPages == 0) totalPages = 1; // 최소 1페이지는 존재하도록 설정
-	//
-	//        List<BoardDTO> boardList = bs.getBoardList(page);
-	//
-	//        model.addAttribute("boardList", boardList);
-	//        model.addAttribute("currentPage", page);
-	//        model.addAttribute("totalPages", totalPages); // 전체 페이지 수 추가 (JSP에서 사용)
-	//
-	//        return "board/list";
-	//    }
-	//    @GetMapping("/detail")
-	//    public String detail(@RequestParam("boardNo") int boardNo, Model model) {
-	//        BoardDTO post = bs.getPost(boardNo);
-	//        List<BoardRepDTO> replies = bs.getRepliesByBoardNo(boardNo);
-	//        
-	//        // depth 정보를 저장할 Map
-	//        Map<Integer, Integer> depthMap = new HashMap<>();
-	//        List<BoardRepDTO> sortedReplies = new ArrayList<>();
-	//
-	//        // 부모 댓글 기준으로 depth 계산
-	//        organizeReplies(replies, sortedReplies, depthMap, 0, 0);
-	//        
-	//        model.addAttribute("post", post);
-	//        model.addAttribute("replies",replies);
-	//        model.addAttribute("depthMap", depthMap); // ✅ JSP에서 depth 참조 가능하도록 추가
-	//        
-	//        return "board/detail"; // detail.jsp 반환
-	//    }
-	// // 재귀적으로 댓글을 정렬하고 depth를 저장하는 메서드
-	//    private void organizeReplies(List<BoardRepDTO> replies, List<BoardRepDTO> sortedReplies, Map<Integer, Integer> depthMap, int parentNo, int depth) {
-	//        for (BoardRepDTO reply : replies) {
-	//            if (reply.getParentNo() == parentNo) {
-	//                depthMap.put(reply.getRepNo(), depth); // ✅ depth 저장
-	//                sortedReplies.add(reply);
-	//                organizeReplies(replies, sortedReplies, depthMap, reply.getRepNo(), depth + 1);
-	//            }
-	//        }
-	//    }
-
+	
+	// 게시글 상세 페이지
 	@GetMapping("/detail")
-	public ResponseEntity<BoardDTO> detail(@RequestParam("boardNo") int boardNo, Model model) {
-		BoardDTO post = bs.getPost(boardNo);
-		//        model.addAttribute("post", post);
-		return ResponseEntity.ok(post);
+	public ResponseEntity<Map<String, Object>> detail(@RequestParam("boardNo") int boardNo) {
+	    BoardDTO post = bs.getPost(boardNo);
+	    List<String> hashtags = bs.tagList(boardNo);  // 해시태그 조회
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("post", post);
+	    response.put("hashtags", hashtags);
+
+	    return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/modifyForm")
-	public String modifyForm(@RequestParam("boardNo") int boardNo, Model model) {
-		BoardDTO post= bs.getPost(boardNo);
-		model.addAttribute("post", post);
-		return "board/modifyForm";
+	// 특정 게시글의 해시태그 조회
+	@GetMapping("/tags/{boardNo}")
+	public ResponseEntity<List<String>> getTags(@PathVariable int boardNo) {
+	    List<String> tags = bs.tagList(boardNo);
+	    return ResponseEntity.ok(tags);
 	}
+
 	// 게시글 수정
 	@PostMapping("/modify")
-	public ResponseEntity<String> modifyPost(@RequestBody BoardDTO dto) {
-		BoardDTO existingPost = bs.getPost(dto.getBoardNo());
-
-		if (!"a".equals(existingPost.getId())) {  // 임시로 "a" 사용자로 설정
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
-		}
-
-		String result = bs.modify(dto, "/board/detail");
-		return ResponseEntity.ok(result);
+	public ResponseEntity<String> modify(@RequestBody BoardDTO dto) {
+	    if (bs.modify(dto)) {
+	        bs.deleteTags(dto.getBoardNo());  // 기존 태그 삭제
+	        if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+	            bs.addTags(dto.getBoardNo(), dto.getHashtags());  // 새로운 태그 추가
+	        }
+	        return ResponseEntity.ok("게시글이 성공적으로 수정되었습니다.");
+	    } else {
+	        return ResponseEntity.badRequest().body("게시글 수정에 실패했습니다.");
+	    }
 	}
+
 
 	// 게시글 삭제
 	@DeleteMapping("/delete/{boardNo}")
-	public ResponseEntity<String> deletePost(@PathVariable int boardNo) {
-		BoardDTO existingPost = bs.getPost(boardNo);
-
-		if (!"a".equals(existingPost.getId())) {  // 임시로 "a" 사용자로 설정
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
-		}
-
-		String result = bs.delete(boardNo, "/board/list");
-		return ResponseEntity.ok(result);
+	public ResponseEntity<String> delete(@PathVariable int boardNo) {
+	    if (bs.delete(boardNo)) {
+	        return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
+	    } else {
+	        return ResponseEntity.badRequest().body("게시글 삭제에 실패했습니다.");
+	    }
 	}
 
-	//    @PostMapping("/modify")
-	//    public void modify(BoardDTO dto, HttpServletRequest request, HttpServletResponse res) throws IOException {
-	//        // 게시글 수정 후 msg와 url반환
-	//        String msg = bs.modify(dto, request.getContextPath());
-	//
-	//        // 응답 타입 설정
-	//        res.setContentType("text/html; charset=utf-8");
-	//        PrintWriter out = res.getWriter();
-	//
-	//        // 메시지와 URL을 포함한 스크립트로 페이지 이동
-	//        out.print(msg); 
-	//    }
-	//    @DeleteMapping("/delete/{boardNo}")
-	//    public void delete(@PathVariable("boardNo") int boardNo, HttpServletRequest request, HttpServletResponse res) throws IOException {
-	//        // 게시글 삭제 후 msg와 url반환
-	//        String msg = bs.delete(boardNo, request.getContextPath());
-	//
-	//        // 응답 타입 설정
-	//        res.setContentType("text/html; charset=utf-8");
-	//        PrintWriter out = res.getWriter();
-	//
-	//        out.print(msg);
-	//    }
+
 	// 좋아요 토글
 	@PostMapping("/like/toggle")
 	public ResponseEntity<Map<String, Object>> toggleLike(@RequestBody Map<String, Integer> request) {
@@ -261,7 +180,7 @@ public class BoardController {
 		int updatedLikes = bs.getLikes(boardNo);
 		boolean newLikedStatus = updatedLikes > 0;
 
-		// 응답 데이터 구성
+		// 응답 데이터
 		Map<String, Object> response = new HashMap<>();
 		response.put("liked", newLikedStatus);
 		response.put("likes", updatedLikes);

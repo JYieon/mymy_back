@@ -2,12 +2,21 @@ package com.trip.mymy.dto;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class BoardDTO {
 	int boardNo, boardCnt, boardLikes;
 	int boardCategory;
 	private Integer boardOpen;
 	String title, content, id, date; 
+	private List<String> hashtags;
+	
+	public List<String> getHashtags() {
+		return hashtags;
+	}
+	public void setHashtags(List<String> hashtags) {
+		this.hashtags = hashtags;
+	}
 	public Integer getBoardOpen() {
 		return boardOpen;
 	}
