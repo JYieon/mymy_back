@@ -1,4 +1,4 @@
-package com.trip.mymy.dto;
+package com.trip.mymy.dto.token;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

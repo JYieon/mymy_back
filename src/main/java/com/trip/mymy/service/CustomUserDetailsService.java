@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.trip.mymy.dto.CustomUserDetails;
 import com.trip.mymy.dto.MemberDTO;
+import com.trip.mymy.dto.token.CustomUserDetails;
 import com.trip.mymy.mybatis.AuthMapper;
 
 @Service

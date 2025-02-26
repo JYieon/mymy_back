@@ -1,4 +1,4 @@
-package com.trip.mymy.dto;
+package com.trip.mymy.dto.token;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

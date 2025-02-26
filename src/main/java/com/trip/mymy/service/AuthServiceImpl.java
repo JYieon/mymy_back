@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.trip.mymy.common.jwt.TokenProvider;
 import com.trip.mymy.dto.LoginReqDTO;
 import com.trip.mymy.dto.MemberDTO;
-import com.trip.mymy.dto.TokenDTO;
+import com.trip.mymy.dto.token.TokenDTO;
 import com.trip.mymy.mybatis.AuthMapper;
 
 @Service

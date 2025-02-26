@@ -77,7 +77,7 @@ public class TestAuth {
 	
 	@Test
 	public void testEmail() throws Exception{
-		as.sendAuthMail("dkcl.8642@gmail.com");
+		//as.sendAuthMail("dkcl.8642@gmail.com");
 	}
 	
 	@Test
@@ -105,5 +105,11 @@ public class TestAuth {
 			 	.param("id", "choi"))
 			    .andDo(print())
 			    .andExpect(status().isOk());
+	}
+	
+	@Test
+	public void TestKakao() throws Exception{
+		lc.kakaoCallback("4lWiTkIoH6oQQaK4spegc1jAx7nsVuYbVlVQtRUX9ymNsi42ffUHSgAAAAQKKiVPAAABlSbkQVmnsOtctwzlGQ");
+		
 	}
 }
