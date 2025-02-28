@@ -7,5 +7,4 @@
 
 	<context:component-scan base-package="com.trip.mymy">
 	</context:component-scan>
-
 </beans>

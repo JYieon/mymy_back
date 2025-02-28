@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {  // ✅ WebSecurityConfigurerAdapter 상속
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter { 
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -29,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {  // ✅ We
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {  // ✅ 기존 방식대로 configure 메서드 사용
+    protected void configure(HttpSecurity http) throws Exception {  
         http
             .httpBasic().disable()
             .csrf().disable()

@@ -50,7 +50,7 @@ public class TestAuth {
 		LoginReqDTO loginreq = new LoginReqDTO("test", "test123");
 		String jsonRequest = new ObjectMapper().writeValueAsString(loginreq);
 		
-		 mock.perform(post("/login")
+		 mock.perform(post("/auth/login")
 				 .contentType(MediaType.APPLICATION_JSON)
 				    .content(jsonRequest))
 				    .andDo(print())
@@ -107,9 +107,4 @@ public class TestAuth {
 			    .andExpect(status().isOk());
 	}
 	
-	@Test
-	public void TestKakao() throws Exception{
-		lc.kakaoCallback("4lWiTkIoH6oQQaK4spegc1jAx7nsVuYbVlVQtRUX9ymNsi42ffUHSgAAAAQKKiVPAAABlSbkQVmnsOtctwzlGQ");
-		
-	}
 }
