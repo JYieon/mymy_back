@@ -28,9 +28,7 @@ public class BoardDTO {
 	}
 	public void setBoardCategory(int boardCategory) {
 		this.boardCategory = boardCategory;
-	}
-	
-	
+	}	
 	public int getBoardNo() {
 		return boardNo;
 	}
