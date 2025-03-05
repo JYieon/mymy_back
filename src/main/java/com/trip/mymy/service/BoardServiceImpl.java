@@ -81,13 +81,15 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	// 게시글 목록 조회
-	public List<Map<String, Object>> getBoardList(int page) {
+	public List<Map<String, Object>> getBoardList(int page, int category) {
 		int limit = 6;
 		int offset = (page - 1) * limit;
 
 		Map<String, Integer> params = new HashMap<>();
 		params.put("offset", offset);
 		params.put("limit", limit);
+		params.put("category", category);  // 카테고리 추가
+
 
 		List<BoardDTO> boardList = mapper.getBoardList(params);
 		List<Map<String, Object>> responseList = new ArrayList<>();
@@ -118,8 +120,8 @@ public class BoardServiceImpl implements BoardService {
 		return responseList;
 	}
 	//전체 게시글 수
-	public int getTotalPosts() {
-		return mapper.getTotalPosts();
+	public int getTotalPosts(int category) {
+		return mapper.getTotalPosts(category);
 	}
 	//게시글 조회수 증가
 	private void boardCnt(int boardNo) {

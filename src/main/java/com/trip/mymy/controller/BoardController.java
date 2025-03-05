@@ -43,20 +43,24 @@ public class BoardController {
 	// 게시글 작성
 	@PostMapping("/writeSave")
 	public ResponseEntity<String> writeSave(@RequestBody BoardDTO dto) {
-		dto.setId("a"); // 기본 ID 설정
-		dto.setBoardCategory(1); // 기본 카테고리 설정
+	    dto.setId("a"); // 기본 ID 설정
 
-		System.out.println("받은 해시태그: " + dto.getHashtags());
-		
-		boolean success = bs.writeSave(dto);
-		  if (success) {
-			  if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-		            bs.addTags(dto.getBoardNo(), dto.getHashtags());
-		        }
-		        return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
-		    } else {
-		        return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
-		    }
+	    // 🔹 계획 게시글이면 공개 여부 및 해시태그 제거
+	    if (dto.getBoardCategory() == 1) {
+	        dto.setBoardOpen(null);
+	        dto.setHashtags(null);
+	    }
+
+	    boolean success = bs.writeSave(dto);
+	    if (success) {
+	        // 🔹 기록 게시글만 해시태그 추가
+	        if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+	            bs.addTags(dto.getBoardNo(), dto.getHashtags());
+	        }
+	        return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
+	    } else {
+	        return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
+	    }
 	}
 
 	// 이미지 업로드 처리uploadSummernoteImageFile
@@ -66,8 +70,7 @@ public class BoardController {
 		Map<String, String> response = new HashMap<>();
 
 		// 파일 저장 경로 설정 (여기서는 resources/upload 디렉토리로 설정)
-		String uploadDir = "C:/summernote_image/";
-
+		String uploadDir = "C:/summernote_image/"; 
 		File uploadFolder = new File(uploadDir);
 		if (!uploadFolder.exists()) {
 			uploadFolder.mkdirs(); // 폴더가 없으면 생성
@@ -96,16 +99,22 @@ public class BoardController {
 	
 	// 게시글 목록
 	@GetMapping("/list")
-	public ResponseEntity<Map<String, Object>> list(@RequestParam(value = "page", defaultValue = "1") int page) {
-	    int totalPosts = bs.getTotalPosts();
+	public ResponseEntity<Map<String, Object>> list(
+		@RequestParam(value = "page", defaultValue = "1") int page,
+		@RequestParam(value = "category", defaultValue = "1") int category
+		) {
+		System.out.println("요청 category:"+category);
+	    int totalPosts = bs.getTotalPosts(category);
+	    System.out.println("totalPosts:"+ totalPosts);
 	    int pageSize = 6;
 	    int totalPages = (totalPosts + pageSize - 1) / pageSize;
 
-	    if (totalPages == 0) totalPages = 1;
 
 	    // BoardDTO 대신 Map 형태로 데이터를 반환
-	    List<Map<String, Object>> boardList = bs.getBoardList(page);
-
+	    List<Map<String, Object>> boardList = bs.getBoardList(page, category);
+	    
+	    System.out.println("가져온 게시글 개수: "+boardList.size());
+	    
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("boardList", boardList);  // 게시글 데이터
 	    response.put("currentPage", page); //현재 페이지

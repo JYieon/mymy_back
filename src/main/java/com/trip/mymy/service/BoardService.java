@@ -8,11 +8,11 @@ import com.trip.mymy.dto.BoardRepDTO;
 
 public interface BoardService {
 	public boolean writeSave(BoardDTO dto);
-	public List<Map<String, Object>> getBoardList(int page);  // 게시글 목록 조회 추가
+	public List<Map<String, Object>> getBoardList(int page, int category);  // 게시글 목록 조회 추가
 	public BoardDTO getPost(int boardNo);
 	public boolean modify(BoardDTO dto);
 	public boolean delete(int boardNo);
-	public int getTotalPosts();
+	public int getTotalPosts(int category);
 	
 	// 좋아요
 	public void toggleLike(int boardNo);
