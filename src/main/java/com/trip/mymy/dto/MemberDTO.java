@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MemberDTO {
-	String id, pwd, name, nick, phone, email, level, bank, profile;
+	private String id, pwd, name, nick, phone, email, level, bank, profile;
 	
 	@Builder.Default
 	private List<GrantedAuthority> authorities = new ArrayList<>();

@@ -1,5 +1,7 @@
 package com.trip.mymy.dto;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import lombok.Getter;
@@ -9,12 +11,23 @@ import lombok.Setter;
 @Setter
 public class ChatMessageDTO {
 	public enum MessageType{
-		ENTER, TALK, CLOSE
+		ENTER, TALK, LEAVE
 	}
-	private MessageType type;
-	private int roomNum;
+	private Long roomNum;
 	private int msgNum;
 	private String member;
 	private String msg;
-	private Date msgDate;
+	private String msgDate;
+	private MessageType type;
+	
+	@Override
+	public String toString() {
+		return "MessageDTO{" +
+				"roomNum=" + roomNum +
+				"msgNum=" + msgNum +
+				"member=" + member +
+				"msg=" + msg +
+				"msgDate" + msgDate +
+				"type" + type + "}";
+	}
 }

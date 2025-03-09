@@ -103,7 +103,7 @@ public class TokenProvider {
         // Access Token 생성
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName()) // 사용자명 설정
-                .claim(AUTHORITIES_KEY, authorities)  // 권한 정보 저장
+                .claim(AUTHORITIES_KEY, "ROLE_USER")  // 권한 정보 저장
                 .setExpiration(accessTokenExpiresIn)  // 만료 시간 설정
                 .signWith(key, SignatureAlgorithm.HS512) // 서명 방식 설정
                 .compact();
@@ -128,22 +128,31 @@ public class TokenProvider {
 
     // 토큰에서 인증 객체 생성
     public Authentication getAuthentication(String accessToken) {
-        Claims claims = parseClaims(accessToken); //토큰 복호화
+    	System.out.println("토큰 복호화");
+    	System.out.println(accessToken);
+        Claims claims = parseClaims(accessToken); // 토큰 복호화
+        System.out.println(claims);
         // 토큰 복호화에 실패하면
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
-        
-        String id = claims.getSubject();
-        
+
+        String id = claims.getSubject(); // 사용자 ID 추출
+
+        // ID로 사용자 정보 조회 (예: MemberDTO)
         MemberDTO member = am.getUser(id);
 
-        // 권한 정보 추출
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-        
+        // 권한 정보 추출 (콤마로 구분된 권한들 처리)
+        String authoritiesString = claims.get(AUTHORITIES_KEY).toString();
+        if (authoritiesString == null || authoritiesString.isEmpty()) {
+            throw new RuntimeException("권한 정보가 비어 있습니다.");
+        }
+
+        // 권한이 여러 개일 경우 (콤마로 구분된 권한 처리)
+        Collection<? extends GrantedAuthority> authorities = Arrays.stream(authoritiesString.split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
         // 인증 객체 생성 후 반환
         return new UsernamePasswordAuthenticationToken(member, accessToken, authorities);
     }

@@ -23,7 +23,7 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
-	<!-- <beans:bean id="sock" class="com.trip.mymy.service.ChatService" />
+<!-- 	<beans:bean id="sock" class="com.trip.mymy.config.WebSocketMessageBrokerConfig" />
 	<websocket:handlers>
 		<websocket:mapping handler="sock" path="/socket"/>
 		<websocket:sockjs></websocket:sockjs>

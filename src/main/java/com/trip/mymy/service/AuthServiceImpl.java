@@ -27,7 +27,7 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Autowired JavaMailSender mailSender;
 	
-	public MemberDTO loginCheck(LoginReqDTO loginData) {
+	public MemberDTO loginCheck(LoginReqDTO loginData) { //비밀번호 확인 추가!!!!
 		MemberDTO dto = mapper.getUser(loginData.getId());
 		return dto;
 	}

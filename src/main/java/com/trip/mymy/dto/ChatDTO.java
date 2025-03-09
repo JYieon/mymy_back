@@ -1,7 +1,5 @@
 package com.trip.mymy.dto;
 
-import java.util.Date;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,18 +8,14 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ChatDTO {
+
+	@Builder.Default
+	private Long roomNum = null;
 	
 	private String member;
 	private String roomName;
-	private String role;
-	private Date enterDate; //입장
 	
 	@Builder.Default
-	private int roomNum = 0;
+	private String lastChat = null; //(마지막) 채팅날짜
 	
-	@Builder.Default
-	private Date lastChat = null; //(마지막) 채팅날짜
-	
-	@Builder.Default
-	private Date leaveDate = null; //퇴장
 }

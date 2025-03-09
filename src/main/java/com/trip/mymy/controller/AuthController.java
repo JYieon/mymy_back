@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @PropertySource("classpath:application.properties")
 public class AuthController {
 	
@@ -49,7 +49,7 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<TokenDTO> loginCheck(@RequestBody LoginReqDTO loginData) {
 		
-		MemberDTO member = ls.loginCheck(loginData);
+		MemberDTO member = ls.loginCheck(loginData); //아이디 유효성 검사
 	
 		if (member == null) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 로그인 실패
@@ -155,5 +155,4 @@ public class AuthController {
 		Authentication authentication = new UsernamePasswordAuthenticationToken(member.getEmail(), null, member.getAuthorities());
 	    return ResponseEntity.ok(tp.generateTokenDto(authentication)); // 로그인 성공, 토큰 반환
 	}
-	
 }
