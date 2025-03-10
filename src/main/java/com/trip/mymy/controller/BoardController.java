@@ -43,24 +43,24 @@ public class BoardController {
 	// 게시글 작성
 	@PostMapping("/writeSave")
 	public ResponseEntity<String> writeSave(@RequestBody BoardDTO dto) {
-	    dto.setId("a"); // 기본 ID 설정
+		dto.setId("a"); // 기본 ID 설정
 
-	    // 🔹 계획 게시글이면 공개 여부 및 해시태그 제거
-	    if (dto.getBoardCategory() == 1) {
-	        dto.setBoardOpen(null);
-	        dto.setHashtags(null);
-	    }
+		// 계획 게시글이면 공개 여부 및 해시태그 제거
+		if (dto.getBoardCategory() == 1) {
+			dto.setBoardOpen(null);
+			dto.setHashtags(null);
+		}
 
-	    boolean success = bs.writeSave(dto);
-	    if (success) {
-	        // 🔹 기록 게시글만 해시태그 추가
-	        if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-	            bs.addTags(dto.getBoardNo(), dto.getHashtags());
-	        }
-	        return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
-	    } else {
-	        return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
-	    }
+		boolean success = bs.writeSave(dto);
+		if (success) {
+			// 기록 게시글만 해시태그 추가
+			if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+				bs.addTags(dto.getBoardNo(), dto.getHashtags());
+			}
+			return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
+		} else {
+			return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
+		}
 	}
 
 	// 이미지 업로드 처리uploadSummernoteImageFile
@@ -96,76 +96,77 @@ public class BoardController {
 		}
 		return response;
 	}
-	
+
 	// 게시글 목록
+	// category - 1: 계획, 2: 기록, 3: 여행 메이트)
 	@GetMapping("/list")
 	public ResponseEntity<Map<String, Object>> list(
-		@RequestParam(value = "page", defaultValue = "1") int page,
-		@RequestParam(value = "category", defaultValue = "1") int category
-		) {
-		System.out.println("요청 category:"+category);
-	    int totalPosts = bs.getTotalPosts(category);
-	    System.out.println("totalPosts:"+ totalPosts);
-	    int pageSize = 6;
-	    int totalPages = (totalPosts + pageSize - 1) / pageSize;
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "category", defaultValue = "1") int category
+			) {
+		//System.out.println("요청 category:"+category);
+		int totalPosts = bs.getTotalPosts(category);
+		//System.out.println("totalPosts:"+ totalPosts);
+		int pageSize = 6;
+		int totalPages = (totalPosts + pageSize - 1) / pageSize;
 
 
-	    // BoardDTO 대신 Map 형태로 데이터를 반환
-	    List<Map<String, Object>> boardList = bs.getBoardList(page, category);
-	    
-	    System.out.println("가져온 게시글 개수: "+boardList.size());
-	    
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("boardList", boardList);  // 게시글 데이터
-	    response.put("currentPage", page); //현재 페이지
-	    response.put("totalPages", totalPages); // 전체 페이지 수
+		// BoardDTO 대신 Map 형태로 데이터를 반환
+		List<Map<String, Object>> boardList = bs.getBoardList(page, category);
 
-	    return ResponseEntity.ok(response);
+		//System.out.println("가져온 게시글 개수: "+boardList.size());
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("boardList", boardList);  // 게시글 데이터
+		response.put("currentPage", page); //현재 페이지
+		response.put("totalPages", totalPages); // 전체 페이지 수
+
+		return ResponseEntity.ok(response);
 	}
-	
+
 	// 게시글 상세 페이지
 	@GetMapping("/detail")
 	public ResponseEntity<Map<String, Object>> detail(@RequestParam("boardNo") int boardNo) {
-	    BoardDTO post = bs.getPost(boardNo);
-	    List<String> hashtags = bs.tagList(boardNo);  // 해시태그 조회
+		BoardDTO post = bs.getPost(boardNo);
+		List<String> hashtags = bs.tagList(boardNo);  // 해시태그 조회
 
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("post", post);
-	    response.put("hashtags", hashtags);
+		Map<String, Object> response = new HashMap<>();
+		response.put("post", post);
+		response.put("hashtags", hashtags);
 
-	    return ResponseEntity.ok(response);
+		return ResponseEntity.ok(response);
 	}
 
 	// 특정 게시글의 해시태그 조회
 	@GetMapping("/tags/{boardNo}")
 	public ResponseEntity<List<String>> getTags(@PathVariable int boardNo) {
-	    List<String> tags = bs.tagList(boardNo);
-	    return ResponseEntity.ok(tags);
+		List<String> tags = bs.tagList(boardNo);
+		return ResponseEntity.ok(tags);
 	}
 
 	// 게시글 수정
 	@PostMapping("/modify")
 	public ResponseEntity<String> modify(@RequestBody BoardDTO dto) {
-	    if (bs.modify(dto)) {
-	        bs.deleteTags(dto.getBoardNo());  // 기존 태그 삭제
-	        if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-	            bs.addTags(dto.getBoardNo(), dto.getHashtags());  // 새로운 태그 추가
-	        }
-	        return ResponseEntity.ok("게시글이 성공적으로 수정되었습니다.");
-	    } else {
-	        return ResponseEntity.badRequest().body("게시글 수정에 실패했습니다.");
-	    }
+		if (bs.modify(dto)) {
+			bs.deleteTags(dto.getBoardNo());  // 기존 태그 삭제
+			if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+				bs.addTags(dto.getBoardNo(), dto.getHashtags());  // 새로운 태그 추가
+			}
+			return ResponseEntity.ok("게시글이 성공적으로 수정되었습니다.");
+		} else {
+			return ResponseEntity.badRequest().body("게시글 수정에 실패했습니다.");
+		}
 	}
 
 
 	// 게시글 삭제
 	@DeleteMapping("/delete/{boardNo}")
 	public ResponseEntity<String> delete(@PathVariable int boardNo) {
-	    if (bs.delete(boardNo)) {
-	        return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
-	    } else {
-	        return ResponseEntity.badRequest().body("게시글 삭제에 실패했습니다.");
-	    }
+		if (bs.delete(boardNo)) {
+			return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
+		} else {
+			return ResponseEntity.badRequest().body("게시글 삭제에 실패했습니다.");
+		}
 	}
 
 
@@ -205,6 +206,29 @@ public class BoardController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("liked", likes > 0);  // 좋아요 여부
 		response.put("likes", likes);      // 좋아요 수
+
+		return ResponseEntity.ok(response);
+	}
+
+	// 검색 기능
+	@GetMapping("/search")
+	public ResponseEntity<Map<String, Object>> search(
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "category", defaultValue = "2") int category, // 기본: 기록 게시글(2)
+			@RequestParam(value = "searchType") String searchType,  // 검색 카테고리
+			@RequestParam(value = "keyword") String keyword
+			) {
+		int totalPosts = bs.getSearchTotalPosts(category, searchType, keyword);
+		int pageSize = 6;
+		int totalPages = (totalPosts + pageSize - 1) / pageSize;
+
+		System.out.println("검색요청:searchtype="+searchType+",keyword="+keyword+", page" + page);
+		List<Map<String, Object>> boardList = bs.searchBoardList(page, category, searchType, keyword);
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("boardList", boardList);
+		response.put("currentPage", page);
+		response.put("totalPages", totalPages);
 
 		return ResponseEntity.ok(response);
 	}

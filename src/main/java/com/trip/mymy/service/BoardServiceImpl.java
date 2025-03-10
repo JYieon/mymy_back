@@ -9,6 +9,7 @@ import java.util.Map;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,29 @@ import com.trip.mymy.mybatis.BoardMapper;
 public class BoardServiceImpl implements BoardService {
 
 	@Autowired BoardMapper mapper;
+	
+	public List<Map<String, Object>> searchBoardList(int page, int category, String searchType, String keyword) {
+	    int limit = 6;
+	    int offset = (page - 1) * limit;
+
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("offset", offset);
+	    params.put("limit", limit);
+	    params.put("category", category);
+	    params.put("searchType", searchType);
+	    params.put("keyword", "%" + keyword + "%"); // LIKE 검색을 위해 % 추가
+
+	    return mapper.searchBoardList(params);
+	}
+
+	public int getSearchTotalPosts(int category, String searchType, String keyword) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("category", category);
+	    params.put("searchType", searchType);
+	    params.put("keyword", "%" + keyword + "%");
+
+	    return mapper.getSearchTotalPosts(params);
+	}
 
 	// 댓글 저장
 	@Override
@@ -102,6 +126,7 @@ public class BoardServiceImpl implements BoardService {
 			postMap.put("boardCnt", post.getBoardCnt());
 			postMap.put("boardLikes", post.getBoardLikes());
 			postMap.put("boardOpen", post.getBoardOpen());
+			postMap.put("date", post.getDate().toString());
 
 			// 첫 번째 이미지 추출
 			String content = post.getContent();
@@ -258,9 +283,92 @@ public class BoardServiceImpl implements BoardService {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public boolean writeMateBoardSave(BoardDTO dto) {
+	    //System.out.println("writeMateBoardSave 요청 데이터: " + dto);
 
+	    dto.setBoardCategory(3); // 여행 메이트 게시판
+	    dto.setBoardOpen(1);  // 공개 설정
+	    dto.setBoardCnt(0);
+	    dto.setBoardLikes(0);
+	    
+	 // <br> 태그가 포함된 HTML을 그대로 저장
+	    String contentWithBr = dto.getContent().replace("\n", "<br>");
+	    dto.setContent(contentWithBr);
 
+	    int result = mapper.insertMateBoard(dto);
+	    return result > 0;
+	}
+	
+	public boolean modifyMateBoard(BoardDTO dto) {
+	    if (dto.getBoardNo() == 0 || dto.getTitle() == null || dto.getContent() == null) {
+	        return false; // 잘못된 요청이면 수정 불가
+	    }
 
+	    // `<br>` 태그 유지하도록 수정
+	    String cleanContent = dto.getContent().replace("\n", "<br>");
+
+	    dto.setContent(cleanContent);
+
+	    int result = mapper.modifyMateBoard(dto);
+	    return result == 1;
+	}
+
+	public boolean deleteMateBoard(int boardNo) {
+	    try {
+	        deleteTags(boardNo); // 태그 삭제
+	        mapper.deleteAllByBoardNo(boardNo); // 게시글 삭제
+	        return true;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
+	public BoardDTO getMateBoardDetail(int boardNo) {
+	    mapper.boardCnt(boardNo); // 조회수 증가
+	    BoardDTO post = mapper.getMateBoardDetail(boardNo);
+	    return post;
+	}
+	
+	public List<Map<String, Object>> searchMateBoardList(int page, int category, String searchType, String keyword) {
+	    int limit = 6;
+	    int offset = (page - 1) * limit;
+
+	    // % 중복 방지
+	    if (keyword.startsWith("%") && keyword.endsWith("%")) {
+	        keyword = keyword.substring(1, keyword.length() - 1);
+	    }
+
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("offset", offset);
+	    params.put("limit", limit);
+	    params.put("category", category);
+	    params.put("searchType", searchType);
+	    params.put("keyword", "%" + keyword + "%");
+
+	    try {
+	        return mapper.searchMateBoardList(params);
+	    } catch (Exception e) {
+	        throw new RuntimeException("SQL 실행 중 오류 발생: " + e.getMessage(), e);
+	    }
+	}
+
+	public int getSearchMateTotalPosts(String searchType, String keyword) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("category", 3);
+	    params.put("searchType", searchType);
+
+	    // LIKE 검색을 위해 % 추가
+	    if (!keyword.contains("%")) {
+	        params.put("keyword", "%" + keyword + "%");
+	    } else {
+	        params.put("keyword", keyword);
+	    }
+
+	    return mapper.getSearchMateTotalPosts(params);
+	}
 
 
 }

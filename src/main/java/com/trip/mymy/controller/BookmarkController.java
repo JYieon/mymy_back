@@ -37,7 +37,7 @@ public class BookmarkController {
 	@ResponseBody
 	public ResponseEntity<List<BoardDTO>> getBookmarkList(@RequestParam(defaultValue = "a") String id) {
 		List<BoardDTO> bookmarkList = bookmarkService.getBookmarkList(id);
-		return ResponseEntity.ok(bookmarkList); // ✅ JSON으로 반환
+		return ResponseEntity.ok(bookmarkList); // JSON으로 반환
 	}
 
 	// 북마크 상태 확인

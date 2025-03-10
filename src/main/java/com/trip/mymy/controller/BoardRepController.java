@@ -26,7 +26,7 @@ import com.trip.mymy.service.BoardService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
-@RequestMapping("/board") // ✅ 댓글도 /board 경로에서 처리
+@RequestMapping("/board")
 public class BoardRepController {
 
 	@Autowired
