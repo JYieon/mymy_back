@@ -123,4 +123,5 @@ public class ChatServiceImpl implements ChatService{
 		cm.saveMsg(chatMsg);
 	}
 	
+	
 }
