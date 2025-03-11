@@ -41,7 +41,6 @@ public class BookmarkServiceImpl implements BookmarkService{
 
 
     // 특정 게시글이 북마크되었는지 확인
-    @Override
     public boolean isBookmarked(String id, int boardNo) {
         return bookmarkMapper.checkBookmark(id, boardNo) > 0;
     }

@@ -4,8 +4,7 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.trip.mymy.mybatis.TimelineMapper">
-	<resultMap type="com.trip.mymy.dto.TimelineDTO"
-		id="TIMELINE_TB">
+	<resultMap type="com.trip.mymy.dto.TimelineDTO" id="TIMELINE_TB">
 		<id property="timelineId" column="TIMELINE_ID_PK" />
 		<result property="boardNo" column="BOARD_NO_PK" />
 		<result property="id" column="MEMBER_ID_PK" />
@@ -17,19 +16,33 @@
 		<result property="location" column="LOCATION" />
 	</resultMap>
 
-	<!-- 일정 조회 -->
-	<select id="TimelineList" resultMap="TIMELINE_TB">
-		SELECT * FROM TIMELINE_TB
-		WHERE BOARD_NO_PK = #{boardNo}
-	</select>
-
-	<!-- 일정 추가 -->
-	<insert id="addTimeline">
+	<!-- 타임라인 추가 -->
+	<insert id="insertTimeline">
 		INSERT INTO TIMELINE_TB (TIMELINE_ID_PK, BOARD_NO_PK, MEMBER_ID_PK,
 		START_DT, END_DT, TODO, LOCATION)
 		VALUES (TIMELINE_TB_SEQ.NEXTVAL, #{boardNo}, #{id}, #{startDt}, #{endDt},
 		#{todo}, #{location})
 	</insert>
 
+	<!-- 타임라인 가져오기 -->
+	<select id="getTimeline"
+		resultType="com.trip.mymy.dto.TimelineDTO">
+		SELECT TIMELINE_ID_PK as timelineId, BOARD_NO_PK as boardNo, MEMBER_ID_PK as id,
+		START_DT as startDt, END_DT as endDt, TODO, LOCATION
+		FROM TIMELINE_TB
+		WHERE BOARD_NO_PK = #{boardNo}
+	</select>
+
+	<!-- 삭제 -->
+	<delete id="deleteTimeline">
+		DELETE FROM TIMELINE_TB WHERE TIMELINE_ID_PK = #{timelineId}
+	</delete>
+	
+	<!-- 수정 -->
+	<update id="updateTimelineTodo">
+		UPDATE TIMELINE_TB
+		SET TODO = #{updatedTodo}
+		WHERE BOARD_NO_PK = #{boardNo}
+	</update>
 
 </mapper>

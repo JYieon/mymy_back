@@ -31,7 +31,6 @@ public class BookmarkController {
 		return ResponseEntity.ok(isBookmarked ? "북마크 추가" : "북마크 삭제");
 	}
 
-
 	// 사용자 북마크 목록 조회
 	@GetMapping("/list")
 	@ResponseBody

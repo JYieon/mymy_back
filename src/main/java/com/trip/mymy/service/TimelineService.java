@@ -5,7 +5,9 @@ import java.util.List;
 import com.trip.mymy.dto.TimelineDTO;
 
 public interface TimelineService {
-	public List<TimelineDTO> TimelineList(int boardNo);
-	public void addTimeline(TimelineDTO timeline);
-	
+	public void insertTimeline(TimelineDTO timeline);
+	public TimelineDTO getTimeline(int boardNo);
+	public void deleteTimeline(int timelineId);
+	public void updateTimelineTodo(int boardNo, String updatedTodo);
+
 }

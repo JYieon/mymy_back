@@ -49,7 +49,6 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	// 댓글 저장
-	@Override
 	public void addReply(BoardRepDTO replyDTO) {
 		// PARENT_NO가 NULL이면 기본값 0 설정
 		if (replyDTO.getParentNo() == null) {
@@ -278,13 +277,12 @@ public class BoardServiceImpl implements BoardService {
 	    return tags;
 	}
 
-	@Override
 	public void updateTags(int boardNo, List<String> tags) {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	@Override
+	// 여행 메이트 게시글 작성
 	public boolean writeMateBoardSave(BoardDTO dto) {
 	    //System.out.println("writeMateBoardSave 요청 데이터: " + dto);
 
@@ -293,7 +291,7 @@ public class BoardServiceImpl implements BoardService {
 	    dto.setBoardCnt(0);
 	    dto.setBoardLikes(0);
 	    
-	 // <br> 태그가 포함된 HTML을 그대로 저장
+	    // <br> 태그가 포함된 HTML을 그대로 저장
 	    String contentWithBr = dto.getContent().replace("\n", "<br>");
 	    dto.setContent(contentWithBr);
 
@@ -301,6 +299,7 @@ public class BoardServiceImpl implements BoardService {
 	    return result > 0;
 	}
 	
+	// 여행 메이트 게시글 수정
 	public boolean modifyMateBoard(BoardDTO dto) {
 	    if (dto.getBoardNo() == 0 || dto.getTitle() == null || dto.getContent() == null) {
 	        return false; // 잘못된 요청이면 수정 불가
@@ -314,10 +313,10 @@ public class BoardServiceImpl implements BoardService {
 	    int result = mapper.modifyMateBoard(dto);
 	    return result == 1;
 	}
-
+	
+	// 여행 메이트 게시글 삭제
 	public boolean deleteMateBoard(int boardNo) {
 	    try {
-	        deleteTags(boardNo); // 태그 삭제
 	        mapper.deleteAllByBoardNo(boardNo); // 게시글 삭제
 	        return true;
 	    } catch (Exception e) {
@@ -326,12 +325,14 @@ public class BoardServiceImpl implements BoardService {
 	    }
 	}
 
+	// 여행 메이트 게시글 상세페이지
 	public BoardDTO getMateBoardDetail(int boardNo) {
 	    mapper.boardCnt(boardNo); // 조회수 증가
 	    BoardDTO post = mapper.getMateBoardDetail(boardNo);
 	    return post;
 	}
 	
+	// 여행 메이트 검색
 	public List<Map<String, Object>> searchMateBoardList(int page, int category, String searchType, String keyword) {
 	    int limit = 6;
 	    int offset = (page - 1) * limit;
@@ -354,7 +355,8 @@ public class BoardServiceImpl implements BoardService {
 	        throw new RuntimeException("SQL 실행 중 오류 발생: " + e.getMessage(), e);
 	    }
 	}
-
+	
+	// 여행 메이트 검색결과
 	public int getSearchMateTotalPosts(String searchType, String keyword) {
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("category", 3);
