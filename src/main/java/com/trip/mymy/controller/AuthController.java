@@ -45,19 +45,24 @@ public class AuthController {
 
     @Value("${kakao.redirectUrl}")
     private String redirectUrl;
+    
+    @Value("${kakao.logoutRedirectUrl}")
+    private String logoutRedirectUrl;
 	
 	@PostMapping("/login")
-	public ResponseEntity<TokenDTO> loginCheck(@RequestBody LoginReqDTO loginData) {
+	public ResponseEntity<?> loginCheck(@RequestBody LoginReqDTO loginData) {
 		
-		MemberDTO member = ls.loginCheck(loginData); //아이디 유효성 검사
-	
-		if (member == null) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 로그인 실패
-	    }
+		Map<String, String> result = ls.loginCheck(loginData); //아이디 유효성 검사
 	    
-	    // 로그인 성공 시 토큰 생성
-		Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), null, member.getAuthorities());
-	    return ResponseEntity.ok(tp.generateTokenDto(authentication)); // 로그인 성공, 토큰 반환
+		if(result.containsKey("status")) {
+			// 로그인 성공 시 토큰 생성
+			MemberDTO member = ls.checkId(loginData.getId());
+			Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), null, member.getAuthorities());
+		    return ResponseEntity.ok(tp.generateTokenDto(authentication));
+		}else {
+			// 로그인 실패 시 실패 메세지 전달
+			return ResponseEntity.status(400).body(result);
+		}
 	}
 	
 	@PostMapping("/find_id")
@@ -75,7 +80,7 @@ public class AuthController {
 	@PostMapping("/mail_auth")
 	public ResponseEntity<String> authMail(@RequestParam String userAuth, String id) {
 		if(ls.authMail(userAuth)) {
-			String resetToken = tp.generateResetToken(id);
+			String resetToken = tp.generateResetToken(id); //비밀번호 재설정용 토큰
 			return ResponseEntity.ok(resetToken);
 		}else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증실패");
@@ -141,18 +146,26 @@ public class AuthController {
 			    .pwd("")
 			    .build();
 		
-		MemberDTO checkMember = ls.checkEmail(member.getEmail());
-		if(checkMember == null) { //기존 회원이 아니라면 자동 회원가입
+		MemberDTO existingMember = ls.checkEmail(member.getEmail());
+		if(existingMember == null) { //기존 회원이 아니라면 자동 회원가입
 			int result = ls.insertUser(member);
 			if(result == 1) {
 				System.out.println("자동회원가입 완료");
+				existingMember = member;
 			}else {
-				System.out.println("기존 회원 로그인입니다.");
+				System.out.println("회원가입 실패");
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		
 		 // 로그인 성공 시 토큰 생성
-		Authentication authentication = new UsernamePasswordAuthenticationToken(member.getEmail(), null, member.getAuthorities());
+		Authentication authentication = new UsernamePasswordAuthenticationToken(existingMember.getEmail(), null, existingMember.getAuthorities());
 	    return ResponseEntity.ok(tp.generateTokenDto(authentication)); // 로그인 성공, 토큰 반환
+	}
+	
+	@GetMapping("/kakao/logout")
+	public ResponseEntity<String> kakaoLogout() {
+		String location = "https://kauth.kakao.com/oauth/logout?client_id=" + clientId + "&logout_redirect_uri=" + logoutRedirectUrl;
+		
+		return ResponseEntity.ok(location);
 	}
 }
