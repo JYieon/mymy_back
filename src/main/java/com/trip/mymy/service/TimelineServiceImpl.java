@@ -1,13 +1,8 @@
 package com.trip.mymy.service;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trip.mymy.dto.TimelineDTO;
 import com.trip.mymy.mybatis.TimelineMapper;
 

@@ -1,6 +1,5 @@
 package com.trip.mymy.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +22,12 @@ public class TimelineController {
         return "타임라인 추가 성공";
     }
 
-    
     @GetMapping("/{boardNo}")
     public TimelineDTO getTimeline(@PathVariable int boardNo) {
         return ts.getTimeline(boardNo);
     }
 
-    
+
     @DeleteMapping("/delete/{timelineId}")
     public String deleteTimeline(@PathVariable int timelineId) {
     	ts.deleteTimeline(timelineId);

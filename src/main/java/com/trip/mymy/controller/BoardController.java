@@ -2,21 +2,14 @@ package com.trip.mymy.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.trip.mymy.dto.BoardDTO;
-import com.trip.mymy.dto.BoardRepDTO;
 import com.trip.mymy.service.BoardService;
 
 
@@ -84,10 +76,8 @@ public class BoardController {
 			File serverFile = new File(filePath);
 			file.transferTo(serverFile);
 			System.out.println("저장된 파일경로 "+filePath);
-
 			//절대 url 반환
 			String fullUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/" + fileName;
-
 			response.put("fileName", fileName); // 파일명 저장
 			response.put("url", fullUrl); // 절대 URL 저장
 		} catch (IOException e) {
@@ -104,9 +94,9 @@ public class BoardController {
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "category", defaultValue = "1") int category
 			) {
-		//System.out.println("요청 category:"+category);
+		System.out.println("요청 category:"+category);
 		int totalPosts = bs.getTotalPosts(category);
-		//System.out.println("totalPosts:"+ totalPosts);
+		System.out.println("totalPosts:"+ totalPosts);
 		int pageSize = 6;
 		int totalPages = (totalPosts + pageSize - 1) / pageSize;
 
@@ -114,7 +104,7 @@ public class BoardController {
 		// BoardDTO 대신 Map 형태로 데이터를 반환
 		List<Map<String, Object>> boardList = bs.getBoardList(page, category);
 
-		//System.out.println("가져온 게시글 개수: "+boardList.size());
+		System.out.println("가져온 게시글 개수: "+boardList.size());
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("boardList", boardList);  // 게시글 데이터
@@ -158,7 +148,6 @@ public class BoardController {
 		}
 	}
 
-
 	// 게시글 삭제
 	@DeleteMapping("/delete/{boardNo}")
 	public ResponseEntity<String> delete(@PathVariable int boardNo) {
@@ -168,7 +157,6 @@ public class BoardController {
 			return ResponseEntity.badRequest().body("게시글 삭제에 실패했습니다.");
 		}
 	}
-
 
 	// 좋아요 토글
 	@PostMapping("/like/toggle")
@@ -222,7 +210,7 @@ public class BoardController {
 		int pageSize = 6;
 		int totalPages = (totalPosts + pageSize - 1) / pageSize;
 
-		System.out.println("검색요청:searchtype="+searchType+",keyword="+keyword+", page" + page);
+		// System.out.println("검색요청:searchtype="+searchType+",keyword="+keyword+", page" + page);
 		List<Map<String, Object>> boardList = bs.searchBoardList(page, category, searchType, keyword);
 		
 		Map<String, Object> response = new HashMap<>();

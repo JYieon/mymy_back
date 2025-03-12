@@ -8,6 +8,7 @@
 //import static org.junit.Assert.assertTrue;
 //
 //import java.util.List;
+//import java.util.Map;
 //
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
@@ -30,181 +31,66 @@
 //	@Autowired BookmarkController bmc;
 //	@Autowired BookmarkService bms;
 //
-//	// BoardController
-//	@Test
-//	public void testBoardController() {
-//		System.out.println("--- BoardController: " + bc);
-//		assertNotNull(bc);
-//	}
-//
-//	// BoardService의 게시글 저장
-//	@Test
-//	public void testBoardServiceInsert() {
-//		BoardDTO dto = new BoardDTO();
-//		dto.setId("a");
-//		dto.setTitle("JUnit 테스트 게시글");  
-//		dto.setContent("JUnit 테스트");
-//		dto.setBoardOpen(0);
-//		dto.setBoardCategory(1);
-//
-//		// 게시글 저장
-//		String result = bs.writeSave(dto, "/test-path/");
-//		System.out.println("게시글 저장 결과: " + result);
-//
-//		assertTrue(result.contains("게시글이 성공적으로 저장되었습니다!"));
-//	}
-//
-//	// BoardService 게시글 목록 조회
-//	@Test
-//	public void testGetBoardList() {
-//		List<BoardDTO> list = bs.getBoardList(1);
-//		System.out.println("게시글 개수: " + list.size());
-//
-//		if (!list.isEmpty()) {
-//			System.out.println("첫 번째 게시글 제목: " + list.get(0).getTitle());
-//		}
-//
-//		assertNotSame(0, list.size());
-//	}
-//	
-//	// 게시글 수정 테스트
-//	@Test
-//	public void testModifyBoard() {
-//	    // 기존 게시글 중 하나 선택 (없으면 생성)
-//	    List<BoardDTO> list = bs.getBoardList(1);
-//	    int boardNo;
-//	    
-//	    if (!list.isEmpty()) {
-//	        boardNo = list.get(0).getBoardNo(); // 기존 게시글 선택
-//	    } else {
-//	        // 게시글이 없다면 새 게시글 추가
-//	        BoardDTO dto = new BoardDTO();
-//	        dto.setId("a");
-//	        dto.setTitle("수정 테스트 게시글");
-//	        dto.setContent("수정 테스트용 내용");
-//	        dto.setBoardOpen(0);
-//	        dto.setBoardCategory(1);
-//
-//	        String result = bs.writeSave(dto, "/test-path/");
-//	        System.out.println("새 게시글 생성 결과: " + result);
-//	        
-//	        // 생성된 게시글 번호 가져오기
-//	        boardNo = Integer.parseInt(result.replaceAll("[^0-9]", ""));
-//	    }
-//
-//	    // 수정할 내용 설정
-//	    BoardDTO modifiedDto = new BoardDTO();
-//	    modifiedDto.setBoardNo(boardNo);
-//	    modifiedDto.setTitle("수정된 게시글 제목");
-//	    modifiedDto.setContent("수정된 게시글 내용");
-//
-//	    String modifyResult = bs.modify(modifiedDto, "/test-path/");
-//	    System.out.println("게시글 수정 결과: " + modifyResult);
-//
-//	    BoardDTO updatedPost = bs.getPost(boardNo);
-//	    assertEquals("수정된 게시글 제목", updatedPost.getTitle());
-//	    assertEquals("수정된 게시글 내용", updatedPost.getContent());
-//	}
-//
-//	// 게시글 삭제 테스트
-//	@Test
-//	public void testDeleteBoard() {
-//	    // 기존 게시글 중 하나 선택 (없으면 생성)
-//	    List<BoardDTO> list = bs.getBoardList(1);
-//	    int boardNo;
-//
-//	    if (!list.isEmpty()) {
-//	        boardNo = list.get(0).getBoardNo(); // 기존 게시글 선택
-//	    } else {
-//	        // 게시글이 없다면 새 게시글 추가
-//	        BoardDTO dto = new BoardDTO();
-//	        dto.setId("a");
-//	        dto.setTitle("삭제 테스트 게시글");
-//	        dto.setContent("삭제 테스트용 내용");
-//	        dto.setBoardOpen(0);
-//	        dto.setBoardCategory(1);
-//
-//	        String result = bs.writeSave(dto, "/test-path/");
-//	        System.out.println("새 게시글 생성 결과: " + result);
-//	        
-//	        // 생성된 게시글 번호 가져오기
-//	        boardNo = Integer.parseInt(result.replaceAll("[^0-9]", ""));
-//	    }
-//	    String deleteResult = bs.delete(boardNo, "/test-path/");
-//	    System.out.println("게시글 삭제 결과: " + deleteResult);
-//
-//	    // 삭제된 게시글이 DB에서 존재하지 않는지 확인
-//	    BoardDTO deletedPost = bs.getPost(boardNo);
-//	    assertNull(deletedPost);
-//	}
-//	
-//	// BookmarkController
-//		@Test
-//		public void testBookmarkController() {
-//			System.out.println("--- BookmarkController: " + bmc);
-//			assertNotNull(bmc);
-//		}
-//
-//	// 북마크 추가 및 삭제
-//	@Test
-//	public void testBookmarkToggle() {
-//		String id = "a"; 
-//		int boardNo = 3; 
-//
-//		// 북마크 추가
-//		boolean isBookmarked = bms.toggleBookmark(id, boardNo);
-//		System.out.println("북마크 추가 결과: " + (isBookmarked ? "추가됨" : "이미 존재함"));
-//
-//		boolean existsAfterAdd = bms.isBookmarked(id, boardNo);
-//		assertTrue(existsAfterAdd);
-//
-//		// 북마크 삭제
-//		isBookmarked = bms.toggleBookmark(id, boardNo);
-//		System.out.println("북마크 삭제 결과: " + (isBookmarked ? "삭제됨" : "이미 삭제됨"));
-//
-//		boolean existsAfterDelete = bms.isBookmarked(id, boardNo);
-//		assertFalse(existsAfterDelete);
-//	}
-//
-//	// 북마크 목록 조회
-//	@Test
-//	public void testGetBookmarkList() {
-//		String id = "a"; 
-//		List<BoardDTO> bookmarkList = bms.getBookmarkList(id);
-//
-//		System.out.println("북마크된 게시글 개수: " + bookmarkList.size());
-//		if (!bookmarkList.isEmpty()) {
-//			System.out.println("첫 번째 북마크 게시글 제목: " + bookmarkList.get(0).getTitle());
-//		}
-//
-//		assertNotSame(0, bookmarkList.size());
-//	}
-//	
-//    // 좋아요 추가
+//	// ✅ 1️⃣ 일반 게시판 글 작성 테스트 (boardCategory = 1)
 //    @Test
-//    public void testIncreaseLike() {
-//        int boardNo = 33;  
-//        int beforeLikes = bs.getLikes(boardNo);
-//        bs.toggleLike(boardNo);
-//        int afterLikes = bs.getLikes(boardNo);
-//        assertEquals(beforeLikes + 1, afterLikes);
+//    public void testWriteNormalPost() {
+//        BoardDTO dto = new BoardDTO();
+//        dto.setId("a");
+//        dto.setTitle("일반 게시판 테스트");
+//        dto.setContent("이것은 일반 게시판 테스트입니다.");
+//        dto.setBoardOpen(1);
+//        dto.setBoardCategory(1); // 일반 게시판
+//
+//        boolean result = bs.writeSave(dto);
+//        assertTrue(result);
+//
+//        BoardDTO savedPost = bs.getPost(dto.getBoardNo());
+//        assertNotNull(savedPost);
+//        assertEquals(dto.getTitle(), savedPost.getTitle());
 //    }
 //
-//    // 좋아요 취소
+//    // ✅ 2️⃣ 기록 게시판 글 작성 테스트 (boardCategory = 2)
 //    @Test
-//    public void testDecreaseLike() {
-//        int boardNo = 33; 
-//        int beforeLikes = bs.getLikes(boardNo);
-//        bs.toggleLike(boardNo);
-//        int afterLikes = bs.getLikes(boardNo);
-//        assertEquals(beforeLikes - 1, afterLikes);
+//    public void testWriteRecordPost() {
+//        BoardDTO dto = new BoardDTO();
+//        dto.setId("a");
+//        dto.setTitle("기록 게시판 테스트");
+//        dto.setContent("이것은 기록 게시판 테스트입니다.");
+//        dto.setBoardOpen(1);
+//        dto.setBoardCategory(2); // 기록 게시판
+//
+//        boolean result = bs.writeSave(dto);
+//        assertTrue(result);
+//
+//        BoardDTO savedPost = bs.getPost(dto.getBoardNo());
+//        assertNotNull(savedPost);
+//        assertEquals(dto.getTitle(), savedPost.getTitle());
 //    }
 //
-//    // 좋아요 개수 
+//    // ✅ 3️⃣ 여행 메이트 게시판 글 작성 테스트 (boardCategory = 3)
 //    @Test
-//    public void testGetLikes() {
-//        int boardNo = 33;
-//        int likes = bs.getLikes(boardNo);
-//        assertTrue(likes >= 0);
+//    public void testWriteMatePost() {
+//        BoardDTO dto = new BoardDTO();
+//        dto.setId("a");
+//        dto.setTitle("여행 메이트 테스트");
+//        dto.setContent("이것은 여행 메이트 게시판 테스트입니다.");
+//        dto.setBoardOpen(1);
+//        dto.setBoardCategory(3); // 여행 메이트 게시판
+//
+//        boolean result = bs.writeMateBoardSave(dto);
+//        assertTrue(result);
+//
+//        BoardDTO savedPost = bs.getMateBoardDetail(dto.getBoardNo());
+//        assertNotNull(savedPost);
+//        assertEquals(dto.getTitle(), savedPost.getTitle());
 //    }
+//
+//    // ✅ 4️⃣ 모든 게시글이 정상적으로 조회되는지 확인
+//    @Test
+//    public void testGetBoardList() {
+//        List<Map<String, Object>> list = bs.getBoardList(1, 2); // 기록 게시판(2) 조회
+//        assertNotNull(list);
+//        assertTrue(list.size() >= 0); // 리스트가 0개여도 오류가 나면 안 됨
+//    }
+//	
 //}

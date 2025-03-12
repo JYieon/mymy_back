@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.trip.mymy.dto.BoardDTO;
-import com.trip.mymy.dto.BookmarkDTO;
 import com.trip.mymy.mybatis.BookmarkMapper;
 
 @Service
@@ -15,9 +14,9 @@ public class BookmarkServiceImpl implements BookmarkService{
 	@Autowired
 	public BookmarkMapper bookmarkMapper;
 	
-	//북마크 추가 삭제 토글
 	@Transactional
 	@Override
+	//북마크 추가 삭제 토글
     public boolean toggleBookmark(String id, int boardNo) {
 		// 북마크 여부 확인
         boolean exists = bookmarkMapper.checkBookmark(id, boardNo) > 0;

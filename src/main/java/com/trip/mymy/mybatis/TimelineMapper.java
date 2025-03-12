@@ -1,6 +1,5 @@
 package com.trip.mymy.mybatis;
 
-import java.util.List;
 import com.trip.mymy.dto.TimelineDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

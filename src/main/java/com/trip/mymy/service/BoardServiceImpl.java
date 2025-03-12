@@ -2,15 +2,11 @@ package com.trip.mymy.service;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Safelist;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,10 +109,11 @@ public class BoardServiceImpl implements BoardService {
 		params.put("limit", limit);
 		params.put("category", category);  // 카테고리 추가
 
-
+		//System.out.println("getBoardList"+offset +", limit=" + limit + ", category=" + category);
 		List<BoardDTO> boardList = mapper.getBoardList(params);
+		//System.out.println("조회된 게시글 개수:"+boardList.size());
 		List<Map<String, Object>> responseList = new ArrayList<>();
-
+		
 		for (BoardDTO post : boardList) {
 			Map<String, Object> postMap = new HashMap<>();
 			postMap.put("boardNo", post.getBoardNo());
