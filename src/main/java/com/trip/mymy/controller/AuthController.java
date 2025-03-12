@@ -52,15 +52,15 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<?> loginCheck(@RequestBody LoginReqDTO loginData) {
 		
-		Map<String, String> result = ls.loginCheck(loginData); //아이디 유효성 검사
+		Map<String, String> result = ls.loginCheck(loginData); //�븘�씠�뵒 �쑀�슚�꽦 寃��궗
 	    
 		if(result.containsKey("status")) {
-			// 로그인 성공 시 토큰 생성
+			// 濡쒓렇�씤 �꽦怨� �떆 �넗�겙 �깮�꽦
 			MemberDTO member = ls.checkId(loginData.getId());
 			Authentication authentication = new UsernamePasswordAuthenticationToken(member.getId(), null, member.getAuthorities());
 		    return ResponseEntity.ok(tp.generateTokenDto(authentication));
 		}else {
-			// 로그인 실패 시 실패 메세지 전달
+			// 濡쒓렇�씤 �떎�뙣 �떆 �떎�뙣 硫붿꽭吏� �쟾�떖
 			return ResponseEntity.status(400).body(result);
 		}
 	}
@@ -80,10 +80,10 @@ public class AuthController {
 	@PostMapping("/mail_auth")
 	public ResponseEntity<String> authMail(@RequestParam String userAuth, String id) {
 		if(ls.authMail(userAuth)) {
-			String resetToken = tp.generateResetToken(id); //비밀번호 재설정용 토큰
+			String resetToken = tp.generateResetToken(id); //鍮꾨�踰덊샇 �옱�꽕�젙�슜 �넗�겙
 			return ResponseEntity.ok(resetToken);
 		}else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증실패");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("�씤利앹떎�뙣");
 		}
 	}
 	
@@ -105,9 +105,9 @@ public class AuthController {
 	    MemberDTO dto = ls.checkId(id);
 	    
 	    if (dto == null) {
-	        return ResponseEntity.ok().body("사용 가능한 아이디입니다."); 
+	        return ResponseEntity.ok().body("�궗�슜 媛��뒫�븳 �븘�씠�뵒�엯�땲�떎."); 
 	    } else {
-	        return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 아이디입니다."); 
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body("�씠誘� �궗�슜 以묒씤 �븘�씠�뵒�엯�땲�떎."); 
 	    }
 	}
 	
@@ -122,7 +122,7 @@ public class AuthController {
 		}	
 	}
 	
-	//카카오 로그인
+	//移댁뭅�삤 濡쒓렇�씤
 	@GetMapping("/kakao")
 	public ResponseEntity<String> kakaoLogin(){
 		String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + clientId + "&redirect_uri=" + redirectUrl;
@@ -136,30 +136,30 @@ public class AuthController {
 		String accessToken = tp.getKakaoAccessToken(code);
 		HashMap<String, Object> userInfo = tp.getUserKakaoInfo(accessToken);
 		
-		System.out.println("*******카카오 유저 정보" + userInfo);
+		System.out.println("*******移댁뭅�삤 �쑀�� �젙蹂�" + userInfo);
 		MemberDTO member = MemberDTO.builder()
-			    .nick((String) userInfo.get("nickname"))  // 형 변환 필요
-			    .email((String) userInfo.get("email"))    // 형 변환 필요
-			    .id(String.valueOf(userInfo.get("id")))   // 숫자일 수도 있으므로 String 변환
+			    .nick((String) userInfo.get("nickname"))  // �삎 蹂��솚 �븘�슂
+			    .email((String) userInfo.get("email"))    // �삎 蹂��솚 �븘�슂
+			    .id(String.valueOf(userInfo.get("id")))   // �닽�옄�씪 �닔�룄 �엳�쑝誘�濡� String 蹂��솚
 			    .name("")
 			    .phone("")
 			    .pwd("")
 			    .build();
 		
 		MemberDTO existingMember = ls.checkEmail(member.getEmail());
-		if(existingMember == null) { //기존 회원이 아니라면 자동 회원가입
+		if(existingMember == null) { //湲곗〈 �쉶�썝�씠 �븘�땲�씪硫� �옄�룞 �쉶�썝媛��엯
 			int result = ls.insertUser(member);
 			if(result == 1) {
-				System.out.println("자동회원가입 완료");
+				System.out.println("�옄�룞�쉶�썝媛��엯 �셿猷�");
 				existingMember = member;
 			}else {
-				System.out.println("회원가입 실패");
+				System.out.println("�쉶�썝媛��엯 �떎�뙣");
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		 // 로그인 성공 시 토큰 생성
+		 // 濡쒓렇�씤 �꽦怨� �떆 �넗�겙 �깮�꽦
 		Authentication authentication = new UsernamePasswordAuthenticationToken(existingMember.getEmail(), null, existingMember.getAuthorities());
-	    return ResponseEntity.ok(tp.generateTokenDto(authentication)); // 로그인 성공, 토큰 반환
+	    return ResponseEntity.ok(tp.generateTokenDto(authentication)); // 濡쒓렇�씤 �꽦怨�, �넗�겙 諛섑솚
 	}
 	
 	@GetMapping("/kakao/logout")

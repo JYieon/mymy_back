@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TokenDTO {
-	private String grantType; // 인증 방식
-    private String accessToken; // 액세스 토큰
-    private String refreshToken; // 리프레시 토큰
-    private Long accessTokenExpiresIn; // 액세스 토큰 만료 시간
-    private Long refreshTokenExpiresIn; // 리프레시 토큰 만료 시간
+	private String grantType; // �씤利� 諛⑹떇
+    private String accessToken; // �븸�꽭�뒪 �넗�겙
+    private String refreshToken; // 由ы봽�젅�떆 �넗�겙
+    private Long accessTokenExpiresIn; // �븸�꽭�뒪 �넗�겙 留뚮즺 �떆媛�
+    private Long refreshTokenExpiresIn; // 由ы봽�젅�떆 �넗�겙 留뚮즺 �떆媛�
 }
