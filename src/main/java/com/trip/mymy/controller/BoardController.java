@@ -94,9 +94,9 @@ public class BoardController {
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "category", defaultValue = "1") int category
 			) {
-		System.out.println("요청 category:"+category);
+		//System.out.println("요청 category:"+category);
 		int totalPosts = bs.getTotalPosts(category);
-		System.out.println("totalPosts:"+ totalPosts);
+		//System.out.println("totalPosts:"+ totalPosts);
 		int pageSize = 6;
 		int totalPages = (totalPosts + pageSize - 1) / pageSize;
 
@@ -104,7 +104,7 @@ public class BoardController {
 		// BoardDTO 대신 Map 형태로 데이터를 반환
 		List<Map<String, Object>> boardList = bs.getBoardList(page, category);
 
-		System.out.println("가져온 게시글 개수: "+boardList.size());
+		//System.out.println("가져온 게시글 개수: "+boardList.size());
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("boardList", boardList);  // 게시글 데이터

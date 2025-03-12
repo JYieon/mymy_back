@@ -206,18 +206,24 @@ public class BoardServiceImpl implements BoardService {
 			// 게시글 수정
 			int result = mapper.modify(dto);
 
-			// 태그 재등록
 			if (result == 1) {
-				deleteTags(dto.getBoardNo());
-				if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-					addTags(dto.getBoardNo(), dto.getHashtags());
-				}
-				return true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
+	            // 계획 게시글이면 해시태그 제거
+	            if (dto.getBoardCategory() == 1) {
+	                deleteTags(dto.getBoardNo());
+	                dto.setHashtags(null); // DTO에서도 제거
+	            } else {
+	                // 기록 게시글만 태그 저장
+	                deleteTags(dto.getBoardNo());
+	                if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+	                    addTags(dto.getBoardNo(), dto.getHashtags());
+	                }
+	            }
+	            return true;
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return false;
 	}
 
 	// 게시글 삭제
@@ -281,7 +287,7 @@ public class BoardServiceImpl implements BoardService {
 	
 	// 여행 메이트 게시글 작성
 	public boolean writeMateBoardSave(BoardDTO dto) {
-	    //System.out.println("writeMateBoardSave 요청 데이터: " + dto);
+	    System.out.println("writeMateBoardSave 요청 데이터: " + dto);
 
 	    dto.setBoardCategory(3); // 여행 메이트 게시판
 	    dto.setBoardOpen(1);  // 공개 설정
@@ -293,6 +299,8 @@ public class BoardServiceImpl implements BoardService {
 	    dto.setContent(contentWithBr);
 
 	    int result = mapper.insertMateBoard(dto);
+	    System.out.println("insert 결과: "+result);
+	    System.out.println("저장된 boardNo:"+dto.getBoardNo());
 	    return result > 0;
 	}
 	
