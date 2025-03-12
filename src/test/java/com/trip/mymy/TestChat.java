@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.trip.mymy.dto.BankDTO;
-import com.trip.mymy.dto.BankServiceDTO;
+import com.trip.mymy.dto.money.BankDTO;
+import com.trip.mymy.dto.money.BankServiceDTO;
 import com.trip.mymy.mybatis.ChatMapper;
 import com.trip.mymy.mybatis.MoneyMapper;
 import com.trip.mymy.service.ChatServiceImpl;

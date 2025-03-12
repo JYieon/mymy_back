@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.trip.mymy.dto.ChatDTO;
-import com.trip.mymy.dto.ChatMemberDTO;
-import com.trip.mymy.dto.ChatMessageDTO;
+import com.trip.mymy.dto.chat.ChatDTO;
+import com.trip.mymy.dto.chat.ChatMemberDTO;
+import com.trip.mymy.dto.chat.ChatMessageDTO;
 
 public interface ChatMapper {
 	public int createRoom(ChatDTO chatRoom);

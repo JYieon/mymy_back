@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.trip.mymy.common.jwt.TokenProvider;
-import com.trip.mymy.dto.BankDTO;
-import com.trip.mymy.dto.BankServiceDTO;
-import com.trip.mymy.dto.ChatDTO;
-import com.trip.mymy.dto.ChatMessageDTO;
-import com.trip.mymy.dto.ChatResDTO;
 import com.trip.mymy.dto.MemberDTO;
+import com.trip.mymy.dto.chat.ChatDTO;
+import com.trip.mymy.dto.chat.ChatMessageDTO;
+import com.trip.mymy.dto.chat.ChatResDTO;
+import com.trip.mymy.dto.money.BankDTO;
+import com.trip.mymy.dto.money.BankServiceDTO;
 import com.trip.mymy.service.AuthServiceImpl;
 import com.trip.mymy.service.ChatServiceImpl;
 import com.trip.mymy.service.MoneyServiceImpl;

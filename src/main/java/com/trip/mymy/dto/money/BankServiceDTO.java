@@ -1,4 +1,4 @@
-package com.trip.mymy.dto;
+package com.trip.mymy.dto.money;
 
 import lombok.Setter;
 import lombok.Builder;

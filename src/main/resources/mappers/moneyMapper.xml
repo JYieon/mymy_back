@@ -4,21 +4,21 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.trip.mymy.mybatis.MoneyMapper">
-    <resultMap type="com.trip.mymy.dto.SettlementDTO" id="settle">
+    <resultMap type="com.trip.mymy.dto.money.SettlementDTO" id="settle">
     	<id property="settleNum" column="SETTLE_NUM_PK"/>
     	<result property="roomNum" column="ROOM_NUM_PK" />
     	<result property="toMember" column="TO_MEMBER_ID_FK" />
     	<result property="money" column="MONEY" />
     	<result property="check" column="SETTLE_CHECK"/>
     </resultMap>
-    <resultMap type="com.trip.mymy.dto.BankDTO" id="bank">
+    <resultMap type="com.trip.mymy.dto.money.BankDTO" id="bank">
     	<id property="roomNum" column="ROOM_NUM_PK" />
     	<result property="bankName" column="BANK_NAME" />
     	<result property="total" column="BANK_TOTAL_MONEY" />
     	<result property="target" column="BANK_TARGET_MONEY"/>
     	<result property="check" column="TARGET_CHECK"/>
     </resultMap>
-    <resultMap type="com.trip.mymy.dto.BankServiceDTO" id="bankSer">
+    <resultMap type="com.trip.mymy.dto.money.BankServiceDTO" id="bankSer">
     	<id property="bankSerNum" column="BANK_SERVICE_NUM_PK"/>
     	<result property="roomNum" column="ROOM_NUM_FK" />
     	<result property="member" column="MEMBER_ID_FK"/>

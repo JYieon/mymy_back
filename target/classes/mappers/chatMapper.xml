@@ -4,20 +4,20 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.trip.mymy.mybatis.ChatMapper">
-    <resultMap type="com.trip.mymy.dto.ChatDTO" id="chat">
+    <resultMap type="com.trip.mymy.dto.chat.ChatDTO" id="chat">
     	<id property="roomNum" column="ROOM_NUM_PK"/>
     	<result property="member" column="MEMBER_ID_FK" />
     	<result property="roomName" column="ROOM_NAME" />
     	<result property="lastChat" column="LAST_CHAT"/>
     </resultMap>
-    <resultMap type="com.trip.mymy.dto.ChatMemberDTO" id="chatMember">
+    <resultMap type="com.trip.mymy.dto.chat.ChatMemberDTO" id="chatMember">
 	    <id property="roomNum" column="ROOM_NUM_PK"/>
 	    <id property="member" column="MEMBER_ID_PK" jdbcType="VARCHAR"/>
 	    <result property="enterDate" column="ENTER_DATE" jdbcType="VARCHAR"/>
 	    <result property="leaveDate" column="LEAVE_DATE" jdbcType="VARCHAR"/>
 	    <result property="role" column="ROLE"/>
 	</resultMap>
-	<resultMap  type="com.trip.mymy.dto.ChatMessageDTO" id="message">
+	<resultMap  type="com.trip.mymy.dto.chat.ChatMessageDTO" id="message">
 	    <id property="msgNum" column="MSG_NUM_PK"/>
 	    <result property="roomNum" column="ROOM_NUM_FK"/>
 	    <result property="member" column="MEMBER_ID_FK"/>
@@ -25,7 +25,7 @@
 	    <result property="msg" column="MSG"/>
 	    <result property="type" column="MSG_TYPE"/>	    
 	</resultMap>
-	<resultMap id="chatRoomResultMap" type="com.trip.mymy.dto.ChatDTO">
+	<resultMap id="chatRoomResultMap" type="com.trip.mymy.dto.chat.ChatDTO">
 	    <result column="ROOM_NAME" property="roomName"/>
 	</resultMap>
     

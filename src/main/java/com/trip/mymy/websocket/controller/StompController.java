@@ -7,7 +7,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
-import com.trip.mymy.dto.ChatMessageDTO;
+import com.trip.mymy.dto.chat.ChatMessageDTO;
 import com.trip.mymy.service.ChatService;
 
 @Controller

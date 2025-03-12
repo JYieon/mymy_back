@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.trip.mymy.dto.BankDTO;
-import com.trip.mymy.dto.BankServiceDTO;
-import com.trip.mymy.dto.SettlementDTO;
+import com.trip.mymy.dto.money.BankDTO;
+import com.trip.mymy.dto.money.BankServiceDTO;
+import com.trip.mymy.dto.money.SettlementDTO;
 import com.trip.mymy.mybatis.MoneyMapper;
 
 @Service

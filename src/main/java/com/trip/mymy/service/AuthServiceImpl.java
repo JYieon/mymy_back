@@ -1,5 +1,6 @@
 package com.trip.mymy.service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.mail.internet.MimeMessage;
@@ -27,9 +28,19 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Autowired JavaMailSender mailSender;
 	
-	public MemberDTO loginCheck(LoginReqDTO loginData) { //비밀번호 확인 추가!!!!
+	public Map<String, String> loginCheck(LoginReqDTO loginData) { 
+		Map<String, String> result = new HashMap<String, String>();
 		MemberDTO dto = mapper.getUser(loginData.getId());
-		return dto;
+		if(dto == null) {
+			result.put("msg", "아이디가 존재하지 않습니다.");
+		}else {
+			if(dto.getPwd().equals(loginData.getPwd())) {
+				result.put("status", "200");
+			}else {
+				result.put("msg", "비밀번호가 존재하지 않습니다.");
+			}
+		}
+		return result;
 	}
 	
 	public String findId(String name, String email) {

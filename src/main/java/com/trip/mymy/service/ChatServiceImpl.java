@@ -10,10 +10,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.trip.mymy.dto.ChatDTO;
-import com.trip.mymy.dto.ChatMemberDTO;
-import com.trip.mymy.dto.ChatMessageDTO;
-import com.trip.mymy.dto.ChatResDTO;
+import com.trip.mymy.dto.chat.ChatDTO;
+import com.trip.mymy.dto.chat.ChatMemberDTO;
+import com.trip.mymy.dto.chat.ChatMessageDTO;
+import com.trip.mymy.dto.chat.ChatResDTO;
 import com.trip.mymy.mybatis.ChatMapper;
 
 @Service

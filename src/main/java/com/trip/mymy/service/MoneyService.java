@@ -2,9 +2,9 @@ package com.trip.mymy.service;
 
 import java.util.List;
 
-import com.trip.mymy.dto.BankDTO;
-import com.trip.mymy.dto.BankServiceDTO;
-import com.trip.mymy.dto.SettlementDTO;
+import com.trip.mymy.dto.money.BankDTO;
+import com.trip.mymy.dto.money.BankServiceDTO;
+import com.trip.mymy.dto.money.SettlementDTO;
 
 public interface MoneyService {
 	public int insertMemberBank(String id, String bankNum);

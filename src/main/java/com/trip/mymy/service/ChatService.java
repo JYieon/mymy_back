@@ -2,10 +2,10 @@ package com.trip.mymy.service;
 
 import java.util.List;
 
-import com.trip.mymy.dto.ChatDTO;
-import com.trip.mymy.dto.ChatMemberDTO;
-import com.trip.mymy.dto.ChatMessageDTO;
-import com.trip.mymy.dto.ChatResDTO;
+import com.trip.mymy.dto.chat.ChatDTO;
+import com.trip.mymy.dto.chat.ChatMemberDTO;
+import com.trip.mymy.dto.chat.ChatMessageDTO;
+import com.trip.mymy.dto.chat.ChatResDTO;
 
 public interface ChatService {
 	public List<ChatDTO> findChatList(String member);

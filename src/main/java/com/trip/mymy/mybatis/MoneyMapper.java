@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.trip.mymy.dto.BankDTO;
-import com.trip.mymy.dto.BankServiceDTO;
-import com.trip.mymy.dto.SettlementDTO;
+import com.trip.mymy.dto.money.BankDTO;
+import com.trip.mymy.dto.money.BankServiceDTO;
+import com.trip.mymy.dto.money.SettlementDTO;
 
 public interface MoneyMapper {
 
