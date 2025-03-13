@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<context:component-scan base-package="com.trip.mymy"></context:component-scan>
+
+    <!-- MyBatis 설정 -->
+    <!-- <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath:mappers/mypage/mypageMapper.xml"/>
+    </bean> -->
+
+    <!-- 트랜잭션 매니저 -->
+    <!-- <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean> -->
+
+    <!-- MyBatis 매퍼 스캔 -->
+    <!-- <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.trip.mymy.mybatis"/>
+    </bean> -->
+
+    <!-- MypageService 설정 -->
+    <!-- <bean id="mypageService" class="com.trip.mymy.service.MypageServiceImpl">
+    </bean> -->
+
+    <!-- MypageController 설정 -->
+   <!--  <bean id="mypageController" class="com.trip.mymy.controller.MypageController">
+        <property name="mypageService" ref="mypageService"/>
+    </bean>
+     -->
+</beans>

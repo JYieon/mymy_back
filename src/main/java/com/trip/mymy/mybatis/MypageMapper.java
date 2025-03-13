@@ -10,5 +10,6 @@ public interface MypageMapper {
     MypageDTO getMember(@Param("id") String id);
 
     // 회원 정보 수정
-    int isUpdateMember(MypageDTO dto);
+    int isUpdateMember(MypageDTO mdto);
 }
+

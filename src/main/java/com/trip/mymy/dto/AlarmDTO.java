@@ -2,21 +2,26 @@ package com.trip.mymy.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+
 public class AlarmDTO {
-	private String alarmId;
+	private int alarmNo;
 	private String senderId;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") //LocalDateTime을 JSON으로 변환할 때 포맷이 깨지지 않도록 설정
+	private LocalDateTime createdAt;
 	private String memberId;
-	private String alarmTypeId;
+	private int alarmTypeId;
 	private String alarmTypeName;
-	private String alarmContent;
-	private LocalDateTime createAt;
+	private String alarmContent = "";
+
 	
 	
-	public String getAlarmId() {
-		return alarmId;
+	public int getAlarmNo() {
+		return alarmNo;
 	}
-	public void setAlarmId(String alarmId) {
-		this.alarmId = alarmId;
+	public void setAlarmNo(int alarmNo) {
+		this.alarmNo = alarmNo;
 	}
 	public String getSenderId() {
 		return senderId;
@@ -24,16 +29,22 @@ public class AlarmDTO {
 	public void setSenderId(String senderId) {
 		this.senderId = senderId;
 	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 	public String getMemberId() {
 		return memberId;
 	}
 	public void setMemberId(String memberId) {
 		this.memberId = memberId;
 	}
-	public String getAlarmTypeId() {
+	public int getAlarmTypeId() {
 		return alarmTypeId;
 	}
-	public void setAlarmTypeId(String alarmTypeId) {
+	public void setAlarmTypeId(int alarmTypeId) {
 		this.alarmTypeId = alarmTypeId;
 	}
 	public String getAlarmTypeName() {
@@ -47,12 +58,6 @@ public class AlarmDTO {
 	}
 	public void setAlarmContent(String alarmContent) {
 		this.alarmContent = alarmContent;
-	}
-	public LocalDateTime getCreateAt() {
-		return createAt;
-	}
-	public void setCreateAt(LocalDateTime createAt) {
-		this.createAt = createAt;
 	}
 
 }

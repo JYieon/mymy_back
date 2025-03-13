@@ -31,11 +31,4 @@ public class MypageServiceImpl implements MypageService {
         return result > 0;
     }
 
-    // 추가된 메서드
-    @Override
-    public String modify(MypageDTO dto) {
-        System.out.println("회원 수정: " + dto);
-        int result = mypageMapper.isUpdateMember(dto);
-        return result > 0 ? "수정 성공" : "수정 실패";
-    }
 }
