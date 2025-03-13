@@ -32,7 +32,7 @@
 		INSERT INTO REPLY_TB(REPLY_NO_PK, MEMBER_ID_PK,
 		BOARD_NO_PK, REPLY_CONTENT,PARENT_NO, REPLY_DT)
 		VALUES
-		(REPLY_TB_SEQ.NEXTVAL, 'a', #{boardNo}, #{repContent}, #{parentNo},
+		(REPLY_TB_SEQ.NEXTVAL, #{id}, #{boardNo}, #{repContent}, #{parentNo},
 		sysdate)
 	</insert>
 

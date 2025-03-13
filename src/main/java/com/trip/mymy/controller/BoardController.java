@@ -2,27 +2,34 @@ package com.trip.mymy.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.trip.mymy.common.jwt.TokenProvider;
 import com.trip.mymy.dto.BoardDTO;
+import com.trip.mymy.dto.MemberDTO;
 import com.trip.mymy.service.BoardService;
 
 
@@ -31,28 +38,48 @@ import com.trip.mymy.service.BoardService;
 @RequestMapping("/board")
 public class BoardController {
 	@Autowired BoardService bs;
+	@Autowired TokenProvider tp;
 
-	// 게시글 작성
 	@PostMapping("/writeSave")
-	public ResponseEntity<String> writeSave(@RequestBody BoardDTO dto) {
-		dto.setId("a"); // 기본 ID 설정
+	public ResponseEntity<String> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
+	    // 토큰이 비어 있거나 null일 경우 처리
+	    if (token == null || token.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JWT 토큰이 비어 있거나 null입니다.");
+	    }
+	    try {
+	        // "Bearer " 부분을 제거하고 실제 토큰만 사용
+	        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
 
-		// 계획 게시글이면 공개 여부 및 해시태그 제거
-		if (dto.getBoardCategory() == 1) {
-			dto.setBoardOpen(null);
-			dto.setHashtags(null);
-		}
+	        // 토큰을 통해 인증 정보를 가져옴
+	        Authentication authentication = tp.getAuthentication(jwtToken);
+	        if (authentication == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
+	        }
 
-		boolean success = bs.writeSave(dto);
-		if (success) {
-			// 기록 게시글만 해시태그 추가
-			if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-				bs.addTags(dto.getBoardNo(), dto.getHashtags());
-			}
-			return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
-		} else {
-			return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
-		}
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal();
+	        dto.setId(member.getId()); // 사용자 ID 설정
+
+	        // 계획 게시글이면 공개 여부 및 해시태그 제거
+	        if (dto.getBoardCategory() == 1) {
+	            dto.setBoardOpen(null);
+	            dto.setHashtags(null);
+	        }
+
+	        // 게시글 저장
+	        boolean success = bs.writeSave(dto);
+	        if (success) {
+	            // 기록 게시글에만 해시태그 추가
+	            if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+	                bs.addTags(dto.getBoardNo(), dto.getHashtags());
+	            }
+	            return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
+	        } else {
+	            return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
+	        }
+	    } catch (Exception e) {
+	        // 예외 처리
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+	    }
 	}
 
 	// 이미지 업로드 처리uploadSummernoteImageFile
@@ -88,30 +115,54 @@ public class BoardController {
 	}
 
 	// 게시글 목록
-	// category - 1: 계획, 2: 기록, 3: 여행 메이트)
+	// category - 1: 계획, 2: 기록)
 	@GetMapping("/list")
 	public ResponseEntity<Map<String, Object>> list(
-			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "category", defaultValue = "1") int category
-			) {
-		//System.out.println("요청 category:"+category);
-		int totalPosts = bs.getTotalPosts(category);
-		//System.out.println("totalPosts:"+ totalPosts);
-		int pageSize = 6;
-		int totalPages = (totalPosts + pageSize - 1) / pageSize;
+			@RequestBody BoardDTO dto,
+	        @RequestParam(value = "page", defaultValue = "1") int page,
+	        @RequestParam(value = "category", defaultValue = "1") int category,
+	        @RequestHeader("Authorization") String token
+	) {
+	    // "Bearer " 부분을 제거하고 실제 토큰만 사용
+	    String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
 
+	    // 토큰을 통해 인증 정보를 가져옴
+	    Authentication authentication = tp.getAuthentication(jwtToken);
+	    if (authentication == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	    }
+	    MemberDTO member = (MemberDTO) authentication.getPrincipal(); // 로그인한 사용자의 ID 추출
+	    dto.setId(member.getId()); // 사용자 ID 설정
+	    // 페이지 처리
+	    int totalPosts = 0;
+	    List<Map<String, Object>> boardList = new ArrayList<>();
 
-		// BoardDTO 대신 Map 형태로 데이터를 반환
-		List<Map<String, Object>> boardList = bs.getBoardList(page, category);
+	    if (category == 1) {
+	        // category = 1일 때 로그인한 사용자 ID 기준으로 필터링
+	        totalPosts = bs.getTotalPosts(category); // 전체 게시글 수 (category 1)
+	        boardList = bs.getBoardList(page, category); // 전체 게시글 목록 (category 1)
+	        
+	        // 로그인한 사용자의 게시글만 필터링 (userId가 일치하는 게시글만 가져옴)
+	        boardList = boardList.stream()
+	                .filter(board -> board.get("MEMBER_ID_PK").equals(member.getId()))  // 필터링
+	                .collect(Collectors.toList());
+	    } else {
+	        // category = 2일 때 모든 게시글 조회
+	        totalPosts = bs.getTotalPosts(category); // 전체 게시글 수 (category 2)
+	        boardList = bs.getBoardList(page, category); // 전체 게시글 목록 (category 2)
+	    }
 
-		//System.out.println("가져온 게시글 개수: "+boardList.size());
+	    // 페이지 계산
+	    int pageSize = 6;
+	    int totalPages = (totalPosts + pageSize - 1) / pageSize;
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("boardList", boardList);  // 게시글 데이터
-		response.put("currentPage", page); //현재 페이지
-		response.put("totalPages", totalPages); // 전체 페이지 수
+	    // 응답 데이터 구성
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("boardList", boardList); // 게시글 목록
+	    response.put("currentPage", page); // 현재 페이지
+	    response.put("totalPages", totalPages); // 전체 페이지 수
 
-		return ResponseEntity.ok(response);
+	    return ResponseEntity.ok(response);
 	}
 
 	// 게시글 상세 페이지
