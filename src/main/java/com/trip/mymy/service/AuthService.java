@@ -18,4 +18,5 @@ public interface AuthService {
 	public MemberDTO checkId(String id);
 	public int sendSignupAuth(String toEmail);
 	public MemberDTO checkEmail(String email);
+	public MemberDTO checkNick(String nick);
 }

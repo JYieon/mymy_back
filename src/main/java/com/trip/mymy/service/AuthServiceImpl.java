@@ -125,5 +125,9 @@ public class AuthServiceImpl implements AuthService {
 	public MemberDTO checkEmail(String email) {
 		return mapper.checkEmail(email);
 	}
+	
+	public MemberDTO checkNick(String nick) {
+		return mapper.checkNick(nick);
+	}
 
 }

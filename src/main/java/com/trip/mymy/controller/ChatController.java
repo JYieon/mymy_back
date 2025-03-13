@@ -92,7 +92,7 @@ public class ChatController {
 	}
 
 	//예금주 조회
-    @PostMapping("/bank/check")
+    @GetMapping("/bank/check/name")
     public ResponseEntity<?> checkBankName(@RequestParam String bankCode, String bankNum, String token) {
     	
 		String bankHolderInfo = portOneService.getAccessToken(bankCode, bankNum);
@@ -104,10 +104,13 @@ public class ChatController {
 			int result = ms.insertMemberBank(member.getId(), bankNum); //통장번호 업데이트
 			if(result == 1) {
 				return ResponseEntity.status(200).build();  				
-			}
+			}else {
+		        return ResponseEntity.status(HttpStatus.CONFLICT).body("계좌 등록에 실패했습니다.");
+		    }
+		}else {
+			 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("예금주 정보가 일치하지 않습니다.");
 		}
 		
-		return ResponseEntity.status(400).build();
     }
     
     //정산추가
