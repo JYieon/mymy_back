@@ -11,6 +11,7 @@ import com.trip.mymy.dto.BoardRepDTO;
 public interface BoardMapper {
 	public int writeSave(BoardDTO dto);
 	public List<BoardDTO> getBoardList(Map<String, Integer> params);
+	public List<BoardDTO> getUserBoardList(@Param("offset") int offset, @Param("limit") int limit,@Param("category") int category, @Param("id") String id);
 	public int getTotalPosts(@Param("category") int category);
 	public BoardDTO getPost(int boardNo);
 	public int modify(BoardDTO dto);

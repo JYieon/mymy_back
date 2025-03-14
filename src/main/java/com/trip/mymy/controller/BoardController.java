@@ -118,38 +118,28 @@ public class BoardController {
 	// category - 1: 계획, 2: 기록)
 	@GetMapping("/list")
 	public ResponseEntity<Map<String, Object>> list(
-			@RequestBody BoardDTO dto,
+			@RequestParam String token,
 	        @RequestParam(value = "page", defaultValue = "1") int page,
-	        @RequestParam(value = "category", defaultValue = "1") int category,
-	        @RequestHeader("Authorization") String token
+	        @RequestParam(value = "category", defaultValue = "1") int category
+	        
 	) {
-	    // "Bearer " 부분을 제거하고 실제 토큰만 사용
-	    String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-
-	    // 토큰을 통해 인증 정보를 가져옴
-	    Authentication authentication = tp.getAuthentication(jwtToken);
-	    if (authentication == null) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-	    }
-	    MemberDTO member = (MemberDTO) authentication.getPrincipal(); // 로그인한 사용자의 ID 추출
-	    dto.setId(member.getId()); // 사용자 ID 설정
+	    
+	 
 	    // 페이지 처리
 	    int totalPosts = 0;
 	    List<Map<String, Object>> boardList = new ArrayList<>();
 
 	    if (category == 1) {
+	    	Authentication authentication = tp.getAuthentication(token);
+			MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
 	        // category = 1일 때 로그인한 사용자 ID 기준으로 필터링
 	        totalPosts = bs.getTotalPosts(category); // 전체 게시글 수 (category 1)
-	        boardList = bs.getBoardList(page, category); // 전체 게시글 목록 (category 1)
+	        boardList = bs.getBoardList(page, category, member.getId()); // 전체 게시글 목록 (category 1)
 	        
-	        // 로그인한 사용자의 게시글만 필터링 (userId가 일치하는 게시글만 가져옴)
-	        boardList = boardList.stream()
-	                .filter(board -> board.get("MEMBER_ID_PK").equals(member.getId()))  // 필터링
-	                .collect(Collectors.toList());
 	    } else {
 	        // category = 2일 때 모든 게시글 조회
 	        totalPosts = bs.getTotalPosts(category); // 전체 게시글 수 (category 2)
-	        boardList = bs.getBoardList(page, category); // 전체 게시글 목록 (category 2)
+	        boardList = bs.getBoardList(page, category, "none"); // 전체 게시글 목록 (category 2)
 	    }
 
 	    // 페이지 계산
@@ -164,6 +154,7 @@ public class BoardController {
 
 	    return ResponseEntity.ok(response);
 	}
+
 
 	// 게시글 상세 페이지
 	@GetMapping("/detail")

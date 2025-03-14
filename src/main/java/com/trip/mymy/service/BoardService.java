@@ -8,7 +8,7 @@ import com.trip.mymy.dto.BoardRepDTO;
 
 public interface BoardService {
 	public boolean writeSave(BoardDTO dto);
-	public List<Map<String, Object>> getBoardList(int page, int category);  // 게시글 목록 조회 추가
+	public List<Map<String, Object>> getBoardList(int page, int category, String id);  // 게시글 목록 조회 추가
 	public BoardDTO getPost(int boardNo);
 	public boolean modify(BoardDTO dto);
 	public boolean delete(int boardNo);

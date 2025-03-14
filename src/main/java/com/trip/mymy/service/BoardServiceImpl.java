@@ -100,17 +100,23 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	// 게시글 목록 조회
-	public List<Map<String, Object>> getBoardList(int page, int category) {
+	public List<Map<String, Object>> getBoardList(int page, int category, String id) {
 		int limit = 6;
 		int offset = (page - 1) * limit;
+		List<BoardDTO> boardList = new ArrayList<BoardDTO>();
 
 		Map<String, Integer> params = new HashMap<>();
 		params.put("offset", offset);
 		params.put("limit", limit);
 		params.put("category", category);  // 카테고리 추가
-
-		//System.out.println("getBoardList"+offset +", limit=" + limit + ", category=" + category);
-		List<BoardDTO> boardList = mapper.getBoardList(params);
+		
+		if(category == 1) {
+			boardList = mapper.getUserBoardList(offset, limit, category, id);
+		}else {
+			//System.out.println("getBoardList"+offset +", limit=" + limit + ", category=" + category);
+			boardList = mapper.getBoardList(params);
+		}
+		
 		//System.out.println("조회된 게시글 개수:"+boardList.size());
 		List<Map<String, Object>> responseList = new ArrayList<>();
 		
