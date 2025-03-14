@@ -13,13 +13,15 @@ import lombok.Setter;
 @Builder
 public class ChatMemberDTO {
 	
+	@Builder.Default
+	private Long roomNum = null;
+	
 	private String member;
 	private String enterDate;
 	private String role;
-	
-	@Builder.Default
-	private Long roomNum = null;
 
 	@Builder.Default
 	private String leaveDate = null; //퇴장
+	
+	private String nick;
 }

@@ -19,6 +19,7 @@ public class ChatMessageDTO {
 	private String msg;
 	private String msgDate;
 	private MessageType type;
+	private String nick;
 	
 	@Override
 	public String toString() {
