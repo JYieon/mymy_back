@@ -17,7 +17,7 @@ public class StompController {
 	private final Logger logger = LoggerFactory.getLogger(StompController.class);
 	
 	@MessageMapping("/sendMessage/chatRoomNo/{chatRoomNum}")
-	@SendTo("/chat/chatRoomNo/{chatRoomNum}/message")
+	@SendTo("/topic/chatRoomNo/{chatRoomNum}/message")
 	public ChatMessageDTO insertChatMessage(ChatMessageDTO chatMessage) {
 		
 		System.out.println(chatMessage);
