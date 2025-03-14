@@ -49,16 +49,22 @@
     <delete id="deleteMember">
     	delete from CHAT_MEMBER_TB where ROOM_NUM_PK = #{roomNum} and MEMBER_ID_PK = #{member}
     </delete>
+    <delete id="deleteMessage">
+    	delete from MESSAGE_TB where ROOM_NUM_FK = #{roomNum}
+    </delete>
     <insert id="saveMsg">
     	insert into MESSAGE_TB values (MESSAGE_TB_SEQ.nextval, #{roomNum}, #{member}, CURRENT_TIMESTAMP, #{msg}, #{type})
     </insert>
     <select id="getRoomMessages" resultMap="message">
-    	select msg.*, m.MEMBER_NICK from MESSAGE_TB msg left join MEMBER_TB m on msg.MEMBER_ID_FK = m.MEMBER_ID_PK where ROOM_NUM_FK = #{roomNum}
+    	select msg.*, m.MEMBER_NICK from MESSAGE_TB msg left join MEMBER_TB m on msg.MEMBER_ID_FK = m.MEMBER_ID_PK where ROOM_NUM_FK = #{roomNum}  order by msg.MSG_DATE ASC
     </select>
     <select id="findRoomMember" resultMap="chatMember">
     	select c.*, m.MEMBER_NICK from CHAT_MEMBER_TB c left join MEMBER_TB m on c.MEMBER_ID_PK = m.MEMBER_ID_PK where ROOM_NUM_PK = #{roomNum}
     </select>
     <select id="findChatRoom" resultMap="chat">
     	select * from CHAT_ROOM_TB where ROOM_NUM_PK = #{roomNum}
+    </select>
+    <select id="getUserChatRole" resultType="string">
+    	select ROLE from CHAT_MEMBER_TB where ROOM_NUM_PK = #{roomNum} and MEMBER_ID_PK = #{id}
     </select>
 </mapper>

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -88,7 +90,22 @@ public class ChatController {
 	    	int result = cs.inviteMember(inviteUser, Long.parseLong(roomNum));
 			return ResponseEntity.ok(result);
 	    }
+	}
+	
+	@DeleteMapping("endChat")
+	public ResponseEntity<?> endChat(@RequestParam Long roomNum, String token) {
+		System.out.println("endChat");
+		System.out.println(roomNum + token);
+		Authentication authentication = tp.getAuthentication(token);
+		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
 		
+		int result = cs.removeRoom(roomNum, member.getId());
+		if(result == 1) {
+			System.out.println("나가기 성공");
+			return ResponseEntity.ok().build();
+		}else {
+			return ResponseEntity.status(500).build();
+		}
 	}
 
 	//예금주 조회

@@ -78,13 +78,23 @@ public class ChatServiceImpl implements ChatService{
 		 return result;
 	}
 	
-	public void removeRoom(Long roomNum, String member, String role) {
-		if(role.equals("방장")) {
+	public int removeRoom(Long roomNum, String member) {
+		String memberRole = cm.getUserChatRole(roomNum, member);
+		System.out.println(memberRole);
+		int result = 0;
+		
+		if(memberRole.equals("방장")) {
 			cm.removeRoomMember(roomNum);
-			cm.removeRoom(roomNum);	
+			cm.deleteMessage(roomNum);
+			result = cm.removeRoom(roomNum);	
 		}else {
-			cm.deleteMember(roomNum, member);
+			System.out.println("멤버 나가기");
+			System.out.println(roomNum);
+			result = cm.deleteMember(roomNum, member);
+			enterLeaveMsg(member, roomNum, "leave");
 		}
+		System.out.println("service" + result);
+		return result;
 	}
 	
 	public void enterLeaveMsg(String member, Long roomNum, String type) {
