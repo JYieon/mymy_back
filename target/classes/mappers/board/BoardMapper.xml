@@ -86,12 +86,13 @@
 		OFFSET #{offset}
 		ROWS FETCH NEXT #{limit} ROWS ONLY
 	</select>
-	
+
 	<select id="getUserBoardList" resultMap="BOARD_TB">
 		SELECT * FROM BOARD_TB
 		WHERE
 		BOARD_CATEGORY = #{category} AND MEMBER_ID_PK = #{id}
-		ORDER BY BOARD_NO_PK DESC
+		ORDER BY
+		BOARD_NO_PK DESC
 		OFFSET #{offset}
 		ROWS FETCH NEXT #{limit} ROWS ONLY
 	</select>
@@ -141,25 +142,35 @@
 		END;
 	</delete>
 
-	<!-- 좋아요 수 증가 -->
-	<update id="increaseLike">
-		UPDATE BOARD_TB
-		SET BOARD_LIKES = BOARD_LIKES + 1
-		WHERE BOARD_NO_PK = #{boardNo}
-	</update>
-
-	<!-- 좋아요 수 감소 -->
-	<update id="decreaseLike">
-		UPDATE BOARD_TB
-		SET BOARD_LIKES = BOARD_LIKES - 1
-		WHERE BOARD_NO_PK = #{boardNo} AND BOARD_LIKES > 0
-	</update>
-
 	<!-- 특정 게시글의 좋아요 수 조회 -->
-	<select id="getLikes" resultType="int">
-		SELECT BOARD_LIKES FROM
-		BOARD_TB WHERE BOARD_NO_PK = #{boardNo}
+	<select id="getBoardLikes" resultType="int">
+		SELECT COUNT(*) FROM
+		LIKE_TB WHERE BOARD_NO_PK = #{boardNo}
 	</select>
+
+	<!-- 각 id별 좋아요 체크 -->
+	<select id="checkUserLike" parameterType="map">
+		SELECT COUNT(*) FROM
+		LIKE_TB
+		WHERE MEMBER_ID_PK =
+		#{id}
+		AND BOARD_NO_PK = #{boardNo}
+	</select>
+	
+	<!-- 좋아요 추가 -->
+	<insert id="addLike" parameterType="map">
+		INSERT INTO LIKE_TB (LIKE_NO_PK, MEMBER_ID_PK, BOARD_NO_PK)
+		VALUES (LIKE_TB_SEQ.NEXTVAL, #{id}, #{boardNo})
+	</insert>
+
+	<!-- 각 id별 좋아요 삭제 -->
+	<delete id="removeLike">
+		DELETE FROM LIKE_TB
+		WHERE MEMBER_ID_PK = #{id}
+		AND
+		BOARD_NO_PK = #{boardNo}
+	</delete>
+
 
 	<insert id="insertTag" parameterType="string">
 		INSERT INTO TAG_TB
@@ -285,7 +296,8 @@
 	</select>
 
 	<!-- 여행 메이트 게시글 작성 -->
-	<insert id="insertMateBoard" parameterType="com.trip.mymy.dto.BoardDTO">
+	<insert id="insertMateBoard"
+		parameterType="com.trip.mymy.dto.BoardDTO">
 		<!-- INSERT 후 BOARD_NO_PK 가져오기 -->
 		<selectKey keyProperty="boardNo" resultType="int"
 			order="AFTER">

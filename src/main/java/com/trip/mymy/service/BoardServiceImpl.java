@@ -77,27 +77,29 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	//게시글 좋아요
-	public void toggleLike(int boardNo) {
-		// 현재 좋아요 개수 가져오기
-		int currentLikes = mapper.getLikes(boardNo);
-
-		// 좋아요 개수가 0이면 증가, 아니면 감소
-		if (currentLikes == 0) {
-			mapper.increaseLike(boardNo);
-		} else {
-			mapper.decreaseLike(boardNo);
+	public boolean toggleLike(String id, int boardNo) {
+		
+		Map<String, Object> params= new HashMap<>();
+		params.put("id", id);
+		params.put("boardNo", boardNo);
+		
+		int liked= mapper.checkUserLike(id, boardNo);
+		
+		if(liked == 0) {
+			mapper.addLike(params);
+		}else {
+			mapper.removeLike(params);
 		}
+		return liked == 0;
 	}
 
-	public int getLikes(int boardNo) {
-		return mapper.getLikes(boardNo);
+	public int getBoardLikes(int boardNo) {
+		return mapper.getBoardLikes(boardNo);
 	}
-	public void increaseLike(int boardNo) {
-		mapper.increaseLike(boardNo);
-	}
-	public void decreaseLike(int boardNo) {
-		mapper.decreaseLike(boardNo);
-	}
+	
+	public boolean checkUserLike(String id, int boardNo) {
+        return mapper.checkUserLike(id, boardNo) > 0;
+    }
 
 	// 게시글 목록 조회
 	public List<Map<String, Object>> getBoardList(int page, int category, String id) {

@@ -15,10 +15,9 @@ public interface BoardService {
 	public int getTotalPosts(int category);
 
 	// 좋아요
-	public void toggleLike(int boardNo);
-	public int getLikes(int boardNo);
-	public void increaseLike(int boardNo);
-	public void decreaseLike(int boardNo);
+	public boolean toggleLike(String id, int boardNo);
+	public int getBoardLikes(int boardNo);
+	public boolean checkUserLike(String id, int boardNo);
 
 	// 댓글
 	public void addReply(BoardRepDTO replyDTO);

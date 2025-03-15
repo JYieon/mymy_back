@@ -19,9 +19,10 @@ public interface BoardMapper {
 	public int deleteAllByBoardNo(@Param("boardNo") int boardNo);
 
 	// 좋아요
-	public int getLikes(@Param("boardNo") int boardNo);
-	public int increaseLike(@Param("boardNo") int boardNo);
-	public int decreaseLike(@Param("boardNo") int boardNo);
+	public int getBoardLikes(@Param("boardNo") int boardNo);
+	public int checkUserLike(@Param("id") String id, @Param("boardNo") int boardNo);
+	public void addLike(Map<String, Object> params);
+	public void removeLike(Map<String, Object> params);
 
 	// 댓글
 	public void addReply(BoardRepDTO replyDTO);
@@ -38,7 +39,6 @@ public interface BoardMapper {
 	// 검색
 	public List<Map<String, Object>> searchBoardList(Map<String, Object> params);
 	public int getSearchTotalPosts(Map<String, Object> params);
-
 
 	// 여행
 	public int insertMateBoard(BoardDTO dto);
