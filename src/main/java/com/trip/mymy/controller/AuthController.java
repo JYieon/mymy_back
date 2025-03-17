@@ -65,7 +65,7 @@ public class AuthController {
 		}
 	}
 	
-	@PostMapping("/find/id")
+	@GetMapping("/find/id")
 	public ResponseEntity<String> findId(@RequestParam String name, String email) {
 		System.out.println(name + email);
 		return ResponseEntity.ok(ls.findId(name, email));
@@ -80,10 +80,10 @@ public class AuthController {
 	@PostMapping("/mail/auth")
 	public ResponseEntity<String> authMail(@RequestParam String userAuth, String id) {
 		if(ls.authMail(userAuth)) {
-			String resetToken = tp.generateResetToken(id); //비밀번호 재설정용 토큰
-			return ResponseEntity.ok(resetToken);
+//			String resetToken = tp.generateResetToken(id); //비밀번호 재설정용 토큰
+			return ResponseEntity.ok().body("인증성공");
 		}else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증실패");
+			return ResponseEntity.status(401).body("인증실패");
 		}
 	}
 	

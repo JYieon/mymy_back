@@ -24,4 +24,5 @@ public class ChatMemberDTO {
 	private String leaveDate = null; //퇴장
 	
 	private String nick;
+	private String profile;
 }
