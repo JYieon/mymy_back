@@ -13,7 +13,7 @@ public class AlarmDTO {
 	private String memberId;
 	private int alarmTypeId;
 	private String alarmTypeName;
-	private String alarmContent = "";
+	private String alarmContent;
 
 	
 	

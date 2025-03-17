@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trip.mymy.mybatis.MyBoardMapper">
+
+	<!-- 내가 쓴 글 조회 -->
+	<select id="findMyPosts" parameterType="String"
+		resultType="com.trip.mymy.dto.MyBoardDTO">
+		SELECT
+		BOARD_NO_PK AS boardNo,
+		BOARD_TITLE AS title,
+		BOARD_CONTENT AS content,
+		MEMBER_ID_PK AS id,
+		TO_CHAR(BOARD_DT, 'YYYY-MM-DD HH24:MI:SS') AS boardDate,  <!-- ✅ 'date' 대신 'boardDate' 사용 -->
+		BOARD_CATEGORY AS boardCategory,
+		BOARD_CNT AS boardCnt,
+		BOARD_LIKES AS boardLikes
+		FROM BOARD_TB
+		WHERE MEMBER_ID_PK = #{userId}
+		ORDER BY BOARD_NO_PK DESC
+	</select>
+
+
+	<!-- 내가 쓴 댓글 조회 -->
+	<select id="findMyComments" parameterType="String"
+		resultType="com.trip.mymy.dto.MyBoardDTO">
+		SELECT
+		R.BOARD_NO_PK AS boardNo,
+		R.REPLY_CONTENT AS content,
+		B.BOARD_TITLE AS originalPost,
+		R.MEMBER_ID_PK AS id,
+		TO_CHAR(R.REPLY_DT, 'YYYY-MM-DD HH24:MI:SS') AS boardDate,
+		B.BOARD_CATEGORY AS boardCategory,
+		B.BOARD_CNT AS boardCnt,
+		(SELECT COUNT(*) FROM REPLY_TB WHERE BOARD_NO_PK = R.BOARD_NO_PK) AS
+		replyCount,
+		B.BOARD_LIKES AS boardLikes
+		FROM REPLY_TB R
+		JOIN BOARD_TB B ON R.BOARD_NO_PK = B.BOARD_NO_PK
+		WHERE R.MEMBER_ID_PK = #{userId}
+		ORDER BY R.REPLY_NO_PK DESC
+	</select>
+</mapper>

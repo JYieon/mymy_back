@@ -22,16 +22,16 @@ public class MypageController {
     @Autowired
     MypageService mypageService;
     
-    //로그인 없이 aaa계정 테스트, 합친 뒤 삭제
-    @GetMapping("/test/setDummyUser")
-    public ResponseEntity<MypageDTO> setDummyUser(HttpSession session) {
-        MypageDTO dummyUser = mypageService.getMember("aaa");
-        if (dummyUser != null) {
-            session.setAttribute("user", dummyUser);
-            return ResponseEntity.ok(dummyUser);
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    }
+//    //로그인 없이 aaa계정 테스트, 합친 뒤 삭제
+//    @GetMapping("/test/setDummyUser")
+//    public ResponseEntity<MypageDTO> setDummyUser(HttpSession session) {
+//        MypageDTO dummyUser = mypageService.getMember("aaa");
+//        if (dummyUser != null) {
+//            session.setAttribute("user", dummyUser);
+//            return ResponseEntity.ok(dummyUser);
+//        }
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//    }
     
     @GetMapping("/userinfo/me")
     public ResponseEntity<MypageDTO> getCurrentUser(HttpSession session) {
@@ -43,10 +43,10 @@ public class MypageController {
     }
 
     //회원 정보 조회
-    @GetMapping("/userinfo")
-    public ResponseEntity<MypageDTO> getUserInfo(@RequestParam("id") String id) {
-        logger.info("회원 정보 조회 요청: ID = {}", id);
-        MypageDTO userInfo = mypageService.getMember(id);
+    @GetMapping("/{usereId}")
+    public ResponseEntity<MypageDTO> getUserInfo(@PathVariable("userId") String userId) {
+        logger.info("회원 정보 조회 요청: ID = {}", userId);
+        MypageDTO userInfo = mypageService.getMember(userId);
         if (userInfo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }

@@ -1,5 +1,6 @@
 package com.trip.mymy.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import com.trip.mymy.dto.AlarmDTO;
 import com.trip.mymy.dto.AlarmSettingsDTO;
 import com.trip.mymy.service.AlarmService;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
@@ -34,6 +38,58 @@ public class AlarmController {
 	    
 	    return ResponseEntity.ok(settings);
 	}
+	
+	/**
+     * 특정 사용자의 알람 목록 조회 API
+     * @param userId 알람을 조회할 사용자의 ID
+     * @return 해당 사용자의 알람 리스트
+     */
+	@GetMapping("/alarm/list")
+	public ResponseEntity<List<AlarmDTO>> getAlarms(@RequestHeader("Authorization") String token) {
+	    System.out.println("받은 토큰: " + token);
+
+	    String userId = extractUserIdFromToken(token);
+	    System.out.println("추출된 userId: " + userId);
+	    
+	    if (userId == null || userId.trim().isEmpty()) {
+	        System.out.println("userId가 NULL이거나 공백입니다! API 요청 중단.");
+	        return ResponseEntity.badRequest().build();
+	    }
+
+	    List<AlarmDTO> alarms = alarmService.getAlarms(userId);
+	    return ResponseEntity.ok(alarms);
+	}
+
+
+	// JWT에서 userId 추출하는 메서드 추가
+	private String extractUserIdFromToken(String token) {
+	    try {
+	        System.out.println("원본 토큰: " + token);  // 디버깅 추가
+
+	        token = token.replace("Bearer ", "").trim(); // "Bearer " 제거 및 공백 제거
+	        System.out.println("변환된 토큰: " + token);  //  디버깅 추가
+
+	        // ✅ SECRET_KEY 확인
+	        String secretKey = "Y29tcGxleCBkYXRhIGZvciBzZWN1cml0eSBhbmQgaGFzaC11c2Uga2V5IGNvbmZpZ3VyZWQgaW4gdGhlIGhlYWRlZCBtZWRpYSBvZiBqb3VybmFsIHJlY29nbml0aW9uLg\r\n"
+	        		+ ""; 
+	        System.out.println("사용 중인 SECRET_KEY: " + secretKey);
+
+	        Claims claims = Jwts.parser()
+	                .setSigningKey(secretKey) // SECRET_KEY 확인 필요!
+	                .parseClaimsJws(token)
+	                .getBody();
+
+	        System.out.println("추출된 userId: " + claims.getSubject()); // 🔥 디버깅 추가
+	        return claims.getSubject(); // userId
+	    } catch (Exception e) {
+	        System.out.println("토큰 파싱 오류: " + e.getMessage());
+	        return null;
+	    }
+	}
+
+
+
+    
 	/**
      * 사용자의 알람 설정을 업데이트하는 API
      * @param settings 업데이트할 알람 설정 정보 (RequestBody로 받음)

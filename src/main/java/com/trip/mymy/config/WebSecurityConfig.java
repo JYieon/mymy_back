@@ -31,6 +31,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {  
         http
+        	.cors()//추가
+        	.and()
             .httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -40,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(jwtAccessDeniedHandler)
             .and()
             .authorizeRequests()
-                .antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/movies/**", "/elastic/**").permitAll()
+                .antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/movies/**", "/elastic/**", "/alarm-ws/**").permitAll()
                 .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/favicon.ico", "/manifest.json").permitAll()
@@ -48,4 +50,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .apply(new JwtSecurityConfig(tokenProvider));
     }
+    //"/alarm-ws/** 알람기능 웹소켓으로 인해 여기 추가
 }
