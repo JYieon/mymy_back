@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,37 +82,51 @@ public class BoardController {
 		}
 	}
 
-	// 이미지 업로드 처리uploadSummernoteImageFile
 	@PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
-	public Map<String, String> uploadSummernoteImageFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-		Map<String, String> response = new HashMap<>();
+	public ResponseEntity<Map<String, String>> uploadSummernoteImageFile(
+	        @RequestParam("file") MultipartFile file, // ✅ @RequestParam으로 변경
+	        HttpServletRequest request) {
 
-		// 파일 저장 경로 설정 (여기서는 resources/upload 디렉토리로 설정)
-		String uploadDir = "C:/summernote_image/"; 
-		File uploadFolder = new File(uploadDir);
-		if (!uploadFolder.exists()) {
-			uploadFolder.mkdirs(); // 폴더가 없으면 생성
-		}
-		//파일 저장
-		String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-		String filePath = uploadDir + fileName;
+	    Map<String, String> response = new HashMap<>();
 
+	    if (file.isEmpty()) {
+	        System.out.println("🚨 업로드된 파일이 없습니다.");
+	        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "파일이 비어 있습니다."));
+	    }
 
-		try {
-			File serverFile = new File(filePath);
-			file.transferTo(serverFile);
-			System.out.println("저장된 파일경로 "+filePath);
-			//절대 url 반환
-			String fullUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/" + fileName;
-			response.put("fileName", fileName); // 파일명 저장
-			response.put("url", fullUrl); // 절대 URL 저장
-		} catch (IOException e) {
-			e.printStackTrace();
-			response.put("error", "파일 업로드 실패");
-		}
-		return response;
+	    // ✅ 업로드 경로 설정
+	    String uploadDir = "C:/summernote_image/";
+	    File uploadFolder = new File(uploadDir);
+
+	    // ✅ 업로드 폴더 없으면 생성
+	    if (!uploadFolder.exists()) {
+	        uploadFolder.mkdirs();
+	    }
+
+	    // ✅ 저장할 파일 이름 생성
+	    String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+	    String filePath = uploadDir + fileName;
+
+	    try {
+	        // ✅ 파일 저장
+	        File serverFile = new File(filePath);
+	        file.transferTo(serverFile);
+
+	        // ✅ URL 반환 (로컬 서버 기준)
+	        String fullUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/" + fileName;
+	        response.put("fileName", fileName);
+	        response.put("url", fullUrl);
+
+	        System.out.println("✅ 이미지 업로드 성공: " + fullUrl);
+	        return ResponseEntity.ok(response);
+	    } catch (IOException e) {
+	        System.out.println("🚨 파일 저장 실패: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body(Collections.singletonMap("error", "파일 업로드 실패: " + e.getMessage()));
+	    }
 	}
+
 
 	// 게시글 목록
 	// category - 1: 계획, 2: 기록)
