@@ -11,7 +11,7 @@ public interface ChatService {
 	public List<ChatDTO> findChatList(String member);
 	public ChatResDTO joinRoom(long roomNum);
 	public int createRoom(String member, String roomName);
-	public int inviteMember(String member, Long roomNum);
+	public int inviteMember(String sender, String member, Long roomNum);
 	public int removeRoom(Long roomNum, String member);
 	public void enterLeaveMsg(String member, Long roomNum, String type);
 	public List<ChatMessageDTO> getMessages(long roomNum);

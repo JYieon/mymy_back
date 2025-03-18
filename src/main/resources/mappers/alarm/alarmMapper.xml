@@ -22,6 +22,7 @@
     	<result property="memberId" column="MEMBER_ID_PK" />
     	<result property="alarmTypeId" column="ALARM_TYPE_ID_PK" javaType="int"/> 
     	<result property="isRead" column="Is_READ" />
+    	<result property="addr" column="ALARM_ADDR" />
     	<result property="alarmTypeName" column="ALARM_TYPE_NAME"/>
     	<result property="alarmContent" column="ALARM_CONTENT" /> 
 	</resultMap>

@@ -22,11 +22,11 @@ public class FollowServiceImpl implements FollowService {
 
     
     @Override
-    public void followUser(FollowingDTO followingDTO) {
+    public void followUser(String sender, FollowingDTO followingDTO) {
         followMapper.followUser(followingDTO);
         
         AlarmDTO alarm = AlarmDTO.builder()
-        		.senderId(followingDTO.getFollowerId())
+        		.senderId(sender)
         		.memberId(followingDTO.getFollowingId())
         		.alarmTypeId(4)
         		.build();

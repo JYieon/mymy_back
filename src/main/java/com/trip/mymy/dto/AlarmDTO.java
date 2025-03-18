@@ -15,8 +15,10 @@ public class AlarmDTO {
 	private String memberId;
 	private int alarmTypeId;
 	private int isRead;
+	private int addr;
 	private String alarmTypeName;
 	private String alarmContent;
+	
 
 	
 	
@@ -67,6 +69,12 @@ public class AlarmDTO {
 	}
 	public void setIsRead(int inRead) {
 		this.isRead = inRead;
+	}
+	public int getAddr() {
+		return addr;
+	}
+	public void setAddr(int addr) {
+		this.addr = addr;
 	}
 
 }

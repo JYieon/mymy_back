@@ -90,13 +90,16 @@ public class ChatController {
 	}
 	
 	@PostMapping("invite")
-	public ResponseEntity<?> inviteUser(@RequestParam String inviteUser, String roomNum){
+	public ResponseEntity<?> inviteUser(@RequestParam String token, String inviteUser, Long roomNum){
+		Authentication authentication = tp.getAuthentication(token);
+        MemberDTO sender = (MemberDTO) authentication.getPrincipal(); 
+        
 		MemberDTO dto = as.checkId(inviteUser);
 	    System.out.println(inviteUser);
 	    if (dto == null) { //아이디 DB에 없음
 	        return ResponseEntity.ok().body("없는 아이디"); 
 	    } else { //있는 아이디. 채팅방에 추가
-	    	int result = cs.inviteMember(inviteUser, Long.parseLong(roomNum));
+	    	int result = cs.inviteMember(sender.getNick(), inviteUser, roomNum);
 			return ResponseEntity.ok(result);
 	    }
 	}

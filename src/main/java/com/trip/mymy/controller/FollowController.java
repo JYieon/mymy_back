@@ -36,9 +36,9 @@ public class FollowController {
     @PutMapping("/{followingId}")
     public ResponseEntity<?> followUser(@PathVariable String followingId,
                                         @RequestHeader("Authorization") String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7); // "Bearer " 제거
-        }
+//        if (token.startsWith("Bearer ")) {
+//            token = token.substring(7); // "Bearer " 제거
+//        }
 
         Authentication authentication = tp.getAuthentication(token);
         MemberDTO member = (MemberDTO) authentication.getPrincipal();
@@ -55,7 +55,7 @@ public class FollowController {
             followingDTO.setFollowerId(followerId);
             followingDTO.setFollowingId(followingId);
 
-            followService.followUser(followingDTO);
+            followService.followUser(member.getNick(), followingDTO);
             return ResponseEntity.ok("팔로우 성공!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("🚨 팔로우 실패: " + e.getMessage());
