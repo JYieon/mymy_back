@@ -142,7 +142,13 @@ public class BoardController {
 		// 페이지 처리
 		int totalPosts = 0;
 		List<Map<String, Object>> boardList = new ArrayList<>();
-
+		
+		// ✅ JSON 응답 확인 로그 추가
+	    System.out.println("📌 게시글 목록 응답 데이터:");
+	    for (Map<String, Object> post : boardList) {
+	        System.out.println(post);
+	    }
+	    
 		if (category == 1) {
 			Authentication authentication = tp.getAuthentication(token);
 			MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
@@ -155,7 +161,13 @@ public class BoardController {
 			totalPosts = bs.getTotalPosts(category); // 전체 게시글 수 (category 2)
 			boardList = bs.getBoardList(page, category, "none"); // 전체 게시글 목록 (category 2)
 		}
-
+		
+		// ✅ JSON 응답 확인 로그 추가
+	    System.out.println("📌 게시글 목록 응답 데이터:");
+	    for (Map<String, Object> post : boardList) {
+	        System.out.println(post);
+	    }
+	    
 		// 페이지 계산
 		int pageSize = 6;
 		int totalPages = (totalPosts + pageSize - 1) / pageSize;

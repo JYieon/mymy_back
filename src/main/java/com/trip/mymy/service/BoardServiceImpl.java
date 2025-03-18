@@ -90,6 +90,11 @@ public class BoardServiceImpl implements BoardService {
 		}else {
 			mapper.removeLike(params);
 		}
+		mapper.updateBoardLikes(boardNo);
+		
+		int updatedLikes= mapper.getBoardLikes(boardNo);
+		
+		System.out.println("✅ 좋아요 변경 후 개수: " + updatedLikes);
 		return liked == 0;
 	}
 
