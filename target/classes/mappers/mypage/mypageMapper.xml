@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trip.mymy.mybatis.MypageMapper">
+
+   <resultMap id="memberResultMap" type="com.trip.mymy.dto.MypageDTO">
+        <id property="id" column="MEMBER_ID_PK"/>
+        <result property="pwd" column="MEMBER_PWD"/>
+        <result property="name" column="MEMBER_NAME"/>
+        <result property="nick" column="MEMBER_NICK"/>
+        <result property="phone" column="MEMBER_PHONE"/>
+        <result property="email" column="MEMBER_EMAIL"/>
+        <result property="level" column="MEMBER_LEVEL"/>
+        <result property="bank" column="MEMBER_BANK"/>
+        <result property="profile" column="MEMBER_PROFILE"/>
+        <result property="testResult" column="MEMBER_TEST_RESULT"/>
+    </resultMap>
+
+    <!-- 회원 정보 조회 -->
+    <select id="getMember" parameterType="string" resultMap="memberResultMap">
+        SELECT MEMBER_ID_PK as id, MEMBER_NAME as name, MEMBER_NICK as nick,
+               MEMBER_PHONE as phone, MEMBER_EMAIL as email, MEMBER_LEVEL as level,
+               MEMBER_BANK as bank, MEMBER_PROFILE as profile, MEMBER_TEST_RESULT as testResult
+        FROM MEMBER_TB
+        WHERE MEMBER_ID_PK = #{id}
+    </select>
+
+    <!-- 회원 정보 수정 -->
+    <update id="isUpdateMember" parameterType="com.trip.mymy.dto.MypageDTO">
+        UPDATE MEMBER_TB
+        <set>
+            <if test="pwd != null and pwd != ''">MEMBER_PWD = #{pwd},</if>
+            <if test="phone != null and phone != ''">MEMBER_PHONE = #{phone},</if>
+            <if test="email != null and email != ''">MEMBER_EMAIL = #{email}</if>
+            <if test="testResult != null and testResult != ''">MEMBER_TEST_RESULT = #{testResult}</if>
+        </set>
+        WHERE MEMBER_ID_PK = #{id}
+    </update>
+    
+    <!-- 여행자 테스트 결과 업데이트 -->
+    <update id="updateTestResult">
+        UPDATE MEMBER_TB
+        SET MEMBER_TEST_RESULT = #{testResult}
+        WHERE MEMBER_ID_PK = #{id}
+    </update>
+
+</mapper>

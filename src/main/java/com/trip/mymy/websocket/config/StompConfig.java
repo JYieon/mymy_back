@@ -21,7 +21,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry
-		.addEndpoint("/stompServer")
+		.addEndpoint("/ws")
 		.setAllowedOrigins("*")  // 프록시 설정을 위해서 설정
 		.withSockJS();
 	}
@@ -29,10 +29,10 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
 		// /chat으로 시작하는 url이 발행가능하도록 설정
-		registry.enableSimpleBroker("/chat");
+		registry.enableSimpleBroker("/topic");
 		
 		// 접두어 자동 추가 기능
-		registry.setApplicationDestinationPrefixes("/chat");  // 구독 url에 /chat을 자동으로 붙임
+		registry.setApplicationDestinationPrefixes("/app");  // 구독 url에 /chat을 자동으로 붙임
 	}
 
 }

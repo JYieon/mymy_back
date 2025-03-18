@@ -13,4 +13,5 @@ public interface AuthMapper {
 	public MemberDTO findPwd(@Param("id") String id, @Param("email") String email);
 	public int resetPwd(@Param("id") String id, @Param("pwd") String pwd);
 	public MemberDTO checkEmail(String email);
+	public MemberDTO checkNick(String nick);
 }

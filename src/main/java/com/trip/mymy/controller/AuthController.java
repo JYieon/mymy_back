@@ -65,19 +65,19 @@ public class AuthController {
 		}
 	}
 	
-	@PostMapping("/find_id")
+	@PostMapping("/find/id")
 	public ResponseEntity<String> findId(@RequestParam String name, String email) {
 		System.out.println(name + email);
 		return ResponseEntity.ok(ls.findId(name, email));
 	}
 	
-	@PostMapping("/find_pwd")
+	@PostMapping("/find/pwd")
 	public ResponseEntity<Integer> findPwd(@RequestParam String id, String email) {
 		
 		return ResponseEntity.ok(ls.findPwd(id, email));
 	}
 	
-	@PostMapping("/mail_auth")
+	@PostMapping("/mail/auth")
 	public ResponseEntity<String> authMail(@RequestParam String userAuth, String id) {
 		if(ls.authMail(userAuth)) {
 			String resetToken = tp.generateResetToken(id); //비밀번호 재설정용 토큰
@@ -87,7 +87,7 @@ public class AuthController {
 		}
 	}
 	
-	@PostMapping("/reset_pwd")
+	@PostMapping("/reset/pwd")
 	public void resetPwd(@RequestParam String id, String pwd) {
 		ls.resetPwd(id, pwd);
 	}
@@ -100,7 +100,7 @@ public class AuthController {
 		return ResponseEntity.ok(ls.insertUser(signupData));
 	}
 	
-	@PostMapping("/id_check")
+	@GetMapping("/check/id")
 	public ResponseEntity<?> checkId(@RequestParam String id) {
 	    MemberDTO dto = ls.checkId(id);
 	    
@@ -111,7 +111,17 @@ public class AuthController {
 	    }
 	}
 	
-	@PostMapping("/signup_email_send")
+	@GetMapping("/check/nick")
+	public ResponseEntity<?> checkNick(@RequestParam String nick) {
+		System.out.println(nick);
+		MemberDTO member = ls.checkNick(nick);
+		if(member == null) { //nick 없음
+			return ResponseEntity.status(200).build();
+		}
+		return ResponseEntity.status(409).build();
+	}
+	
+	@PostMapping("/signup/email/send")
 	public ResponseEntity<Integer> signupEmailAuth(@RequestParam String toEmail) {
 		MemberDTO mailDto = ls.checkEmail(toEmail);
 		

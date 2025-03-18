@@ -107,4 +107,9 @@ public class TestAuth {
 			    .andExpect(status().isOk());
 	}
 	
+	@Test
+	public void TestNick() {
+		as.checkNick("test");
+	}
+	
 }

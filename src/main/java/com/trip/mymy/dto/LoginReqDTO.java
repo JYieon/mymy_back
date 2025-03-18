@@ -16,5 +16,4 @@ public class LoginReqDTO {
 		this.id = id;
 		this.pwd = pwd;
 	}
-
 }

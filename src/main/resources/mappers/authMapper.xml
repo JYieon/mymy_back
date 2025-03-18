@@ -31,4 +31,7 @@
     	insert into MEMBER_TB (MEMBER_ID_PK, MEMBER_PWD, MEMBER_NAME, MEMBER_NICK, MEMBER_PHONE, MEMBER_EMAIL)
     		values(#{id}, #{pwd}, #{name}, #{nick}, #{phone}, #{email})
     </insert>
+    <select id="checkNick" resultMap="member">
+    	select * from MEMBER_TB where MEMBER_NICK = #{nick}
+    </select>
 </mapper>
