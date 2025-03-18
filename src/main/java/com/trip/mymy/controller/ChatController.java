@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -74,10 +75,18 @@ public class ChatController {
 	}
 	
 	@GetMapping("user/info")
-	public ResponseEntity<MemberDTO> getuserInfo(@RequestParam String token){
-		Authentication authentication = tp.getAuthentication(token);
-		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
-		return ResponseEntity.ok(member);
+	public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
+	    try {
+	    	System.out.println("userInfo");
+	        Authentication authentication = tp.getAuthentication(token);
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
+	        System.out.println(member.getId());
+	        return ResponseEntity.ok(member);
+	    } catch (RuntimeException e) {
+	        // 예외 처리: 예를 들어, 토큰이 만료되었거나 권한이 없는 경우
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body("인증 실패: " + e.getMessage()); // 적절한 오류 메시지 반환
+	    }
 	}
 	
 	@PostMapping("invite")

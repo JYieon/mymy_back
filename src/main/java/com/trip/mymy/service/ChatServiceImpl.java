@@ -118,10 +118,10 @@ public class ChatServiceImpl implements ChatService{
 		cm.saveMsg(enterMsg);
 
 		// WebSocket을 통해 입장 메시지 전송
-		messagingTemplate.convertAndSend("/chat/chatRoomNo/" + roomNum + "/message", enterMsg);
+		messagingTemplate.convertAndSend("/topic/chatRoomNo/" + roomNum + "/message", enterMsg);
 		
 		List<ChatMemberDTO> chatMember = cm.findRoomMember(roomNum);
-		messagingTemplate.convertAndSend("/chat/chatRoomNo/" + roomNum + "/enternleave", chatMember);
+		messagingTemplate.convertAndSend("/topic/chatRoomNo/" + roomNum + "/enternleave", chatMember);
 	}
 	
 	public List<ChatMessageDTO> getMessages(long roomNum){

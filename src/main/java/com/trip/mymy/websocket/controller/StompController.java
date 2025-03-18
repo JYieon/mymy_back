@@ -26,8 +26,5 @@ public class StompController {
 		
 		return chatMessage;
 	}
-	
-	//알람
-	
 
 }

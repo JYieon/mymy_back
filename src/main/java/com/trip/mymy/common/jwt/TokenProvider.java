@@ -130,9 +130,26 @@ public class TokenProvider {
     public Authentication getAuthentication(String accessToken) {
     	System.out.println("토큰 복호화");
     	System.out.println(accessToken);
+    	
+    	if (accessToken != null && accessToken.startsWith("Bearer ")) {
+    	    accessToken = accessToken.substring(7);  // "Bearer " 부분을 제거
+    	}
+    	
         Claims claims = parseClaims(accessToken); // 토큰 복호화
         System.out.println(claims);
-        // 토큰 복호화에 실패하면
+     // 토큰 복호화에 실패하거나 만료된 경우 예외 처리
+        if (claims == null) {
+            throw new RuntimeException("토큰 복호화 실패");
+        }
+        
+        System.out.println(claims.getExpiration());
+        
+        // 만료된 토큰 확인
+        if (claims.getExpiration().before(new Date())) {
+            throw new RuntimeException("토큰이 만료되었습니다.");
+        }
+
+        // 토큰에 권한 정보가 없으면 예외 처리
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
@@ -178,16 +195,16 @@ public class TokenProvider {
     }
     
     //비밀번호 재설정용 일회성 토큰
-    public String generateResetToken(String id) {
-    	long now = (new Date()).getTime();
-        Date resetTokenExpiresIn = new Date(now + (1000 * 60 * 10)); // 10분 후 만료
-
-        return Jwts.builder()
-                .setSubject(id)  // 이메일을 토큰의 subject로 설정
-                .setExpiration(resetTokenExpiresIn) // 만료 시간 설정
-                .signWith(key, SignatureAlgorithm.HS512) // 서명 방식 설정
-                .compact();
-    }
+//    public String generateResetToken(String id) {
+//    	long now = (new Date()).getTime();
+//        Date resetTokenExpiresIn = new Date(now + (1000 * 60 * 10)); // 10분 후 만료
+//
+//        return Jwts.builder()
+//                .setSubject(id)  // 이메일을 토큰의 subject로 설정
+//                .setExpiration(resetTokenExpiresIn) // 만료 시간 설정
+//                .signWith(key, SignatureAlgorithm.HS512) // 서명 방식 설정
+//                .compact();
+//    }
     
     //카카오
     public String getKakaoAccessToken(String code) throws Exception {
@@ -285,5 +302,6 @@ public class TokenProvider {
     	
     	return userInfo;
     }
+
     
 }
