@@ -85,43 +85,43 @@ public class BoardController {
 	@PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
 	public ResponseEntity<Map<String, String>> uploadSummernoteImageFile(
-	        @RequestParam("file") MultipartFile file, // ✅ @RequestParam으로 변경
+	        @RequestParam("file") MultipartFile file, 
 	        HttpServletRequest request) {
 
 	    Map<String, String> response = new HashMap<>();
 
 	    if (file.isEmpty()) {
-	        System.out.println("🚨 업로드된 파일이 없습니다.");
+	        System.out.println("업로드된 파일이 없습니다.");
 	        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "파일이 비어 있습니다."));
 	    }
 
-	    // ✅ 업로드 경로 설정
+	    // 업로드 경로 설정
 	    String uploadDir = "C:/summernote_image/";
 	    File uploadFolder = new File(uploadDir);
 
-	    // ✅ 업로드 폴더 없으면 생성
+	    // 업로드 폴더 없으면 생성
 	    if (!uploadFolder.exists()) {
 	        uploadFolder.mkdirs();
 	    }
 
-	    // ✅ 저장할 파일 이름 생성
+	    // 저장할 파일 이름 생성
 	    String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 	    String filePath = uploadDir + fileName;
 
 	    try {
-	        // ✅ 파일 저장
+	        // 파일 저장
 	        File serverFile = new File(filePath);
 	        file.transferTo(serverFile);
 
-	        // ✅ URL 반환 (로컬 서버 기준)
+	        // URL 반환
 	        String fullUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/" + fileName;
 	        response.put("fileName", fileName);
 	        response.put("url", fullUrl);
 
-	        System.out.println("✅ 이미지 업로드 성공: " + fullUrl);
+	        // System.out.println("이미지 업로드 성공: " + fullUrl);
 	        return ResponseEntity.ok(response);
 	    } catch (IOException e) {
-	        System.out.println("🚨 파일 저장 실패: " + e.getMessage());
+	        System.out.println("파일 저장 실패: " + e.getMessage());
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                             .body(Collections.singletonMap("error", "파일 업로드 실패: " + e.getMessage()));
 	    }
@@ -137,18 +137,10 @@ public class BoardController {
 			@RequestParam(value = "category", defaultValue = "1") int category
 
 			) {
-
-
 		// 페이지 처리
 		int totalPosts = 0;
 		List<Map<String, Object>> boardList = new ArrayList<>();
 		
-		// ✅ JSON 응답 확인 로그 추가
-	    System.out.println("📌 게시글 목록 응답 데이터:");
-	    for (Map<String, Object> post : boardList) {
-	        System.out.println(post);
-	    }
-	    
 		if (category == 1) {
 			Authentication authentication = tp.getAuthentication(token);
 			MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
@@ -161,17 +153,11 @@ public class BoardController {
 			totalPosts = bs.getTotalPosts(category); // 전체 게시글 수 (category 2)
 			boardList = bs.getBoardList(page, category, "none"); // 전체 게시글 목록 (category 2)
 		}
-		
-		// ✅ JSON 응답 확인 로그 추가
-	    System.out.println("📌 게시글 목록 응답 데이터:");
-	    for (Map<String, Object> post : boardList) {
-	        System.out.println(post);
-	    }
 	    
 		// 페이지 계산
 		int pageSize = 6;
 		int totalPages = (totalPosts + pageSize - 1) / pageSize;
-
+		
 		// 응답 데이터 구성
 		Map<String, Object> response = new HashMap<>();
 		response.put("boardList", boardList); // 게시글 목록
@@ -188,7 +174,7 @@ public class BoardController {
 		BoardDTO post = bs.getPost(boardNo);
 		List<String> hashtags = bs.tagList(boardNo);  // 해시태그 조회
 
-		System.out.println(post);
+		// System.out.println(post);
 	
 		Map<String, Object> response = new HashMap<>();
 		response.put("post", post);
@@ -262,7 +248,7 @@ public class BoardController {
 	// 특정 사용자가 해당 게시글에 좋아요를 눌렀는지 확인하는 API
 	@GetMapping("/likes/check")
 	public ResponseEntity<Map<String, Object>> checkUserLike(@RequestParam String token, @RequestParam int boardNo) {
-	    System.out.println("🔥 좋아요 확인 요청 - boardNo: " + boardNo + ", token: " + token);
+	    // System.out.println("좋아요 확인 요청 - boardNo: " + boardNo + ", token: " + token);
 
 	    // 토큰 검증
 	    Authentication authentication = tp.getAuthentication(token);

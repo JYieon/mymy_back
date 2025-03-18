@@ -94,7 +94,7 @@ public class BoardServiceImpl implements BoardService {
 		
 		int updatedLikes= mapper.getBoardLikes(boardNo);
 		
-		System.out.println("✅ 좋아요 변경 후 개수: " + updatedLikes);
+		// System.out.println("좋아요 변경 후 개수: " + updatedLikes);
 		return liked == 0;
 	}
 
@@ -124,6 +124,11 @@ public class BoardServiceImpl implements BoardService {
 			boardList = mapper.getBoardList(params);
 		}
 		
+//		 System.out.println("[Service] 게시글 목록 응답 데이터:");
+//		    for (BoardDTO post : boardList) {
+//		        System.out.println("게시글 No." + post.getBoardNo() + " - 좋아요 수: " + post.getBoardLikes());
+//		    }
+		    
 		//System.out.println("조회된 게시글 개수:"+boardList.size());
 		List<Map<String, Object>> responseList = new ArrayList<>();
 		
