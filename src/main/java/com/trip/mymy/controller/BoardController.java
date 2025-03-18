@@ -193,26 +193,74 @@ public class BoardController {
 
 	// 게시글 수정
 	@PostMapping("/modify")
-	public ResponseEntity<String> modify(@RequestBody BoardDTO dto) {
-		if (bs.modify(dto)) {
-			bs.deleteTags(dto.getBoardNo());  // 기존 태그 삭제
-			if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-				bs.addTags(dto.getBoardNo(), dto.getHashtags());  // 새로운 태그 추가
-			}
-			return ResponseEntity.ok("게시글이 성공적으로 수정되었습니다.");
-		} else {
-			return ResponseEntity.badRequest().body("게시글 수정에 실패했습니다.");
-		}
+	public ResponseEntity<String> modify(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
+	        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+	        
+	        // 토큰을 통해 인증 정보 가져오기
+	        Authentication authentication = tp.getAuthentication(jwtToken);
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal();
+	        String loggedInUserId = member.getId();
+
+//	        // 백엔드에서 로그인한 사용자 ID 자동 설정
+//	        dto.setId(loggedInUserId);
+
+	        // 게시글 작성자와 로그인한 사용자 비교
+	        BoardDTO existingPost = bs.getPost(dto.getBoardNo());
+	        
+	        if (!existingPost.getId().equals(loggedInUserId)) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("작성자만 수정할 수 있습니다.");
+	        }
+
+	        // 게시글 수정
+	        boolean success = bs.modify(dto);
+	        if (success) {
+	            return ResponseEntity.ok("게시글이 성공적으로 수정되었습니다.");
+	        } else {
+	            return ResponseEntity.badRequest().body("게시글 수정에 실패했습니다.");
+	        }
 	}
 
 	// 게시글 삭제
 	@DeleteMapping("/delete/{boardNo}")
-	public ResponseEntity<String> delete(@PathVariable int boardNo) {
-		if (bs.delete(boardNo)) {
-			return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
-		} else {
-			return ResponseEntity.badRequest().body("게시글 삭제에 실패했습니다.");
-		}
+	public ResponseEntity<String> delete(@PathVariable int boardNo, @RequestHeader("Authorization") String token) {
+	    if (token == null || token.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 토큰이 비어 있습니다.");
+	    }
+
+	    try {
+	        // "Bearer " 부분 제거
+	        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+	        // 토큰을 통해 인증 정보 가져오기
+	        Authentication authentication = tp.getAuthentication(jwtToken);
+	        if (authentication == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
+	        }
+
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal();
+	        String loggedInUserId = member.getId();
+
+	        // 게시글 정보 가져오기
+	        BoardDTO existingPost = bs.getPost(boardNo);
+	        if (existingPost == null) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+	        }
+
+	        // 게시글 작성자와 로그인된 사용자가 동일한지 확인
+	        if (!existingPost.getId().equals(loggedInUserId)) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("작성자만 삭제할 수 있습니다.");
+	        }
+
+	        // 게시글 삭제
+	        boolean success = bs.delete(boardNo);
+	        if (success) {
+	            return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
+	        } else {
+	            return ResponseEntity.badRequest().body("게시글 삭제에 실패했습니다.");
+	        }
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+	    }
 	}
 
 	// 좋아요 토글
