@@ -176,9 +176,12 @@ public class BoardController {
 		BoardDTO post = bs.getPost(boardNo);
 		List<String> hashtags = bs.tagList(boardNo);  // 해시태그 조회
 
+		System.out.println(post);
+	
 		Map<String, Object> response = new HashMap<>();
 		response.put("post", post);
 		response.put("hashtags", hashtags);
+		
 
 		return ResponseEntity.ok(response);
 	}

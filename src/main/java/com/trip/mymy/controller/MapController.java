@@ -10,7 +10,7 @@ import com.trip.mymy.dto.MapDTO;
 import com.trip.mymy.service.MapService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000") // React와 연동
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/map")
 public class MapController {
 
@@ -19,9 +19,9 @@ public class MapController {
     
     // 마커 추가
     @PostMapping("/add")
-    public ResponseEntity<String> addMarker(@RequestBody MapDTO map) {
-        mapService.insertMarker(map);
-        return ResponseEntity.ok("마커가 추가되었습니다!");
+    public ResponseEntity<Integer> addMarker(@RequestBody MapDTO map) {
+        int markerId = mapService.insertMarker(map);
+        return ResponseEntity.ok(markerId);
     }
 
     // 마커 불러오기

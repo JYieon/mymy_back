@@ -17,8 +17,9 @@ public class MapServiceImpl implements MapService {
     private MapMapper mapMapper;
 
     @Override
-    public void insertMarker(MapDTO map) {
+    public int insertMarker(MapDTO map) {
         mapMapper.insertMarker(map);
+        return map.getMarkerId();
     }
 
     @Override
