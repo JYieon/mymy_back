@@ -23,55 +23,37 @@
     	<result property="alarmTypeId" column="ALARM_TYPE_ID_PK" javaType="int"/> 
     	<result property="alarmTypeName" column="ALARM_TYPE_NAME"/>
     	<result property="alarmContent" column="ALARM_CONTENT" /> 
+    	<result property="isread" column="Is_READ" />
 	</resultMap>
-
-    <!-- 특정 사용자의 알람 목록 조회 -->
-    <select id="getUserAlarms" resultMap="alarmResultMap">
-        SELECT A.*, T.ALARM_TYPE_NAME 
-        FROM ALARM_TB A
-        JOIN ALARM_TYPE_TB T ON A.ALARM_TYPE_ID_PK = T.ALARM_TYPE_ID_PK
-        WHERE A.MEMBER_ID_PK = #{memberId}
-        ORDER BY A.ALARM_CREATED_AT_DT DESC
-    </select>
-    
-     <!-- 특정 사용자의 알람 목록 조회 (API에서 사용) -->
-    <select id="getAlarms" resultMap="alarmResultMap">
-    SELECT 
-        A.ALARM_NO_PK, 
-        A.SENDER_ID, 
-        A.ALARM_CREATED_AT_DT, 
-        A.MEMBER_ID_PK, 
-        A.ALARM_TYPE_ID_PK,
-        T.ALARM_TYPE_NAME  <!-- 🔹 알람 타입명 추가 -->
-    FROM ALARM_TB A
-    JOIN ALARM_TYPE_TB T ON A.ALARM_TYPE_ID_PK = T.ALARM_TYPE_ID_PK
-    WHERE A.MEMBER_ID_PK = #{userId}
-    ORDER BY A.ALARM_CREATED_AT_DT DESC
-</select>
-
-
-
-
-    <!-- 특정 사용자의 알람 설정 조회 -->
+	
+	<!-- 특정 사용자의 알람 설정 조회 -->
     <select id="getAlarmSettings" resultMap="alarmSettingsResultMap">
         SELECT * FROM ALARM_SETTINGS_TB WHERE MEMBER_ID_PK = #{memberId}
     </select>
+    
+    <update id="markAlarmsAsRead" parameterType="string">
+        UPDATE ALARM_TB 
+        SET is_read = 1 
+        WHERE MEMBER_ID_PK = #{memberId} 
+    </update>
 
-    <!-- 알람 설정 기본값 삽입 (사용자가 설정이 없을 경우) -->
-    <insert id="insertDefaultAlarmSettings">
-   	 	INSERT INTO ALARM_SETTINGS_TB (MEMBER_ID_PK, POST_ALARM, COMMENT_ALARM, CHAT_ALARM, FOLLOW_ALARM) 
-    	VALUES (#{memberId}, 1, 1, 1, 1)
-	</insert>
+	<!-- 특정 사용자의 알람 목록 조회 (API에서 사용) -->
+	<select id="getAlarms" resultMap="alarmResultMap">
+		SELECT
+		A.ALARM_NO_PK,
+		A.SENDER_ID,
+		A.ALARM_CREATED_AT_DT,
+		A.MEMBER_ID_PK,
+		A.ALARM_TYPE_ID_PK,
+		A.IS_READ,
+		T.ALARM_TYPE_NAME
+		FROM ALARM_TB A
+		JOIN ALARM_TYPE_TB T ON A.ALARM_TYPE_ID_PK = T.ALARM_TYPE_ID_PK
+		WHERE A.MEMBER_ID_PK = #{userId}
+		ORDER BY A.ALARM_CREATED_AT_DT DESC
+	</select>
 	
-
-    <!-- 알람 추가 -->
-    <insert id="insertAlarm">
-    	INSERT INTO ALARM_TB (ALARM_NO_PK, SENDER_ID, ALARM_CREATED_AT_DT, MEMBER_ID_PK, ALARM_TYPE_ID_PK, IS_READ)
-    	VALUES (ALARM_TB_SEQ.NEXTVAL, #{senderId}, SYSDATE, #{memberId}, #{alarmTypeId}, 0)
-	</insert>
-
-
-    <!-- 알람 상태 업데이트 (STATUS 컬럼 확인 필요) -->
+	<!-- 알람 상태 업데이트 (STATUS 컬럼 확인 필요) -->
     <update id="updateAlarmStatus">
         UPDATE ALARM_TB 
         SET STATUS = #{status} 
@@ -86,18 +68,45 @@
         CHAT_ALARM = #{chatAlarm},
         FOLLOW_ALARM = #{followAlarm}
     WHERE MEMBER_ID_PK = #{memberId}
-</update>
-    
-
-    <!-- 특정 사용자의 모든 알람 삭제 -->
+	</update>
+	
+	<!-- 알람 설정 기본값 삽입 (사용자가 설정이 없을 경우) -->
+    <insert id="insertDefaultAlarmSettings">
+   	 	INSERT INTO ALARM_SETTINGS_TB (MEMBER_ID_PK, POST_ALARM, COMMENT_ALARM, CHAT_ALARM, FOLLOW_ALARM) 
+    	VALUES (#{memberId}, 1, 1, 1, 1)
+	</insert>
+	
+	<!-- 알람 추가 -->
+    <insert id="insertAlarm">
+    	INSERT INTO ALARM_TB (ALARM_NO_PK, SENDER_ID, ALARM_CREATED_AT_DT, MEMBER_ID_PK, ALARM_TYPE_ID_PK, IS_READ)
+    	VALUES (ALARM_TB_SEQ.NEXTVAL, #{senderId}, SYSDATE, #{memberId}, #{alarmTypeId}, 0)
+	</insert>
+	
+	 <!-- 특정 사용자의 모든 알람 삭제 -->
     <delete id="deleteUserAlarms">
         DELETE FROM ALARM_TB WHERE MEMBER_ID_PK = #{memberId}
     </delete>
+
+
+    <!-- 특정 사용자의 알람 목록 조회 
+    <select id="getUserAlarms" resultMap="alarmResultMap">
+        SELECT A.*, T.ALARM_TYPE_NAME 
+        FROM ALARM_TB A
+        JOIN ALARM_TYPE_TB T ON A.ALARM_TYPE_ID_PK = T.ALARM_TYPE_ID_PK
+        WHERE A.MEMBER_ID_PK = #{memberId}
+        ORDER BY A.ALARM_CREATED_AT_DT DESC
+    </select>
+    -->
+    
+    
     
      <!-- 특정 사용자의 읽지 않은 알람 개수 조회 -->
     <select id="getUnreadAlarmCount" resultType="int">
-    	SELECT COUNT(*) FROM ALARM_TB WHERE MEMBER_ID_PK = #{memberId} AND IS_READ = 0
+    	SELECT * FROM ALARM_TB WHERE  MEMBER_ID_PK = #{memberId} AND is_read = 0 ORDER BY created_at DESC
 	</select>
+	
+	
+	
     
 
 </mapper>

@@ -38,6 +38,23 @@ public class AlarmController {
 	    
 	    return ResponseEntity.ok(settings);
 	}
+	//알림 읽음 처리
+	@PostMapping("/alarm/mark-read")
+	public ResponseEntity<String> markAlarmsAsRead(@RequestHeader("Authorization") String token) {
+        System.out.println(" 알림 읽음 처리 API 호출됨!");
+
+        String memberId = extractUserIdFromToken(token);
+        if (memberId == null || memberId.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(" 유효하지 않은 토큰입니다.");
+        }
+
+        int updatedRows = alarmService.markAlarmsAsRead(memberId);
+        System.out.println(" 알림 읽음 처리 완료: " + updatedRows + "개의 행 업데이트됨");
+
+        return ResponseEntity.ok("" + updatedRows + "개의 알람이 읽음 처리되었습니다.");
+    }
+
+
 	
 	/**
      * 특정 사용자의 알람 목록 조회 API
@@ -135,6 +152,14 @@ public class AlarmController {
 	    alarmService.deleteUserAlarms(memberId);
 	    return ResponseEntity.ok("알람이 성공적으로 삭제되었습니다.");
 	}
+	
+	 // 읽지 않은 알람 가져오기
+    @GetMapping("/alarm/unread/{memberId}")
+    public List<AlarmDTO> getUnreadAlarms(@PathVariable int memberId) {
+        return alarmService.getUnreadAlarms(memberId);
+    }
+	
+	
 
 	
 	

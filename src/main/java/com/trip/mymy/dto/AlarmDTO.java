@@ -14,6 +14,7 @@ public class AlarmDTO {
 	private int alarmTypeId;
 	private String alarmTypeName;
 	private String alarmContent;
+	private int isRead;
 
 	
 	
@@ -59,5 +60,12 @@ public class AlarmDTO {
 	public void setAlarmContent(String alarmContent) {
 		this.alarmContent = alarmContent;
 	}
+	public int getIsRead() {
+		return isRead;
+	}
+	public void setIsRead(int isRead) {
+		this.isRead = isRead;
+	}
+	
 
 }

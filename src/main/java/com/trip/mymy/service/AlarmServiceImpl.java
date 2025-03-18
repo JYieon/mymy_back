@@ -137,10 +137,26 @@ public class AlarmServiceImpl implements AlarmService {
      * @param memberId 사용자 ID
      * @return 읽지 않은 알람 개수
      */
-	@Override
-	public int getUnreadAlarmCount(String memberId) {
-	    return alarmMapper.getUnreadAlarmCount(memberId);
+	public List<AlarmDTO> getUnreadAlarms(int memberId){
+		 return alarmMapper.getUnreadAlarms(memberId);
+		
 	}
+	
+	@Override
+    public int markAlarmsAsRead(String memberId) {
+        try {
+            System.out.println("🚀 알림 읽음 처리 시작: userId = " + memberId);
+            int updatedRows = alarmMapper.markAlarmsAsRead(memberId);
+            System.out.println("✅ 알림 읽음 처리 완료: " + updatedRows + "개의 행 업데이트됨");
+            return updatedRows;
+        } catch (Exception e) {
+            System.out.println("🚨 SQL 실행 오류: " + e.getMessage());
+            return 0;
+        }
+    }
+	
+	
+	
 
 
 
