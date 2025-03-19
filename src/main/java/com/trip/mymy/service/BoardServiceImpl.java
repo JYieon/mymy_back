@@ -72,10 +72,25 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	// 댓글 삭제 (대댓글 포함)
-	public String deleteReply(int replyNo, String path) {
-		int result = mapper.deleteReply(replyNo);
-		return (result == 1) ? "댓글이 성공적으로 삭제되었습니다." : "댓글 삭제에 실패했습니다.";
+	@Override
+	public int deleteReply(int replyNo, String id) {
+	    // 댓글 작성자 조회
+	    String writerId = mapper.getReplyWriter(replyNo);
+
+	    // 댓글이 존재하지 않는 경우
+	    if (writerId == null) {
+	        return 0;
+	    }
+
+	    // 댓글 작성자와 로그인한 사용자 비교
+	    if (!writerId.equals(id)) {
+	        throw new RuntimeException("해당 댓글을 삭제할 권한이 없습니다.");
+	    }
+
+	    // 4️⃣ 댓글 삭제 실행 (삭제된 행 개수 반환)
+	    return mapper.deleteReply(replyNo);
 	}
+
 
 	//게시글 좋아요
 	public boolean toggleLike(String id, int boardNo) {

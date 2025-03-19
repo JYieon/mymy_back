@@ -9,11 +9,13 @@
 		<result property="id" column="MEMBER_ID_PK" />
 		<result property="title" column="BOARD_TITLE" />
 		<result property="content" column="BOARD_CONTENT" />
-		<result property="date" column="BOARD_DT" javaType="java.sql.Timestamp" />
+		<result property="date" column="BOARD_DT"
+			javaType="java.sql.Timestamp" />
 		<result property="boardOpen" column="BOARD_OPEN" />
 		<result property="boardCategory" column="BOARD_CATEGORY" />
 		<result property="boardCnt" column="BOARD_CNT" />
-		<result property="boardLikes" column="BOARD_LIKES" javaType="java.lang.Integer" />
+		<result property="boardLikes" column="BOARD_LIKES"
+			javaType="java.lang.Integer" />
 	</resultMap>
 
 	<resultMap id="REPLY_TB" type="com.trip.mymy.dto.BoardRepDTO">
@@ -22,7 +24,8 @@
 		<result property="boardNo" column="BOARD_NO_PK" />
 		<result property="repContent" column="REPLY_CONTENT" />
 		<result property="parentNo" column="PARENT_NO" />
-		<result property="repDate" column="REPLY_DT" javaType="java.sql.Timestamp" />
+		<result property="repDate" column="REPLY_DT"
+			javaType="java.sql.Timestamp" />
 	</resultMap>
 
 	<!-- 댓글 저장 -->
@@ -30,7 +33,8 @@
 		INSERT INTO REPLY_TB(REPLY_NO_PK, MEMBER_ID_PK,
 		BOARD_NO_PK, REPLY_CONTENT,PARENT_NO, REPLY_DT)
 		VALUES
-		(REPLY_TB_SEQ.NEXTVAL, #{id}, #{boardNo}, #{repContent}, #{parentNo}, sysdate)
+		(REPLY_TB_SEQ.NEXTVAL, #{id}, #{boardNo}, #{repContent}, #{parentNo},
+		sysdate)
 	</insert>
 
 
@@ -44,7 +48,8 @@
 	<select id="getRepData" resultMap="REPLY_TB">
 		SELECT BOARD_NO_PK,
 		REPLY_NO_PK, MEMBER_ID_PK, REPLY_CONTENT, PARENT_NO, REPLY_DT
-		FROM REPLY_TB
+		FROM
+		REPLY_TB
 		WHERE BOARD_NO_PK = #{boardNo}
 		ORDER BY CASE WHEN PARENT_NO = 0
 		THEN REPLY_NO_PK -- 부모 댓글 우선 정렬
@@ -53,6 +58,12 @@
 		REPLY_NO_PK -- 부모 댓글 내에서 정렬
 	</select>
 
+	<!-- 특정 댓글의 작성자 ID 조회 -->
+	<select id="getReplyWriter" resultType="string">
+		SELECT MEMBER_ID_PK FROM REPLY_TB WHERE REPLY_NO_PK = #{replyNo}
+	</select>
+
+
 	<!-- 댓글 삭제 (대댓글도 함께 삭제) -->
 	<delete id="deleteReply">
 		DELETE FROM REPLY_TB WHERE REPLY_NO_PK = #{replyNo}
@@ -60,8 +71,10 @@
 	</delete>
 
 	<!-- 게시글 저장 -->
-	<insert id="writeSave" parameterType="com.trip.mymy.dto.BoardDTO">
-		<selectKey keyProperty="boardNo" resultType="int" order="AFTER">
+	<insert id="writeSave"
+		parameterType="com.trip.mymy.dto.BoardDTO">
+		<selectKey keyProperty="boardNo" resultType="int"
+			order="AFTER">
 			SELECT BOARD_TB_SEQ.CURRVAL FROM DUAL
 		</selectKey>
 		INSERT INTO BOARD_TB (BOARD_NO_PK, MEMBER_ID_PK, BOARD_TITLE,
@@ -72,17 +85,22 @@
 	</insert>
 
 	<select id="getBoardList" resultMap="BOARD_TB">
-		SELECT b.BOARD_NO_PK, b.MEMBER_ID_PK, b.BOARD_TITLE, b.BOARD_CONTENT, 
+		SELECT b.BOARD_NO_PK,
+		b.MEMBER_ID_PK, b.BOARD_TITLE, b.BOARD_CONTENT,
 		b.BOARD_DT, b.BOARD_OPEN, b.BOARD_CATEGORY, b.BOARD_CNT,
-		COALESCE(l.LIKE_COUNT, 0) AS BOARD_LIKES -- NULL 방지
+		COALESCE(l.LIKE_COUNT, 0)
+		AS BOARD_LIKES -- NULL 방지
 		FROM (
-		SELECT * FROM BOARD_TB WHERE BOARD_CATEGORY = #{category}
+		SELECT * FROM BOARD_TB WHERE
+		BOARD_CATEGORY = #{category}
 		) b
 		LEFT OUTER JOIN (
-		SELECT BOARD_NO_PK, COUNT(*) AS LIKE_COUNT
+		SELECT BOARD_NO_PK,
+		COUNT(*) AS LIKE_COUNT
 		FROM LIKE_TB
 		GROUP BY BOARD_NO_PK
-		) l ON b.BOARD_NO_PK = l.BOARD_NO_PK
+		) l ON
+		b.BOARD_NO_PK = l.BOARD_NO_PK
 		ORDER BY b.BOARD_NO_PK DESC
 	</select>
 
@@ -90,22 +108,27 @@
 	<select id="getUserBoardList" resultMap="BOARD_TB">
 		SELECT * FROM BOARD_TB
 		WHERE BOARD_CATEGORY = #{category} AND MEMBER_ID_PK = #{id}
-		ORDER BY BOARD_NO_PK DESC
+		ORDER BY
+		BOARD_NO_PK DESC
 		OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
 	</select>
 
 	<!-- 게시글 상세 조회 -->
 	<select id="getPost" parameterType="int" resultMap="BOARD_TB">
 		SELECT
-		BOARD_NO_PK, MEMBER_ID_PK, BOARD_TITLE, REPLACE(BOARD_CONTENT,',',',\n')
-		AS BOARD_CONTENT, BOARD_DT, BOARD_OPEN,BOARD_CATEGORY, BOARD_CNT, BOARD_LIKES
-		FROM BOARD_TB WHERE BOARD_NO_PK = #{boardNo}
+		BOARD_NO_PK, MEMBER_ID_PK, BOARD_TITLE,
+		REPLACE(BOARD_CONTENT,',',',\n')
+		AS BOARD_CONTENT, BOARD_DT,
+		BOARD_OPEN,BOARD_CATEGORY, BOARD_CNT, BOARD_LIKES
+		FROM BOARD_TB WHERE
+		BOARD_NO_PK = #{boardNo}
 	</select>
 
 	<!-- 게시글 조회수 -->
 	<update id="boardCnt">
 		UPDATE BOARD_TB SET BOARD_CNT= BOARD_CNT+1
-		WHERE BOARD_NO_PK = #{boardNo}
+		WHERE
+		BOARD_NO_PK = #{boardNo}
 	</update>
 
 	<!-- 총 게시글 수 -->
@@ -118,29 +141,34 @@
 	<update id="modify">
 		UPDATE BOARD_TB SET BOARD_TITLE=#{title},
 		BOARD_CONTENT=#{content}
-		WHERE BOARD_NO_PK=#{boardNo} AND MEMBER_ID_PK = #{id} 
+		WHERE BOARD_NO_PK=#{boardNo} AND MEMBER_ID_PK
+		= #{id}
 	</update>
 
 	<!-- 게시글 삭제 전 연결된 데이터 먼저 삭제 -->
 	<delete id="deleteAllByBoardNo" parameterType="int">
 		BEGIN
-		DELETE FROM REPLY_TB WHERE BOARD_NO_PK = #{boardNo}
-		DELETE FROM BOOKMARK_TB WHERE BOARD_NO_PK = #{boardNo}
-		DELETE FROM BOARD_TAG_TB WHERE BOARD_NO_PK = #{boardNo}
+		DELETE FROM
+		REPLY_TB WHERE BOARD_NO_PK = #{boardNo}
+		DELETE FROM BOOKMARK_TB WHERE
+		BOARD_NO_PK = #{boardNo}
+		DELETE FROM BOARD_TAG_TB WHERE BOARD_NO_PK =
+		#{boardNo}
 		DELETE FROM BOARD_TB WHERE BOARD_NO_PK = #{boardNo}
 		END;
 	</delete>
 
 	<!-- 특정 게시글의 좋아요 수 조회 -->
 	<select id="getBoardLikes" resultType="int">
-		SELECT COALESCE(COUNT(*), 0) 
+		SELECT COALESCE(COUNT(*),
+		0)
 		FROM LIKE_TB WHERE BOARD_NO_PK = #{boardNo}
 	</select>
 
-
 	<!-- 각 id별 좋아요 체크 -->
 	<select id="checkUserLike" parameterType="map">
-		SELECT COUNT(*) FROM LIKE_TB
+		SELECT COUNT(*) FROM
+		LIKE_TB
 		WHERE MEMBER_ID_PK = #{id}
 		AND BOARD_NO_PK = #{boardNo}
 	</select>
@@ -149,7 +177,8 @@
 	<insert id="addLike" parameterType="map">
 		INSERT INTO LIKE_TB
 		(LIKE_NO_PK, MEMBER_ID_PK, BOARD_NO_PK)
-		VALUES (LIKE_TB_SEQ.NEXTVAL, #{id}, #{boardNo})
+		VALUES (LIKE_TB_SEQ.NEXTVAL,
+		#{id}, #{boardNo})
 	</insert>
 
 	<!-- 각 id별 좋아요 삭제 -->
@@ -162,14 +191,15 @@
 	<update id="updateBoardLikes" parameterType="int">
 		UPDATE BOARD_TB
 		SET
-		BOARD_LIKES = (SELECT COUNT(*) FROM LIKE_TB 
+		BOARD_LIKES = (SELECT COUNT(*) FROM LIKE_TB
 		WHERE BOARD_NO_PK = #{boardNo})
 		WHERE BOARD_NO_PK = #{boardNo}
 	</update>
 
 
 	<insert id="insertTag" parameterType="string">
-		INSERT INTO TAG_TB (TAG_NUM_PK, TAG_NAME)
+		INSERT INTO TAG_TB
+		(TAG_NUM_PK, TAG_NAME)
 		SELECT TAG_TB_SEQ.NEXTVAL, #{tagName}
 		FROM DUAL
 		WHERE NOT EXISTS (SELECT 1 FROM TAG_TB WHERE TAG_NAME = #{tagName})
@@ -179,10 +209,12 @@
 	<insert id="insertBoardTag" parameterType="map">
 		INSERT INTO
 		BOARD_TAG_TB (BOARD_TAG_NUM_PK, BOARD_NO_PK, TAG_NUM_PK)
-		SELECT BOARD_TAG_SEQ.NEXTVAL, #{boardNo}, t.TAG_NUM_PK
+		SELECT
+		BOARD_TAG_SEQ.NEXTVAL, #{boardNo}, t.TAG_NUM_PK
 		FROM TAG_TB t
-		WHERE t.TAG_NAME = #{tagName} AND NOT EXISTS (SELECT 1
-		FROM BOARD_TAG_TB 
+		WHERE
+		t.TAG_NAME = #{tagName} AND NOT EXISTS (SELECT 1
+		FROM BOARD_TAG_TB
 		WHERE BOARD_NO_PK = #{boardNo} AND TAG_NUM_PK = t.TAG_NUM_PK)
 	</insert>
 
@@ -191,22 +223,26 @@
 		resultType="string">
 		SELECT t.TAG_NAME
 		FROM BOARD_TAG_TB bt
-		JOIN TAG_TB t ON bt.TAG_NUM_PK = t.TAG_NUM_PK
+		JOIN TAG_TB t ON
+		bt.TAG_NUM_PK = t.TAG_NUM_PK
 		WHERE bt.BOARD_NO_PK = #{boardNo}
 	</select>
 
 	<!-- 게시글 삭제 시 연결된 태그 삭제 -->
 	<delete id="deleteBoardTags" parameterType="int">
-		DELETE FROM BOARD_TAG_TB
+		DELETE FROM
+		BOARD_TAG_TB
 		WHERE BOARD_NO_PK = #{boardNo}
 	</delete>
 
 	<!-- 검색된 게시글 리스트 조회 -->
 	<select id="searchBoardList" resultMap="BOARD_TB">
 		SELECT b.BOARD_NO_PK, b.MEMBER_ID_PK, b.BOARD_TITLE, b.BOARD_CONTENT,
-		b.BOARD_DT, b.BOARD_OPEN, b.BOARD_CATEGORY, b.BOARD_CNT, b.BOARD_LIKES, m.MEMBER_NICK
+		b.BOARD_DT, b.BOARD_OPEN, b.BOARD_CATEGORY, b.BOARD_CNT,
+		b.BOARD_LIKES, m.MEMBER_NICK
 		FROM BOARD_TB b
-		JOIN MEMBER_TB m ON b.MEMBER_ID_PK = m.MEMBER_ID_PK
+		JOIN MEMBER_TB m ON
+		b.MEMBER_ID_PK = m.MEMBER_ID_PK
 
 		<!-- 기록 게시판(2)에서만 해시태그 검색 적용 -->
 		<if test="category == 2 and searchType == 'tag'">
@@ -248,7 +284,8 @@
 	<select id="getSearchTotalPosts" resultType="int">
 		SELECT COUNT(*)
 		FROM BOARD_TB b
-		JOIN MEMBER_TB m ON b.MEMBER_ID_PK = m.MEMBER_ID_PK
+		JOIN MEMBER_TB m ON b.MEMBER_ID_PK =
+		m.MEMBER_ID_PK
 
 		<!-- 기록에서만 해시태그 검색 적용 -->
 		<if test="category == 2 and searchType == 'tag'">
@@ -288,9 +325,11 @@
 			SELECT BOARD_TB_SEQ.CURRVAL FROM DUAL
 		</selectKey>
 		INSERT INTO BOARD_TB
-		(BOARD_NO_PK, MEMBER_ID_PK, BOARD_TITLE, BOARD_CONTENT, BOARD_DT, 
+		(BOARD_NO_PK, MEMBER_ID_PK, BOARD_TITLE,
+		BOARD_CONTENT, BOARD_DT,
 		BOARD_OPEN, BOARD_CNT, BOARD_CATEGORY, BOARD_LIKES)
-		VALUES (BOARD_TB_SEQ.NEXTVAL, #{id}, #{title}, #{content},
+		VALUES (BOARD_TB_SEQ.NEXTVAL,
+		#{id}, #{title}, #{content},
 		SYSDATE, 1, 0, 3, 0)
 	</insert>
 
@@ -307,13 +346,16 @@
 	<select id="getMateBoardDetail" parameterType="int"
 		resultMap="BOARD_TB">
 		SELECT * FROM BOARD_TB
-		WHERE BOARD_NO_PK = #{boardNo} AND BOARD_CATEGORY = 3
+		WHERE BOARD_NO_PK = #{boardNo} AND
+		BOARD_CATEGORY = 3
 	</select>
 
 	<!-- 여행 메이트 게시글 수정 -->
 	<update id="modifyMateBoard">
-		UPDATE BOARD_TB SET BOARD_TITLE=#{title}, BOARD_CONTENT=#{content}
-		WHERE BOARD_NO_PK=#{boardNo} AND BOARD_CATEGORY=3
+		UPDATE BOARD_TB SET BOARD_TITLE=#{title},
+		BOARD_CONTENT=#{content}
+		WHERE BOARD_NO_PK=#{boardNo} AND
+		BOARD_CATEGORY=3
 	</update>
 
 	<!-- 여행 메이트 게시글 삭제 -->
@@ -332,7 +374,8 @@
 			AND BOARD_CONTENT LIKE #{keyword}
 		</if>
 		<if test="searchType == 'titleContent'">
-			AND (BOARD_TITLE LIKE #{keyword} OR BOARD_CONTENT LIKE #{keyword})
+			AND (BOARD_TITLE LIKE #{keyword} OR BOARD_CONTENT LIKE
+			#{keyword})
 		</if>
 		ORDER BY BOARD_NO_PK DESC
 		OFFSET #{offset} ROWS FETCH NEXT #{limit}

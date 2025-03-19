@@ -22,7 +22,7 @@ public interface BoardService {
 	// 댓글
 	public void addReply(BoardRepDTO replyDTO);
 	public List<BoardRepDTO> getRepliesByBoardNo(int boardNo);
-	public String deleteReply(int replyNo, String path);
+	public int deleteReply(int replyNo, String path);
 
 	// 해시태그
 	public List<String> tagList(int boardNo); 
