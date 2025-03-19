@@ -34,11 +34,32 @@
         WHERE FOLLOWING_ID = #{followingId}
     </select>
     
-   <select id="isFollowing" resultType="boolean">
-    	SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
-    	FROM FOLLOW_TB
-    	WHERE FOLLOWER_ID = #{followerId} AND FOLLOWING_ID = #{followingId}
-	</select>
+   <!-- ✅ 팔로우 여부 확인 -->
+    <select id="isFollowing" parameterType="map" resultType="int">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM FOLLOW_TB
+        WHERE FOLLOWER_ID = #{followerId} AND FOLLOWING_ID = #{followingId}
+    </select>
+    
+    <!-- 언팔로우 요청 -->
+    <delete id="unfollowUser" parameterType="map">  <!-- ✅ 올바른 방식 -->
+    	DELETE FROM FOLLOW_TB WHERE FOLLOWER_ID = #{followerId} AND FOLLOWING_ID = #{followingId}
+	</delete>
+	
+	<delete id="deleteFollow">
+   		DELETE FROM FOLLOW_TB 
+    	WHERE FOLLOWER_ID = #{followerId} 
+    	AND FOLLOWING_ID = #{followingId}
+	</delete>
+	
+	<!-- 팔로우 요청 -->
+	<insert id="followUser">
+    	INSERT INTO FOLLOW_TB (FOLLOWER_ID, FOLLOWING_ID, CREATED_AT)
+    	VALUES (#{followerId}, #{followingId}, SYSDATE)
+	</insert>
+	
+	
+    
 
 
 </mapper>

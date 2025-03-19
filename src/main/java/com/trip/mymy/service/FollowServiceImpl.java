@@ -16,30 +16,25 @@ public class FollowServiceImpl implements FollowService {
     @Autowired
     private FollowMapper followMapper;
 
-    @Transactional
+    
     @Override
     public void followUser(FollowingDTO followingDTO) {
-        if (!followMapper.isFollowing(followingDTO)) {
-            followMapper.followUser(followingDTO);
-        } else {
-            throw new RuntimeException("이미 팔로우한 사용자입니다.");
-        }
+        followMapper.followUser(followingDTO);
     }
 
-    @Transactional
-    @Override
-    public void unfollowUser(FollowingDTO followingDTO) {
-        if (followMapper.isFollowing(followingDTO)) {
-            followMapper.unfollowUser(followingDTO);
-        } else {
-            throw new RuntimeException("팔로우하지 않은 사용자입니다.");
-        }
-    }
+
+//    @Transactional
+//    public void unfollowUser(String followerId, String followingId) {
+//        followMapper.unfollowUser(followerId, followingId); // ✅ 직접 String 값 전달
+//    }
+
 
     @Override
     public boolean isFollowing(String followerId, String followingId) {
-        return followMapper.isFollowing(followerId, followingId);
+        Integer result = followMapper.isFollowing(followerId, followingId);
+        return result != null && result > 0;  // ✅ 1이면 true, 0이면 false 반환
     }
+
 
 
 
@@ -71,4 +66,24 @@ public class FollowServiceImpl implements FollowService {
     public List<FollowerDTO> getFollowerList(String followingId) {
         return followMapper.getFollowerList(followingId);
     }
+
+    @Override
+    public void unfollowUser(FollowingDTO followingDTO) {
+        try {
+            System.out.println("🚀 언팔로우 요청: " + followingDTO.getFollowerId() + " → " + followingDTO.getFollowingId());
+
+            // MyBatis Mapper를 호출하여 언팔로우 실행
+            int deletedRows = followMapper.deleteFollow(followingDTO);
+
+            if (deletedRows > 0) {
+                System.out.println("✅ 언팔로우 성공: " + followingDTO.getFollowerId() + " → " + followingDTO.getFollowingId());
+            } else {
+                System.out.println("⚠️ 언팔로우 실패: 해당 팔로우 관계가 존재하지 않음.");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ 언팔로우 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }

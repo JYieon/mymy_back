@@ -46,6 +46,7 @@ public class BoardServiceImpl implements BoardService {
 
 	// 댓글 저장
 	public void addReply(BoardRepDTO replyDTO) {
+		System.out.println(replyDTO.getBoardNo());
 		// PARENT_NO가 NULL이면 기본값 0 설정
 		if (replyDTO.getParentNo() == null) {
 			replyDTO.setParentNo(0);
