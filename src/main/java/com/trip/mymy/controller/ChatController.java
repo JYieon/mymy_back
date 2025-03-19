@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.trip.mymy.common.jwt.TokenProvider;
+import com.trip.mymy.dto.AlarmDTO;
 import com.trip.mymy.dto.MemberDTO;
 import com.trip.mymy.dto.chat.ChatDTO;
 import com.trip.mymy.dto.chat.ChatMessageDTO;
@@ -44,6 +45,8 @@ public class ChatController {
 	@Autowired ChatServiceImpl cs;
 	@Autowired MoneyServiceImpl ms;
 	@Autowired TokenProvider tp;
+    @Autowired
+    private AlarmController alramController;
 
 	 @Autowired PortOneService portOneService;
 	
@@ -99,7 +102,18 @@ public class ChatController {
 	    if (dto == null) { //아이디 DB에 없음
 	        return ResponseEntity.ok().body("없는 아이디"); 
 	    } else { //있는 아이디. 채팅방에 추가
-	    	int result = cs.inviteMember(sender.getNick(), inviteUser, roomNum);
+	    	int result = cs.inviteMember(inviteUser, roomNum);
+	    	System.out.println(roomNum);
+	    	System.out.println(roomNum.intValue());
+//			 방 초대 알람
+			 AlarmDTO alarm = AlarmDTO.builder()
+		        		.senderId(sender.getNick())
+		        		.memberId(inviteUser)
+		        		.alarmTypeId(3)
+		        		.addr(roomNum.intValue())
+		        		.build();
+		        System.out.println("알람" + alarm);
+		        alramController.sendNotification(alarm);
 			return ResponseEntity.ok(result);
 	    }
 	}

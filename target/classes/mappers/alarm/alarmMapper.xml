@@ -21,7 +21,7 @@
     	<result property="createdAt" column="ALARM_CREATED_AT_DT" javaType="java.time.LocalDateTime"/>
     	<result property="memberId" column="MEMBER_ID_PK" />
     	<result property="alarmTypeId" column="ALARM_TYPE_ID_PK" javaType="int"/> 
-    	<result property="isRead" column="Is_READ" />
+    	<result property="isRead" column="IS_READ" />
     	<result property="addr" column="ALARM_ADDR" />
     	<result property="alarmTypeName" column="ALARM_TYPE_NAME"/>
     	<result property="alarmContent" column="ALARM_CONTENT" /> 
@@ -62,8 +62,7 @@
 
     <!-- 알람 추가 -->
     <insert id="insertAlarm">
-    	INSERT INTO ALARM_TB (ALARM_NO_PK, SENDER_ID, ALARM_CREATED_AT_DT, MEMBER_ID_PK, ALARM_TYPE_ID_PK, IS_READ)
-    	VALUES (ALARM_TB_SEQ.NEXTVAL, #{senderId}, SYSDATE, #{memberId}, #{alarmTypeId}, 0)
+    	INSERT INTO ALARM_TB VALUES (ALARM_TB_SEQ.NEXTVAL, #{senderId}, SYSDATE, #{memberId}, #{alarmTypeId}, 0, #{addr})
 	</insert>
 
 

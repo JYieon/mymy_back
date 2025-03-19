@@ -17,21 +17,11 @@ public class FollowServiceImpl implements FollowService {
 
     @Autowired
     private FollowMapper followMapper;
-    @Autowired
-    private AlarmController alramController;
 
     
     @Override
-    public void followUser(String sender, FollowingDTO followingDTO) {
+    public void followUser(FollowingDTO followingDTO) {
         followMapper.followUser(followingDTO);
-        
-        AlarmDTO alarm = AlarmDTO.builder()
-        		.senderId(sender)
-        		.memberId(followingDTO.getFollowingId())
-        		.alarmTypeId(4)
-        		.build();
-        System.out.println("알람" + alarm);
-        alramController.sendNotification(alarm);
     }
 
 

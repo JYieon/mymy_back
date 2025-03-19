@@ -22,9 +22,6 @@ import com.trip.mymy.mybatis.ChatMapper;
 public class ChatServiceImpl implements ChatService{
 	@Autowired ChatMapper cm;
 	@Autowired SimpMessagingTemplate messagingTemplate;
-    @Autowired
-    private AlarmController alramController;
-	
 	
 	public List<ChatDTO> findChatList(String member) {
 		System.out.println("find: "+member);
@@ -71,7 +68,7 @@ public class ChatServiceImpl implements ChatService{
 	}
 	
 	//방 초대하기
-	public int inviteMember(String sender, String member, Long roomNum) {
+	public int inviteMember(String member, Long roomNum) {
 		ChatMemberDTO chatMember = ChatMemberDTO.builder()
 				.roomNum(roomNum)
 				.member(member)
@@ -79,15 +76,6 @@ public class ChatServiceImpl implements ChatService{
 				.build();
 		 int result = cm.insertChatMember(chatMember);
 		 enterLeaveMsg(member, roomNum, "enter");
-//		 방 초대 알람
-		 AlarmDTO alarm = AlarmDTO.builder()
-	        		.senderId(sender)
-	        		.memberId(member)
-	        		.alarmTypeId(3)
-	        		.addr(roomNum.intValue())
-	        		.build();
-	        System.out.println("알람" + alarm);
-	        alramController.sendNotification(alarm);
 	        
 		 return result;
 	}

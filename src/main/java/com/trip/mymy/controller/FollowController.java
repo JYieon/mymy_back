@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.trip.mymy.dto.FollowingDTO;
 import com.trip.mymy.dto.MemberDTO;
 import com.trip.mymy.common.jwt.TokenProvider;
+import com.trip.mymy.dto.AlarmDTO;
 import com.trip.mymy.dto.FollowerDTO;
 import com.trip.mymy.service.FollowService;
 
@@ -30,6 +31,8 @@ public class FollowController {
 
     @Autowired
     private FollowService followService;
+    @Autowired
+    private AlarmController alramController;
     @Autowired TokenProvider tp;
 
     // ✅ 팔로우 요청 (토큰 기반)
@@ -55,7 +58,15 @@ public class FollowController {
             followingDTO.setFollowerId(followerId);
             followingDTO.setFollowingId(followingId);
 
-            followService.followUser(member.getNick(), followingDTO);
+            followService.followUser(followingDTO);
+//          팔로우 알람
+            AlarmDTO alarm = AlarmDTO.builder()
+            		.senderId(member.getNick())
+            		.memberId(followingDTO.getFollowingId())
+            		.alarmTypeId(4)
+            		.build();
+            System.out.println("알람" + alarm);
+            alramController.sendNotification(alarm);
             return ResponseEntity.ok("팔로우 성공!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("🚨 팔로우 실패: " + e.getMessage());
@@ -68,9 +79,9 @@ public class FollowController {
     @DeleteMapping("/{followingId}")
     public ResponseEntity<?> unfollowUser(@PathVariable String followingId,
                                           @RequestHeader("Authorization") String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
+//        if (token.startsWith("Bearer ")) {
+//            token = token.substring(7);
+//        }
 
         Authentication authentication = tp.getAuthentication(token);
         MemberDTO member = (MemberDTO) authentication.getPrincipal();
@@ -130,9 +141,9 @@ public class FollowController {
 
         try {
             // ✅ "Bearer " 제거 후 토큰 검증
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7); // "Bearer " 제거
-            }
+//            if (token.startsWith("Bearer ")) {
+//                token = token.substring(7); // "Bearer " 제거
+//            }
 
             Authentication authentication = tp.getAuthentication(token);
             MemberDTO member = (MemberDTO) authentication.getPrincipal();
@@ -154,9 +165,9 @@ public class FollowController {
 
         try {
             // ✅ "Bearer " 제거 후 토큰 검증
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
+//            if (token.startsWith("Bearer ")) {
+//                token = token.substring(7);
+//            }
 
             Authentication authentication = tp.getAuthentication(token);
             MemberDTO member = (MemberDTO) authentication.getPrincipal();

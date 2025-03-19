@@ -5,7 +5,7 @@ import com.trip.mymy.dto.FollowingDTO;
 import com.trip.mymy.dto.FollowerDTO;
 
 public interface FollowService {
-    void followUser(String sender, FollowingDTO followDTO);
+    void followUser(FollowingDTO followDTO);
     boolean isFollowing(String followerId, String followingId); 
     List<FollowingDTO> getFollowingList(String followerId);
     List<FollowerDTO> getFollowerList(String followingId);

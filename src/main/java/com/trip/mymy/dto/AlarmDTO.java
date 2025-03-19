@@ -17,10 +17,7 @@ public class AlarmDTO {
 	private int isRead;
 	private int addr;
 	private String alarmTypeName;
-	private String alarmContent;
-	
-
-	
+	private String alarmContent;	
 	
 	public int getAlarmNo() {
 		return alarmNo;
