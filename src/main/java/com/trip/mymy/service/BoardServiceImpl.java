@@ -185,40 +185,61 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	// 게시글 저장 (HTML 정리 + 첫 번째 이미지 자동 추출)
-	public boolean writeSave(BoardDTO dto) {
-		//	공개 범위 기본값 설정
-		if (dto.getBoardOpen() == 0 || dto.getBoardOpen() == 1) {
-		} else {
-			dto.setBoardOpen(1); // 기본값 1 (공개) 설정
-		}
+	public int writeSave(BoardDTO dto) {
+	    System.out.println("📌 writeSave 호출됨!");
 
-		try {
-			// HTML 내용 정리
-			Document doc = Jsoup.parse(dto.getContent());
-			doc.select("script, style").remove();
+	    if (dto == null) {
+	        System.out.println("❌ dto가 null입니다!");
+	        return 0;
+	    }
+	    if (dto.getTitle() == null) {
+	        System.out.println("❌ dto.getTitle()이 null입니다!");
+	    }
+	    if (dto.getContent() == null) {
+	        System.out.println("❌ dto.getContent()이 null입니다!");
+	    }
+	    if (dto.getBoardOpen() == null) {
+	        System.out.println("❌ dto.getBoardOpen()이 null입니다! 기본값(1) 설정");
+	        dto.setBoardOpen(1);
+	    }
+	    if (dto.getBoardCategory() == null) {
+	        System.out.println("❌ dto.getBoardCategory()가 null입니다! 기본값(1) 설정");
+	        dto.setBoardCategory(1);
+	    }
 
-			// <br> 태그를 (\n)로 변환
-			String formattedContent = doc.body().html().replace("<br>", "\n").replace("<br/>", "\n");
+	    try {
+	        // HTML 내용 정리
+	        Document doc = Jsoup.parse(dto.getContent());
+	        doc.select("script, style").remove();
 
-			// <img> 태그만 유지
-			formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
-			dto.setContent(formattedContent); // 변경된 내용을 DTO에 적용
+	        // <br> 태그를 (\n)로 변환
+	        String formattedContent = doc.body().html().replace("<br>", "\n").replace("<br/>", "\n");
 
-			// DB에 저장
-			int result = mapper.writeSave(dto);
+	        // <img> 태그만 유지
+	        formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
+	        dto.setContent(formattedContent); // 변경된 내용을 DTO에 적용
 
-			// 해시태그 저장
+	        // 게시글 저장
+	        int result = mapper.writeSave(dto);
+	        
+	        // 저장된 boardNo 확인
+	        int boardNo = dto.getBoardNo();
+	        System.out.println("✅ 저장된 boardNo: " + boardNo);
+
+	        // 해시태그 저장
 	        if (result == 1 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-	            addTags(dto.getBoardNo(), dto.getHashtags());
+	            addTags(boardNo, dto.getHashtags());
 	        }
-	        return result == 1;
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false; // 실패 시 false 반환
-		}
+	        return boardNo;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return -1; // 실패 시 -1 반환
+	    }
 	}
 
+
+	
 	// 게시글 수정 (태그 포함)
 	public boolean modify(BoardDTO dto) {
 		try {

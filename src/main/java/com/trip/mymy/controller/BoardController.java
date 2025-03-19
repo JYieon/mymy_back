@@ -41,46 +41,39 @@ public class BoardController {
 	@Autowired TokenProvider tp;
 
 	@PostMapping("/writeSave")
-	public ResponseEntity<String> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
-		// 토큰이 비어 있거나 null일 경우 처리
-		if (token == null || token.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JWT 토큰이 비어 있거나 null입니다.");
-		}
-		try {
-			// "Bearer " 부분을 제거하고 실제 토큰만 사용
-			String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+	public ResponseEntity<Map<String, Object>> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
+	    Map<String, Object> response = new HashMap<>();
 
-			// 토큰을 통해 인증 정보를 가져옴
-			Authentication authentication = tp.getAuthentication(jwtToken);
-			if (authentication == null) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
-			}
+	    try {
+	        // 토큰 검증 및 사용자 정보 가져오기
+	        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+	        Authentication authentication = tp.getAuthentication(jwtToken);
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal();
+	        dto.setId(member.getId());
 
-			MemberDTO member = (MemberDTO) authentication.getPrincipal();
-			dto.setId(member.getId()); // 사용자 ID 설정
+	        // 게시글 저장 후 boardNo 반환
+	        int boardNo = bs.writeSave(dto);
+	        System.out.println("✅ 반환된 boardNo: " + boardNo); // ✅ 로그 추가
 
-			// 계획 게시글이면 공개 여부 및 해시태그 제거
-			if (dto.getBoardCategory() == 1) {
-				dto.setBoardOpen(null);
-				dto.setHashtags(null);
-			}
-
-			// 게시글 저장
-			boolean success = bs.writeSave(dto);
-			if (success) {
-				// 기록 게시글에만 해시태그 추가
-				if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-					bs.addTags(dto.getBoardNo(), dto.getHashtags());
-				}
-				return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
-			} else {
-				return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
-			}
-		} catch (Exception e) {
-			// 예외 처리
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
-		}
+	        if (boardNo > 0) {
+	            response.put("status", 200);
+	            response.put("message", "게시글이 성공적으로 저장되었습니다.");
+	            response.put("boardNo", boardNo); // ✅ boardNo 프론트로 반환
+	            return ResponseEntity.ok(response);
+	        } else {
+	            response.put("status", 400);
+	            response.put("message", "게시글 저장 실패");
+	            return ResponseEntity.badRequest().body(response);
+	        }
+	    } catch (Exception e) {
+	    	 // ✅ 오류 메시지 콘솔에 출력
+	        e.printStackTrace();
+	        response.put("status", 500);
+	        response.put("message", "서버 오류 발생: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
 	}
+
 
 	@PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
