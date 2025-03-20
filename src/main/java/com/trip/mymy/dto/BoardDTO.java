@@ -5,7 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class BoardDTO {
-	int boardNo, boardCnt, boardLikes;
+	int boardNo, boardCnt, boardLikes, repCnt;
+	public int getRepCnt() {
+		return repCnt;
+	}
+	public void setRepCnt(int repCnt) {
+		this.repCnt = repCnt;
+	}
 	private Integer boardCategory;
 	private Integer boardOpen;
 	String title, content, id, date; 

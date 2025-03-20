@@ -32,6 +32,9 @@ public interface BoardMapper {
 	public int deleteReply(@Param("replyNo") int replyNo);
 	public int checkParentExists(@Param("parentNo") int parentNo);
 	public String getReplyWriter(@Param("replyNo") int replyNo);
+	public void updateReplyCnt(@Param("boardNo") int boardNo, @Param("increment") int increment);
+	public int getBoardNoByReplyNo(@Param("replyNo") int replyNo);
+
 
 	// 해시태그
 	public List<String> getTagsByBoardNo(@Param("boardNo") int boardNo);

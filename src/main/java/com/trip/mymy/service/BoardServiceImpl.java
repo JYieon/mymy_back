@@ -64,6 +64,7 @@ public class BoardServiceImpl implements BoardService {
 
 		// 댓글 추가
 		mapper.addReply(replyDTO);
+		mapper.updateReplyCnt(replyDTO.getBoardNo(), 1);
 	}
 
 	// 댓글 목록 조회
@@ -88,9 +89,18 @@ public class BoardServiceImpl implements BoardService {
 	    if (!writerId.equals(id)) {
 	        throw new RuntimeException("해당 댓글을 삭제할 권한이 없습니다.");
 	    }
+	    
+	    int boardNo = mapper.getBoardNoByReplyNo(replyNo);
+	    
+	   
+	    int result= mapper.deleteReply(replyNo);
+	    
+	    // 게시글의 댓글 개수 감소
+	    if (result > 0) {
+	        mapper.updateReplyCnt(boardNo, -1);
+	    }
 
-	    // 4️⃣ 댓글 삭제 실행 (삭제된 행 개수 반환)
-	    return mapper.deleteReply(replyNo);
+	    return result;
 	}
 
 
@@ -159,6 +169,7 @@ public class BoardServiceImpl implements BoardService {
 			postMap.put("boardLikes", post.getBoardLikes());
 			postMap.put("boardOpen", post.getBoardOpen());
 			postMap.put("date", post.getDate().toString());
+			postMap.put("repCnt", post.getRepCnt());
 
 			// 첫 번째 이미지 추출
 			String content = post.getContent();
