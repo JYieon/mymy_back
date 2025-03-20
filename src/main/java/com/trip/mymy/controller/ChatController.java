@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -72,7 +73,7 @@ public class ChatController {
 	}
 	
 	@GetMapping("user/info")
-	public ResponseEntity<MemberDTO> getuserInfo(@RequestParam String token){
+	public ResponseEntity<MemberDTO> getuserInfo(@RequestHeader("Authorization") String token){
 		Authentication authentication = tp.getAuthentication(token);
 		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
 		return ResponseEntity.ok(member);

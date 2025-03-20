@@ -130,9 +130,26 @@ public class TokenProvider {
     public Authentication getAuthentication(String accessToken) {
     	System.out.println("토큰 복호화");
     	System.out.println(accessToken);
+    	
+    	if (accessToken != null && accessToken.startsWith("Bearer ")) {
+    	    accessToken = accessToken.substring(7);  // "Bearer " 부분을 제거
+    	}
+    	
         Claims claims = parseClaims(accessToken); // 토큰 복호화
         System.out.println(claims);
-        // 토큰 복호화에 실패하면
+     // 토큰 복호화에 실패하거나 만료된 경우 예외 처리
+        if (claims == null) {
+            throw new RuntimeException("토큰 복호화 실패");
+        }
+        
+        System.out.println(claims.getExpiration());
+        
+        // 만료된 토큰 확인
+        if (claims.getExpiration().before(new Date())) {
+            throw new RuntimeException("토큰이 만료되었습니다.");
+        }
+
+        // 토큰에 권한 정보가 없으면 예외 처리
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }

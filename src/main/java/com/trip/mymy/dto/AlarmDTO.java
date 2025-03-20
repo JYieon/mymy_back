@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.Builder;
 
+@Builder
 public class AlarmDTO {
 	private int alarmNo;
 	private String senderId;
@@ -12,11 +14,10 @@ public class AlarmDTO {
 	private LocalDateTime createdAt;
 	private String memberId;
 	private int alarmTypeId;
-	private String alarmTypeName;
-	private String alarmContent;
 	private int isRead;
-
-	
+	private int addr;
+	private String alarmTypeName;
+	private String alarmContent;	
 	
 	public int getAlarmNo() {
 		return alarmNo;
@@ -63,9 +64,14 @@ public class AlarmDTO {
 	public int getIsRead() {
 		return isRead;
 	}
-	public void setIsRead(int isRead) {
-		this.isRead = isRead;
+	public void setIsRead(int inRead) {
+		this.isRead = inRead;
 	}
-	
+	public int getAddr() {
+		return addr;
+	}
+	public void setAddr(int addr) {
+		this.addr = addr;
+	}
 
 }

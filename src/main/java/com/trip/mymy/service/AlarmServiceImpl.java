@@ -22,8 +22,8 @@ public class AlarmServiceImpl implements AlarmService {
     @Autowired
     private AlarmMapper alarmMapper;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate; // WebSocket 사용
+//    @Autowired
+//    private SimpMessagingTemplate messagingTemplate; // WebSocket 사용
 
     /**
      * 특정 사용자의 알람 목록 조회
@@ -31,8 +31,16 @@ public class AlarmServiceImpl implements AlarmService {
      * @return 사용자의 알람 목록 리스트
      */
     @Override
-    public List<AlarmDTO> getUserAlarms(String memberId) {
-        return alarmMapper.getUserAlarms(memberId);
+    public List<AlarmDTO> getUserAlarms(String userId) {
+    	System.out.println("serGetUserAlram" + userId);
+    	List<AlarmDTO> aram = new ArrayList();
+    	try {
+    		aram = alarmMapper.getUserAlarms(userId);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+    	System.out.println("!!!!!!!!!"+ aram);
+        return aram;
     }
 
     /**
@@ -45,11 +53,11 @@ public class AlarmServiceImpl implements AlarmService {
         alarmMapper.insertAlarm(a_dto);
         
         //WebSocket을 통해 알람을 실시간 전송
-        try {
-            messagingTemplate.convertAndSend("/topic/notifications/" + a_dto.getMemberId(), a_dto);
-        } catch (Exception e) {
-            System.err.println("WebSocket 메시지 전송 실패: " + e.getMessage());
-        }
+//        try {
+//            messagingTemplate.convertAndSend("/topic/notifications/" + a_dto.getMemberId(), a_dto);
+//        } catch (Exception e) {
+//            System.err.println("WebSocket 메시지 전송 실패: " + e.getMessage());
+//        }
     }
 
     /**
@@ -102,63 +110,42 @@ public class AlarmServiceImpl implements AlarmService {
      * @param userId 알람을 조회할 사용자 ID
      * @return 해당 사용자의 알람 리스트
      */
-	@Override
-	public List<AlarmDTO> getAlarms(String userId) {
-	    List<AlarmDTO> alarms = alarmMapper.getAlarms(userId);
-
-	    // 알람 내용이 없으면 알람 타입에 따라 자동 설정
-	    for (AlarmDTO alarm : alarms) {
-	        if (alarm.getAlarmContent() == null || alarm.getAlarmContent().isEmpty()) {
-	            switch (alarm.getAlarmTypeId()) {
-	                case 1: 
-	                    alarm.setAlarmContent("내 게시글에 댓글이 달렸습니다.");
-	                    break;
-	                case 2: 
-	                    alarm.setAlarmContent("내가 팔로우한 사용자의 새 게시물이 게시되었습니다.");
-	                    break;
-	                case 3: 
-	                    alarm.setAlarmContent("새로운 채팅이 도착했습니다.");
-	                    break;
-	                case 4: 
-	                    alarm.setAlarmContent("새로운 팔로우 요청이 도착했습니다.");
-	                    break;
-	                default:
-	                    alarm.setAlarmContent("새로운 알림이 있습니다.");
-	                    break;
-	            }
-	        }
-	    }
-
-	    return alarms;
-	}
+		/*
+		 * @Override public List<AlarmDTO> getAlarms(String userId) { List<AlarmDTO>
+		 * alarms = alarmMapper.getUserAlarms(userId);
+		 * 
+		 * // 알람 내용이 없으면 알람 타입에 따라 자동 설정 for (AlarmDTO alarm : alarms) { if
+		 * (alarm.getAlarmContent() == null || alarm.getAlarmContent().isEmpty()) {
+		 * switch (alarm.getAlarmTypeId()) { case 1:
+		 * alarm.setAlarmContent("내 게시글에 댓글이 달렸습니다."); break; case 2:
+		 * alarm.setAlarmContent("내가 팔로우한 사용자의 새 게시물이 게시되었습니다."); break; case 3:
+		 * alarm.setAlarmContent("새로운 채팅이 도착했습니다."); break; case 4:
+		 * alarm.setAlarmContent("새로운 팔로우 요청이 도착했습니다."); break; default:
+		 * alarm.setAlarmContent("새로운 알림이 있습니다."); break; } } }
+		 * 
+		 * return alarms; }
+		 */
 	
 	/**
      * 특정 사용자의 읽지 않은 알람 개수를 조회
      * @param memberId 사용자 ID
      * @return 읽지 않은 알람 개수
      */
-	public List<AlarmDTO> getUnreadAlarms(int memberId){
-		 return alarmMapper.getUnreadAlarms(memberId);
-		
-	}
-	
 	@Override
-    public int markAlarmsAsRead(String memberId) {
+	public int getUnreadAlarmCount(String memberId) {
+	    return alarmMapper.getUnreadAlarmCount(memberId);
+	}
+
+	@Override
+    public int markAlarmsAsRead(int no) {
         try {
-            System.out.println("🚀 알림 읽음 처리 시작: userId = " + memberId);
-            int updatedRows = alarmMapper.markAlarmsAsRead(memberId);
+            int updatedRows = alarmMapper.markAlarmsAsRead(no);
             System.out.println("✅ 알림 읽음 처리 완료: " + updatedRows + "개의 행 업데이트됨");
             return updatedRows;
         } catch (Exception e) {
             System.out.println("🚨 SQL 실행 오류: " + e.getMessage());
             return 0;
         }
-    }
-	
-	
-	
-
-
-
+	}
 
 } 
