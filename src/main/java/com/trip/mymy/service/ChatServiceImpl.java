@@ -10,6 +10,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.trip.mymy.controller.AlarmController;
+import com.trip.mymy.dto.AlarmDTO;
 import com.trip.mymy.dto.chat.ChatDTO;
 import com.trip.mymy.dto.chat.ChatMemberDTO;
 import com.trip.mymy.dto.chat.ChatMessageDTO;
@@ -20,7 +22,6 @@ import com.trip.mymy.mybatis.ChatMapper;
 public class ChatServiceImpl implements ChatService{
 	@Autowired ChatMapper cm;
 	@Autowired SimpMessagingTemplate messagingTemplate;
-	
 	
 	public List<ChatDTO> findChatList(String member) {
 		System.out.println("find: "+member);
@@ -75,16 +76,27 @@ public class ChatServiceImpl implements ChatService{
 				.build();
 		 int result = cm.insertChatMember(chatMember);
 		 enterLeaveMsg(member, roomNum, "enter");
+	        
 		 return result;
 	}
 	
-	public void removeRoom(Long roomNum, String member, String role) {
-		if(role.equals("방장")) {
+	public int removeRoom(Long roomNum, String member) {
+		String memberRole = cm.getUserChatRole(roomNum, member);
+		System.out.println(memberRole);
+		int result = 0;
+		
+		if(memberRole.equals("방장")) {
 			cm.removeRoomMember(roomNum);
-			cm.removeRoom(roomNum);	
+			cm.deleteMessage(roomNum);
+			result = cm.removeRoom(roomNum);	
 		}else {
-			cm.deleteMember(roomNum, member);
+			System.out.println("멤버 나가기");
+			System.out.println(roomNum);
+			result = cm.deleteMember(roomNum, member);
+			enterLeaveMsg(member, roomNum, "leave");
 		}
+		System.out.println("service" + result);
+		return result;
 	}
 	
 	public void enterLeaveMsg(String member, Long roomNum, String type) {
@@ -108,10 +120,10 @@ public class ChatServiceImpl implements ChatService{
 		cm.saveMsg(enterMsg);
 
 		// WebSocket을 통해 입장 메시지 전송
-		messagingTemplate.convertAndSend("/chat/chatRoomNo/" + roomNum + "/message", enterMsg);
+		messagingTemplate.convertAndSend("/topic/chatRoomNo/" + roomNum + "/message", enterMsg);
 		
 		List<ChatMemberDTO> chatMember = cm.findRoomMember(roomNum);
-		messagingTemplate.convertAndSend("/chat/chatRoomNo/" + roomNum + "/enternleave", chatMember);
+		messagingTemplate.convertAndSend("/topic/chatRoomNo/" + roomNum + "/enternleave", chatMember);
 	}
 	
 	public List<ChatMessageDTO> getMessages(long roomNum){

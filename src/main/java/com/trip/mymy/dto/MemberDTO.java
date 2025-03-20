@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MemberDTO {
 	private String id, pwd, name, nick, phone, email, level, bank, profile;
+	private String testResult;
 	
 	@Builder.Default
 	private List<GrantedAuthority> authorities = new ArrayList<>();
@@ -101,5 +102,13 @@ public class MemberDTO {
 
 	public void setAuthorities(List<GrantedAuthority> authorities) {
 		this.authorities = authorities;
+	}
+
+	public String getTestResult() {
+		return testResult;
+	}
+
+	public void setTestResult(String testResult) {
+		this.testResult = testResult;
 	}
 }

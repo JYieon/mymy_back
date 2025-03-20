@@ -40,7 +40,7 @@ public class TestChat {
 	
 	@Test
 	public void testRemoveRoom() {
-		cs.removeRoom((long)24, "mymy", "방장");
+		cs.removeRoom((long)24, "mymy");
 	}
 	
 	@Test

@@ -44,9 +44,10 @@ public class BookmarkController {
 		
 		Authentication authentication = tp.getAuthentication(token);
 		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
-	 
+		
 	    // 사용자 ID로 북마크 목록 조회
 	    List<BoardDTO> bookmarkList = bs.getBookmarkList(member.getId());
+	    
 	    return ResponseEntity.ok(bookmarkList); // JSON으로 반환
 	}
 

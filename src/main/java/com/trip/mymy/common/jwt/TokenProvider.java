@@ -195,16 +195,16 @@ public class TokenProvider {
     }
     
     //비밀번호 재설정용 일회성 토큰
-    public String generateResetToken(String id) {
-    	long now = (new Date()).getTime();
-        Date resetTokenExpiresIn = new Date(now + (1000 * 60 * 10)); // 10분 후 만료
-
-        return Jwts.builder()
-                .setSubject(id)  // 이메일을 토큰의 subject로 설정
-                .setExpiration(resetTokenExpiresIn) // 만료 시간 설정
-                .signWith(key, SignatureAlgorithm.HS512) // 서명 방식 설정
-                .compact();
-    }
+//    public String generateResetToken(String id) {
+//    	long now = (new Date()).getTime();
+//        Date resetTokenExpiresIn = new Date(now + (1000 * 60 * 10)); // 10분 후 만료
+//
+//        return Jwts.builder()
+//                .setSubject(id)  // 이메일을 토큰의 subject로 설정
+//                .setExpiration(resetTokenExpiresIn) // 만료 시간 설정
+//                .signWith(key, SignatureAlgorithm.HS512) // 서명 방식 설정
+//                .compact();
+//    }
     
     //카카오
     public String getKakaoAccessToken(String code) throws Exception {

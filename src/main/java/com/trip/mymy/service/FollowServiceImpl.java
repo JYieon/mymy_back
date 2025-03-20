@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.trip.mymy.dto.FollowingDTO;
+import com.trip.mymy.controller.AlarmController;
+import com.trip.mymy.dto.AlarmDTO;
 import com.trip.mymy.dto.FollowerDTO;
 import com.trip.mymy.mybatis.FollowMapper;
 
@@ -85,5 +87,4 @@ public class FollowServiceImpl implements FollowService {
             e.printStackTrace();
         }
     }
-
 }

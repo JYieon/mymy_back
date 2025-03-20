@@ -12,7 +12,7 @@ public interface ChatService {
 	public ChatResDTO joinRoom(long roomNum);
 	public int createRoom(String member, String roomName);
 	public int inviteMember(String member, Long roomNum);
-	public void removeRoom(Long roomNum, String member, String role);
+	public int removeRoom(Long roomNum, String member);
 	public void enterLeaveMsg(String member, Long roomNum, String type);
 	public List<ChatMessageDTO> getMessages(long roomNum);
 	public void saveMessage(ChatMessageDTO chatMsg);

@@ -30,5 +30,10 @@ public class MypageServiceImpl implements MypageService {
         int result = mypageMapper.isUpdateMember(member);
         return result > 0;
     }
+    
+    // 여행자 테스트 결과 저장
+    public void updateTestResult(String id, String testResult) {
+            mypageMapper.updateTestResult(id, testResult);
+    }
 
 }

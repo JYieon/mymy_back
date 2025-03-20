@@ -38,8 +38,7 @@ public class BookmarkServiceImpl implements BookmarkService{
 	}
 
     // 북마크 목록 조회
-	public List<BoardDTO> getBookmarkList(String id) {
-		id="a"; //테스트용
+	public List<BoardDTO> getBookmarkList(String id) { 
 	    List<BoardDTO> list = bookmarkMapper.getBookmarkList(id);
 	    return list;
 	}

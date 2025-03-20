@@ -12,4 +12,5 @@ public class ChatResDTO {
 	private ChatDTO chat;
 	private List<ChatMemberDTO> member;
 	private List<ChatMessageDTO> messages;
+	
 }

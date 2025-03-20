@@ -10,7 +10,14 @@ public class MypageDTO {
 	private String level;
 	private String bank;
 	private String profile;
+	private String testResult;
 	
+	public String getTestResult() {
+		return testResult;
+	}
+	public void setTestResult(String testResult) {
+		this.testResult = testResult;
+	}
 	public String getId() {
 		return id;
 	}

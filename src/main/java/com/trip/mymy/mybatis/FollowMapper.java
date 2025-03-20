@@ -17,8 +17,5 @@ public interface FollowMapper {
 	boolean isFollowing(FollowingDTO followingDTO);
 //	public void unfollowUser(@Param("followerId") String followerId, @Param("followingId") String followingId);
 	int deleteFollow(FollowingDTO followingDTO);
-
-	
-	
 	
 }

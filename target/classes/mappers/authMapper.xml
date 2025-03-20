@@ -22,7 +22,10 @@
     	select * from MEMBER_TB where MEMBER_NAME = #{name} AND MEMBER_EMAIL = #{email}
     </select>
     <select id="checkEmail" resultMap="member">
-    	select * from Member_TB where MEMBER_EMAIL = #{email}
+    	select * from MEMBER_TB where MEMBER_EMAIL = #{email}
+    </select>
+    <select id="findPwd" resultMap="member">
+    	select * from MEMBER_TB where MEMBER_ID_PK = #{id} and MEMBER_EMAIL = #{email}
     </select>
     <update id="resetPwd">
     	update MEMBER_TB set MEMBER_PWD = #{pwd} where MEMBER_ID_PK = #{id}
