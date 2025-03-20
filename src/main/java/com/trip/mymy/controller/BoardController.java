@@ -374,6 +374,11 @@ public class BoardController {
 
 		return ResponseEntity.ok(response);
 	}
-
+	
+	@GetMapping("/hashtags")
+	public ResponseEntity<List<Map<String, Object>>> getAllTagsCnt() {
+	    List<Map<String, Object>> hashtags = bs.getAllTagsCnt();
+	    return ResponseEntity.ok(hashtags);
+	}
 
 }

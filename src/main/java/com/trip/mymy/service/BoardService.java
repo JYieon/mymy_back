@@ -29,6 +29,7 @@ public interface BoardService {
 	public void addTags(int boardNo, List<String> tags);
 	public void deleteTags(int boardNo);
 	public void updateTags(int boardNo, List<String> tags);
+	public List<Map<String, Object>> getAllTagsCnt();
 
 	//검색
 	public List<Map<String, Object>> searchBoardList(int page,int category, String searchType, String keyword);

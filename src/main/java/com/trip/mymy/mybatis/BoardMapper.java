@@ -41,6 +41,8 @@ public interface BoardMapper {
 	public void insertTag(@Param("tagName") String tagName);
 	public void insertBoardTag(Map<String, Object> params);
 	public int deleteBoardTags(@Param("boardNo") int boardNo);
+	public List<Map<String, Object>> getAllTagsCnt();
+
 	
 	
 	// 검색
