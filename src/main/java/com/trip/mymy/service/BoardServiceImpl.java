@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.trip.mymy.dto.AlarmDTO;
 import com.trip.mymy.dto.BoardDTO;
 import com.trip.mymy.dto.BoardRepDTO;
 import com.trip.mymy.mybatis.BoardMapper;
@@ -48,6 +49,7 @@ public class BoardServiceImpl implements BoardService {
 	public void addReply(BoardRepDTO replyDTO) {
 		System.out.println(replyDTO.getBoardNo());
 		// PARENT_NO가 NULL이면 기본값 0 설정
+		System.out.println("reply" + replyDTO.getParentNo());
 		if (replyDTO.getParentNo() == null) {
 			replyDTO.setParentNo(0);
 		}
@@ -283,21 +285,10 @@ public class BoardServiceImpl implements BoardService {
 
 	// 게시글 삭제
 	@Transactional
-	public boolean delete(int boardNo) {
-	    try {
-	        // 1️ 해시태그 연결 데이터 삭제
-	        deleteTags(boardNo);
-
-	        // 2️ 게시글과 연결된 모든 데이터 삭제
-	        mapper.deleteAllByBoardNo(boardNo);
-	        
-	       // System.out.println("모든 데이터 삭제 완료! (게시글 번호: " + boardNo + ")");
-	        return true;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        // System.out.println("게시글 삭제 중 오류 발생: " + e.getMessage());
-	        return false;
-	    }
+	public boolean deleteBoard(int boardNo) {
+	    int result = mapper.deleteBoard(boardNo);
+	    //System.out.println("삭제된 행 개수: " + result);
+	    return result > 0;
 	}
 
 	// 특정 게시글과 연결된 해시태그 삭제
@@ -377,7 +368,7 @@ public class BoardServiceImpl implements BoardService {
 	// 여행 메이트 게시글 삭제
 	public boolean deleteMateBoard(int boardNo) {
 	    try {
-	        mapper.deleteAllByBoardNo(boardNo); // 게시글 삭제
+	        mapper.deleteBoard(boardNo); // 게시글 삭제
 	        return true;
 	    } catch (Exception e) {
 	        e.printStackTrace();

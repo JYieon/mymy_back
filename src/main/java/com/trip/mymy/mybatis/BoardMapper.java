@@ -16,7 +16,7 @@ public interface BoardMapper {
 	public BoardDTO getPost(int boardNo);
 	public int modify(BoardDTO dto);
 	public void boardCnt(@Param("boardNo") int boardNo);
-	public int deleteAllByBoardNo(@Param("boardNo") int boardNo);
+	public int deleteBoard(@Param("boardNo") int boardNo);
 
 	// 좋아요
 	public int getBoardLikes(@Param("boardNo") int boardNo);

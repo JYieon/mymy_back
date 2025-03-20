@@ -28,9 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.trip.mymy.common.jwt.TokenProvider;
+import com.trip.mymy.dto.AlarmDTO;
 import com.trip.mymy.dto.BoardDTO;
+import com.trip.mymy.dto.FollowerDTO;
 import com.trip.mymy.dto.MemberDTO;
 import com.trip.mymy.service.BoardService;
+import com.trip.mymy.service.FollowService;
 
 
 @RestController
@@ -39,19 +42,42 @@ import com.trip.mymy.service.BoardService;
 public class BoardController {
 	@Autowired BoardService bs;
 	@Autowired TokenProvider tp;
+	@Autowired AlarmController alramController;
+	@Autowired private FollowService followService;
 
 	@PostMapping("/writeSave")
-	public ResponseEntity<Map<String, Object>> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
-	    Map<String, Object> response = new HashMap<>();
+	public ResponseEntity<?> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
+		Map<String, Object> response = new HashMap<>();
+	
+		// 토큰이 비어 있거나 null일 경우 처리
+		if (token == null || token.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JWT 토큰이 비어 있거나 null입니다.");
+		}
+//		// "Bearer " 부분을 제거하고 실제 토큰만 사용
+//		String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
 
-	    try {
-	        // 토큰 검증 및 사용자 정보 가져오기
-	        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-	        Authentication authentication = tp.getAuthentication(jwtToken);
-	        MemberDTO member = (MemberDTO) authentication.getPrincipal();
-	        dto.setId(member.getId());
+		// 토큰을 통해 인증 정보를 가져옴
+		Authentication authentication = tp.getAuthentication(token);
+		MemberDTO member = (MemberDTO) authentication.getPrincipal();
+		dto.setId(member.getId()); // 사용자 ID 설정
+		try {
 
-	        // 게시글 저장 후 boardNo 반환
+
+			// 계획 게시글이면 공개 여부 및 해시태그 제거
+			if (dto.getBoardCategory() == 1) {
+				dto.setBoardOpen(null);
+				dto.setHashtags(null);
+			}
+
+			// 게시글 저장
+//			boolean success = bs.writeSave(dto);
+//			if (success) {
+//				// 기록 게시글에만 해시태그 추가
+//				if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+//					bs.addTags(dto.getBoardNo(), dto.getHashtags());
+//				}
+			
+			// 게시글 저장 후 boardNo 반환
 	        int boardNo = bs.writeSave(dto);
 	        System.out.println("✅ 반환된 boardNo: " + boardNo); // ✅ 로그 추가
 
@@ -59,6 +85,25 @@ public class BoardController {
 	            response.put("status", 200);
 	            response.put("message", "게시글이 성공적으로 저장되었습니다.");
 	            response.put("boardNo", boardNo); // ✅ boardNo 프론트로 반환
+	            
+	            
+//				팔로우 불러오기
+				List<FollowerDTO> followers = followService.getFollowerList(member.getId());
+
+				// 팔로워들에게 알람 전송
+				for (FollowerDTO follower : followers) {
+				    AlarmDTO alarm = AlarmDTO.builder()
+				            .senderId(member.getNick())      
+				            .memberId(follower.getFollowerId()) 
+				            .alarmTypeId(1)    
+				            .addr(dto.getBoardNo())
+				            .build();
+
+				    System.out.println("🔔 알람 전송: " + alarm);
+				    alramController.sendNotification(alarm);
+				}
+				    
+				    
 	            return ResponseEntity.ok(response);
 	        } else {
 	            response.put("status", 400);
@@ -245,7 +290,7 @@ public class BoardController {
 	        }
 
 	        // 게시글 삭제
-	        boolean success = bs.delete(boardNo);
+	        boolean success = bs.deleteBoard(boardNo);
 	        if (success) {
 	            return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
 	        } else {

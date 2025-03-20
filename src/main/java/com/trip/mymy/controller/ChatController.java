@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +13,18 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.trip.mymy.common.jwt.TokenProvider;
+import com.trip.mymy.dto.AlarmDTO;
 import com.trip.mymy.dto.MemberDTO;
 import com.trip.mymy.dto.chat.ChatDTO;
 import com.trip.mymy.dto.chat.ChatMessageDTO;
@@ -41,6 +45,8 @@ public class ChatController {
 	@Autowired ChatServiceImpl cs;
 	@Autowired MoneyServiceImpl ms;
 	@Autowired TokenProvider tp;
+    @Autowired
+    private AlarmController alramController;
 
 	 @Autowired PortOneService portOneService;
 	
@@ -72,23 +78,60 @@ public class ChatController {
 	}
 	
 	@GetMapping("user/info")
-	public ResponseEntity<MemberDTO> getuserInfo(@RequestParam String token){
-		Authentication authentication = tp.getAuthentication(token);
-		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
-		return ResponseEntity.ok(member);
+	public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
+	    try {
+	    	System.out.println("userInfo");
+	        Authentication authentication = tp.getAuthentication(token);
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
+	        System.out.println(member.getId());
+	        return ResponseEntity.ok(member);
+	    } catch (RuntimeException e) {
+	        // 예외 처리: 예를 들어, 토큰이 만료되었거나 권한이 없는 경우
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body("인증 실패: " + e.getMessage()); // 적절한 오류 메시지 반환
+	    }
 	}
 	
 	@PostMapping("invite")
-	public ResponseEntity<?> inviteUser(@RequestParam String inviteUser, String roomNum){
+	public ResponseEntity<?> inviteUser(@RequestParam String token, String inviteUser, Long roomNum){
+		Authentication authentication = tp.getAuthentication(token);
+        MemberDTO sender = (MemberDTO) authentication.getPrincipal(); 
+        
 		MemberDTO dto = as.checkId(inviteUser);
 	    System.out.println(inviteUser);
 	    if (dto == null) { //아이디 DB에 없음
 	        return ResponseEntity.ok().body("없는 아이디"); 
 	    } else { //있는 아이디. 채팅방에 추가
-	    	int result = cs.inviteMember(inviteUser, Long.parseLong(roomNum));
+	    	int result = cs.inviteMember(inviteUser, roomNum);
+	    	System.out.println(roomNum);
+	    	System.out.println(roomNum.intValue());
+//			 방 초대 알람
+			 AlarmDTO alarm = AlarmDTO.builder()
+		        		.senderId(sender.getNick())
+		        		.memberId(inviteUser)
+		        		.alarmTypeId(3)
+		        		.addr(roomNum.intValue())
+		        		.build();
+		        System.out.println("알람" + alarm);
+		        alramController.sendNotification(alarm);
 			return ResponseEntity.ok(result);
 	    }
+	}
+	
+	@DeleteMapping("endChat")
+	public ResponseEntity<?> endChat(@RequestParam Long roomNum, String token) {
+		System.out.println("endChat");
+		System.out.println(roomNum + token);
+		Authentication authentication = tp.getAuthentication(token);
+		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
 		
+		int result = cs.removeRoom(roomNum, member.getId());
+		if(result == 1) {
+			System.out.println("나가기 성공");
+			return ResponseEntity.ok().build();
+		}else {
+			return ResponseEntity.status(500).build();
+		}
 	}
 
 	//예금주 조회

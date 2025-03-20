@@ -146,7 +146,7 @@
 	</update>
 
 	<!-- 게시글 삭제 -->
-	<delete id="deleteAllByBoardNo" parameterType="int">
+	<delete id="deleteBoard" parameterType="int">
     	DELETE FROM BOARD_TB WHERE BOARD_NO_PK = #{boardNo}
 	</delete>
 
