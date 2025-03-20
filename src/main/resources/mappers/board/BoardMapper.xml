@@ -145,18 +145,11 @@
 		= #{id}
 	</update>
 
-	<!-- 게시글 삭제 전 연결된 데이터 먼저 삭제 -->
+	<!-- 게시글 삭제 -->
 	<delete id="deleteAllByBoardNo" parameterType="int">
-		BEGIN
-		DELETE FROM
-		REPLY_TB WHERE BOARD_NO_PK = #{boardNo}
-		DELETE FROM BOOKMARK_TB WHERE
-		BOARD_NO_PK = #{boardNo}
-		DELETE FROM BOARD_TAG_TB WHERE BOARD_NO_PK =
-		#{boardNo}
-		DELETE FROM BOARD_TB WHERE BOARD_NO_PK = #{boardNo}
-		END;
+    	DELETE FROM BOARD_TB WHERE BOARD_NO_PK = #{boardNo}
 	</delete>
+
 
 	<!-- 특정 게시글의 좋아요 수 조회 -->
 	<select id="getBoardLikes" resultType="int">
