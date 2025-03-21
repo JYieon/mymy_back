@@ -17,6 +17,7 @@ public interface BoardMapper {
 	public int modify(BoardDTO dto);
 	public void boardCnt(@Param("boardNo") int boardNo);
 	public int deleteBoard(@Param("boardNo") int boardNo);
+	public void cleanupUnusedTags();
 
 	// 좋아요
 	public int getBoardLikes(@Param("boardNo") int boardNo);
@@ -38,10 +39,11 @@ public interface BoardMapper {
 
 	// 해시태그
 	public List<String> getTagsByBoardNo(@Param("boardNo") int boardNo);
-	public void insertTag(@Param("tagName") String tagName);
+	public void insertTag(Map<String, Object> tagParam);
 	public void insertBoardTag(Map<String, Object> params);
 	public int deleteBoardTags(@Param("boardNo") int boardNo);
 	public List<Map<String, Object>> getAllTagsCnt();
+	public List<Map<String, Object>> getTagsByType(int tagType);
 
 	
 	

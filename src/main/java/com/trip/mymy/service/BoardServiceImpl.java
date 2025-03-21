@@ -2,6 +2,7 @@ package com.trip.mymy.service;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.jsoup.Jsoup;
@@ -297,8 +298,10 @@ public class BoardServiceImpl implements BoardService {
 	// 게시글 삭제
 	@Transactional
 	public boolean deleteBoard(int boardNo) {
+		deleteTags(boardNo); 
 	    int result = mapper.deleteBoard(boardNo);
 	    //System.out.println("삭제된 행 개수: " + result);
+	    mapper.cleanupUnusedTags(); 
 	    return result > 0;
 	}
 
@@ -306,17 +309,30 @@ public class BoardServiceImpl implements BoardService {
 	public void deleteTags(int boardNo) {
 		mapper.deleteBoardTags(boardNo);
 	}
-
-	// 게시글과 연결된 해시태그 추가
+	
+	// 여행자 테스트 결과 태그 이름 리스트 (TAG_TYPE = 1)
+		private static final List<String> TEST_TAGS = Arrays.asList(
+		    "고독한 방랑자", "자연 속 낭만주의자", "즉흥적인 모험가", "축제의 아이콘",
+		    "미래 건축가", "지식 수집가", "여행 정복자", "혁신적인 탐험가",
+		    "평화로운 나그네", "별을 좇는 시인", "세상을 밝히는 등불", "무지개 비행자",
+		    "시간 설계자", "시간의 선장", "별빛의 수호자", "추억 수집가"
+		);
+		
+	// 해시태그 추가
 	public void addTags(int boardNo, List<String> tags) {
 	    if (tags != null && !tags.isEmpty()) {
 	        for (String tag : tags) {
 	            if (tag != null && !tag.trim().isEmpty()) {
 	                try {
-	                    // 태그 삽입 (중복 방지)
-	                    mapper.insertTag(tag.trim());
+	                    int tagType = TEST_TAGS.contains(tag.trim()) ? 1 : 0;
 
-	                    // 게시글과 태그 연결
+	                    Map<String, Object> tagParam = new HashMap<>();
+	                    tagParam.put("tagName", tag.trim());
+	                    tagParam.put("tagType", tagType);
+
+	                    mapper.insertTag(tagParam); // 태그 저장 (TAG_TYPE 포함)
+
+	                    // 게시글-태그 연결
 	                    Map<String, Object> params = new HashMap<>();
 	                    params.put("boardNo", boardNo);
 	                    params.put("tagName", tag.trim());
@@ -330,12 +346,24 @@ public class BoardServiceImpl implements BoardService {
 	    }
 	}
 
+
 	// 특정 게시글의 해시태그 조회
 	public List<String> tagList(int boardNo) {
 	    List<String> tags = mapper.getTagsByBoardNo(boardNo);
 	    // System.out.println("가져온 해시태그: " + tags);
 	    return tags;
 	}
+	
+	// 일반 해시태그만 조회
+	public List<Map<String, Object>> getNormalTags() {
+	    return mapper.getTagsByType(0); // 일반 해시태그 (TAG_TYPE = 0)
+	}
+
+	// 여행자 테스트 결과 해시태그만 조회
+	public List<Map<String, Object>> getTestTags() {
+	    return mapper.getTagsByType(1); // 여행자 해시태그 (TAG_TYPE = 1)
+	}
+
 
 	public void updateTags(int boardNo, List<String> tags) {
 		// TODO Auto-generated method stub

@@ -380,5 +380,16 @@ public class BoardController {
 	    List<Map<String, Object>> hashtags = bs.getAllTagsCnt();
 	    return ResponseEntity.ok(hashtags);
 	}
+	
+	
+	// 해시태그 게시판 정렬
+	@GetMapping("/hashtags/split")
+	public ResponseEntity<Map<String, List<Map<String, Object>>>> getSplitHashtags() {
+	    Map<String, List<Map<String, Object>>> result = new HashMap<>();
+	    result.put("testTags", bs.getTestTags());
+	    result.put("normalTags", bs.getNormalTags());
+	    return ResponseEntity.ok(result);
+	}
+
 
 }
