@@ -8,7 +8,7 @@ public interface MypageService {
 	boolean isUpdateMember(MypageDTO mdto);
 	
 	public void updateTestResult(String id, String testResult);
-	
+	public String getTestResult(String id);
 
 
 }

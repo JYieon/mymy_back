@@ -40,11 +40,15 @@
         WHERE MEMBER_ID_PK = #{id}
     </update>
     
-    <!-- 여행자 테스트 결과 업데이트 -->
+    <!-- 여행자 테스트 결과 추가 -->
     <update id="updateTestResult">
-        UPDATE MEMBER_TB
-        SET MEMBER_TEST_RESULT = #{testResult}
+        UPDATE MEMBER_TB SET MEMBER_TEST_RESULT = #{testResult}
         WHERE MEMBER_ID_PK = #{id}
     </update>
-
+	
+	<!-- 여행자 테스트 결과 조회 -->
+	<select id="getTestResult" parameterType="string" resultType="string">
+    	SELECT MEMBER_TEST_RESULT FROM MEMBER_TB WHERE MEMBER_ID_PK = #{id}
+	</select>
+	
 </mapper>

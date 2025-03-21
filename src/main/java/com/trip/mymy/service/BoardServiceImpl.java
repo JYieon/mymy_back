@@ -342,6 +342,10 @@ public class BoardServiceImpl implements BoardService {
 		
 	}
 	
+	public List<Map<String, Object>> getAllTagsCnt() {
+	    return mapper.getAllTagsCnt();
+	}
+	
 	// 여행 메이트 게시글 작성
 	public boolean writeMateBoardSave(BoardDTO dto) {
 	    System.out.println("writeMateBoardSave 요청 데이터: " + dto);

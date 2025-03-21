@@ -19,7 +19,16 @@ public class MypageServiceImpl implements MypageService {
     @Override
     public MypageDTO getMember(String id) {
         System.out.println("회원 정보 조회: " + id);
-        return mypageMapper.getMember(id);  // MyBatis 매퍼 호출
+        MypageDTO member = mypageMapper.getMember(id);  // MyBatis 매퍼 호출
+    
+        // 🔍 디버깅용 로그 추가
+        System.out.println("🔍 DB 조회된 여행자 테스트 결과: " + member.getTestResult());
+
+        if (member.getTestResult() == null || member.getTestResult().isEmpty()) {
+            member.setTestResult("미설정");
+        }
+
+        return member;  // MyBatis 매퍼 호출
     }
 
     // 회원 정보 수정
@@ -34,6 +43,11 @@ public class MypageServiceImpl implements MypageService {
     // 여행자 테스트 결과 저장
     public void updateTestResult(String id, String testResult) {
             mypageMapper.updateTestResult(id, testResult);
+    }
+    
+    // 여행자 테스트 결과 조회
+    public String getTestResult(String id) {
+        return mypageMapper.getTestResult(id);
     }
 
 }
