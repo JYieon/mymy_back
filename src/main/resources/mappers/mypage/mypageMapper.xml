@@ -51,4 +51,37 @@
     	SELECT MEMBER_TEST_RESULT FROM MEMBER_TB WHERE MEMBER_ID_PK = #{id}
 	</select>
 	
+	<!-- 회원 상태 탈퇴로 변경 -->
+    <update id="updateMemberStatusToDeleted" parameterType="com.trip.mymy.dto.MypageDTO">
+        UPDATE MEMBER_TB
+        SET MEMBER_STATUS = '탈퇴'
+        WHERE MEMBER_ID_PK = #{id}
+    </update>
+
+    <!-- 게시글 작성자 anonymous로 변경 -->
+    <update id="anonymizeUserPosts" parameterType="com.trip.mymy.dto.MypageDTO">
+        UPDATE BOARD_TB
+        SET MEMBER_ID_PK = 'anonymous'
+        WHERE MEMBER_ID_PK = #{id}
+    </update>
+    
+    <!-- 댓글 작성자 anonymous로 변경 -->
+    <update id="anonymizeUserComments">
+  		UPDATE REPLY_TB
+  		SET MEMBER_ID_PK = 'anonymous'
+  		WHERE MEMBER_ID_PK = #{id}
+	</update>
+    
+
+    <!-- 게시글 삭제 -->
+    <delete id="deleteUserPosts" parameterType="com.trip.mymy.dto.MypageDTO">
+        DELETE FROM BOARD_TB WHERE MEMBER_ID_PK = #{id}
+    </delete>
+
+    <!-- 회원 삭제 -->
+    <delete id="deleteMember" parameterType="com.trip.mymy.dto.MypageDTO">
+        DELETE FROM MEMBER_TB WHERE MEMBER_ID_PK = #{id}
+    </delete>
+	
+
 </mapper>

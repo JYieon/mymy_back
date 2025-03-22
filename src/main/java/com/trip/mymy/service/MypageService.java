@@ -9,6 +9,8 @@ public interface MypageService {
 	
 	public void updateTestResult(String id, String testResult);
 	public String getTestResult(String id);
+	public void deleteUser(MypageDTO dto, boolean keepPosts);
+	
 
 
 }
