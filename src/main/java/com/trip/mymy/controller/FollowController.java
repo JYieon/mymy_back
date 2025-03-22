@@ -39,6 +39,7 @@ public class FollowController {
     @PutMapping("/{followingId}")
     public ResponseEntity<?> followUser(@PathVariable String followingId,
                                         @RequestHeader("Authorization") String token) {
+
 //        if (token.startsWith("Bearer ")) {
 //            token = token.substring(7); // "Bearer " 제거
 //        }
@@ -179,6 +180,7 @@ public class FollowController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("🚨 서버 오류 발생: " + e.getMessage());
         }
     }
+}
 
 
 
@@ -191,4 +193,3 @@ public class FollowController {
 //		
 //        return ResponseEntity.ok(followService.getFollowerList(member.getId()));
 //    }
-}

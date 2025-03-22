@@ -41,10 +41,11 @@
         WHERE FOLLOWER_ID = #{followerId} AND FOLLOWING_ID = #{followingId}
     </select>
     
+    <!-- 언팔로우 요청 -->
     <delete id="unfollowUser" parameterType="map">  <!-- ✅ 올바른 방식 -->
     	DELETE FROM FOLLOW_TB WHERE FOLLOWER_ID = #{followerId} AND FOLLOWING_ID = #{followingId}
 	</delete>
-	<!-- 언팔로우 요청 -->
+	
 	<delete id="deleteFollow">
    		DELETE FROM FOLLOW_TB 
     	WHERE FOLLOWER_ID = #{followerId} 
