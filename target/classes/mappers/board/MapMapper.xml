@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trip.mymy.mybatis.MapMapper">
+    
+    <!-- 마커 추가 -->
+    <insert id="insertMarker">
+        INSERT INTO MAP_TB (MARKER_ID, BOARD_NO_PK, LATITUDE, LONGITUDE, INFO)
+        VALUES (MAP_TB_SEQ.NEXTVAL, #{boardNo}, #{latitude}, #{longitude}, #{info})
+    </insert>
+
+    <!-- 특정 게시판(boardNo)의 마커 조회 -->
+    <select id="getMarkersByBoard" resultType="com.trip.mymy.dto.MapDTO">
+        SELECT MARKER_ID, BOARD_NO_PK, LATITUDE, LONGITUDE, INFO 
+        FROM MAP_TB
+        WHERE BOARD_NO_PK = #{boardNo}
+        ORDER BY MARKER_ID ASC
+    </select>
+
+    <!-- 특정 마커 삭제 -->
+    <delete id="deleteMarker">
+        DELETE FROM MAP_TB WHERE MARKER_ID = #{markerId}
+    </delete>
+
+    <!-- 특정 게시판(boardNo)의 모든 마커 삭제 -->
+    <delete id="deleteMarkersByBoard">
+        DELETE FROM MAP_TB WHERE BOARD_NO_PK = #{boardNo}
+    </delete>
+
+</mapper>

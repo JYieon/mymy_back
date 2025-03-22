@@ -7,14 +7,16 @@ import org.apache.ibatis.annotations.Param;
 import com.trip.mymy.dto.money.BankDTO;
 import com.trip.mymy.dto.money.BankServiceDTO;
 import com.trip.mymy.dto.money.SettlementDTO;
+import com.trip.mymy.dto.money.SettlementServiceDTO;
 
 public interface MoneyMapper {
 
 	public int insertMemberBank(@Param("bankNum") String bankNum, @Param("memberId") String memberId);
-	public void insertSettlement(@Param("roomNum") int roomNum, @Param("toMember") String toMember, @Param("money") int money, @Param("roomMember") int roomMember);
+	public int insertSettlement(@Param("roomNum") int roomNum, @Param("toMember") String toMember, @Param("money") int money, @Param("roomMember") int roomMember);
 	public void settlement(@Param("settleNum") int settleNum, @Param("id") String id);
-	public void updateSettleCheck(int SettleMember, int settleNum);
-	public SettlementDTO getSettlement(int roomNum);
+	public void updateSettleCheck(@Param("settleMember") int settleMember, @Param("settleNum") int settleNum);
+	public List<SettlementDTO> getSettlement(int roomNum);
+	public List<SettlementServiceDTO> getSettlementService(int settleNum);
 	public int makeBank(BankDTO bank);
 	public BankDTO getBank(int roomNum);
 	public List<BankServiceDTO> getBankService(int roomNum);

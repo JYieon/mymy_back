@@ -31,6 +31,8 @@ import com.trip.mymy.dto.chat.ChatMessageDTO;
 import com.trip.mymy.dto.chat.ChatResDTO;
 import com.trip.mymy.dto.money.BankDTO;
 import com.trip.mymy.dto.money.BankServiceDTO;
+import com.trip.mymy.dto.money.SettlementDTO;
+import com.trip.mymy.dto.money.SettlementServiceDTO;
 import com.trip.mymy.service.AuthServiceImpl;
 import com.trip.mymy.service.ChatServiceImpl;
 import com.trip.mymy.service.MoneyServiceImpl;
@@ -136,7 +138,7 @@ public class ChatController {
 
 	//예금주 조회
     @GetMapping("/bank/check/name")
-    public ResponseEntity<?> checkBankName(@RequestParam String bankCode, String bankNum, String token) {
+    public ResponseEntity<?> checkBankName(@RequestHeader("Authorization") String token, @RequestParam String bankCode, String bankNum) {
     	
 		String bankHolderInfo = portOneService.getAccessToken(bankCode, bankNum);
 		
@@ -158,31 +160,38 @@ public class ChatController {
     
     //정산추가
     @PostMapping("/settlement/add")
-    public void addSettlement(@RequestParam int roomNum, String toMember, int money, int roomMember) throws Exception{
-    	MemberDTO dto = as.checkId(toMember); //채팅방 멤버의 아이디가 맞는지 확인
-	    
-	    if (dto != null) {
-	    	ms.insertSettlement(roomNum, toMember, money, --roomMember);
+    public ResponseEntity<Integer> addSettlement(@RequestParam int roomNum, String toMember, int money, int roomMember) throws Exception{
+    	boolean member = cs.checkMember(toMember, roomNum); //채팅방 멤버의 아이디가 맞는지 확인
+	    int result = 0;
+	    if (member) {
+	    	System.out.println(toMember + roomNum);
+	    	result = ms.insertSettlement(roomNum, toMember, money, --roomMember);
 	    }else {//없는 아이디
 	    	System.out.println("없는 아이디 입니다.");
 	    }    	
+	    return ResponseEntity.ok(result);
     }
     
     //정산하기 버튼 settleNum이 1에 대한것은 프론트에서 응답이후 처리하기
     @PostMapping("/settlement")
-    public void settlement(@RequestParam int settleNum, String token, int SettleMember) {
+    public void settlement(@RequestParam String token, int settleNum, int settleMember) {
     	Authentication authentication = tp.getAuthentication(token);
 		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
-    	ms.settlement(settleNum, member.getId()); //정산내역 추가
-    	ms.updateSettleCheck(SettleMember, settleNum); //check 업데이트
+    	ms.settlement(settleNum, member.getNick()); //정산내역 추가
+    	ms.updateSettleCheck(settleMember, settleNum); //check 업데이트
     }
     
     //정산내역 버튼
     @GetMapping("/settlement/list")
-    public void getSettlementList(@RequestParam int roomNum) {
-    	ms.getSettlement(roomNum);
+    public ResponseEntity<List<SettlementDTO>> getSettlementList(@RequestParam int roomNum) {
+    	return ResponseEntity.ok(ms.getSettlement(roomNum));
     }
     
+    //정산 서비스 내역
+    @GetMapping("/settlement/service")
+    public ResponseEntity<List<SettlementServiceDTO>> getSettlementServiceList(@RequestParam int settleNum) {
+    	return ResponseEntity.ok(ms.getSettlementService(settleNum));
+    }
     
     //여기부터 확인하기!!
     //모임통장 

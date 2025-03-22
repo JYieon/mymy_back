@@ -23,6 +23,8 @@ public interface BoardMapper {
 	public int checkUserLike(@Param("id") String id, @Param("boardNo") int boardNo);
 	public void addLike(Map<String, Object> params);
 	public void removeLike(Map<String, Object> params);
+	public void updateBoardLikes(@Param("boardNo") int boardNo);
+
 
 	// 댓글
 	public void addReply(BoardRepDTO replyDTO);

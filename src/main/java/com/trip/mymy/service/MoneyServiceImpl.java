@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.trip.mymy.dto.money.BankDTO;
 import com.trip.mymy.dto.money.BankServiceDTO;
 import com.trip.mymy.dto.money.SettlementDTO;
+import com.trip.mymy.dto.money.SettlementServiceDTO;
 import com.trip.mymy.mybatis.MoneyMapper;
 
 @Service
@@ -20,12 +21,9 @@ public class MoneyServiceImpl implements MoneyService {
 		return result;
 	}
 	
-	public void insertSettlement(int roomNum, String toMember, int money, int roomMember) {
-		try {
-			mm.insertSettlement(roomNum, toMember, money, roomMember);			
-		} catch (Exception e) {
-			System.out.println("아이디 없음");
-		}
+	public int insertSettlement(int roomNum, String toMember, int money, int roomMember) {
+		int result = mm.insertSettlement(roomNum, toMember, money, roomMember);			
+		return result;
 	}
 	
 	public void settlement(int settleNum, String id) {
@@ -33,11 +31,17 @@ public class MoneyServiceImpl implements MoneyService {
 	}
 	
 	public void updateSettleCheck(int settleMember, int settleNum) {
-		mm.updateSettleCheck(settleMember, --settleNum);
+		mm.updateSettleCheck(--settleMember, settleNum);
 	}
 	
-	public SettlementDTO getSettlement(int roomNum) {
-		return mm.getSettlement(roomNum);
+	public List<SettlementDTO> getSettlement(int roomNum) {
+		List<SettlementDTO> list = mm.getSettlement(roomNum);
+		return list;
+	}
+	
+	public List<SettlementServiceDTO> getSettlementService(int settleNum){
+		List<SettlementServiceDTO> list = mm.getSettlementService(settleNum);
+		return list;
 	}
 	
 	//모임통장

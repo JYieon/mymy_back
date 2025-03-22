@@ -6,10 +6,15 @@
 <mapper namespace="com.trip.mymy.mybatis.MoneyMapper">
     <resultMap type="com.trip.mymy.dto.money.SettlementDTO" id="settle">
     	<id property="settleNum" column="SETTLE_NUM_PK"/>
-    	<result property="roomNum" column="ROOM_NUM_PK" />
-    	<result property="toMember" column="TO_MEMBER_ID_FK" />
+    	<result property="roomNum" column="ROOM_NUM_FK" />
+    	<result property="toMember" column="TO_MEMBER_NICK_FK" />
     	<result property="money" column="MONEY" />
     	<result property="check" column="SETTLE_CHECK"/>
+    </resultMap>
+    <resultMap type="com.trip.mymy.dto.money.SettlementServiceDTO" id="settleService">
+    	<id property="serviceNum" column="SETTLEMENT_SERVICE_NUM"/>
+    	<result property="sender" column="SEND_MEMBER_NICK_FK"/>
+    	<result property="settleNum" column="SETTLEMENT_NUM_FK"/>
     </resultMap>
     <resultMap type="com.trip.mymy.dto.money.BankDTO" id="bank">
     	<id property="roomNum" column="ROOM_NUM_PK" />
@@ -27,6 +32,7 @@
     	<result property="personalTotal" column="PERSONAL_TOTAL"/>
     	<result property="date" column="UPDATE_DATE"/>
     </resultMap>
+
     
     <update id="insertMemberBank">
     	update MEMBER_TB set MEMBER_BANK = #{bankNum} where MEMBER_ID_PK = #{memberId}
@@ -38,10 +44,13 @@
     	insert into SETTLEMENT_SERVICE_TB values(SETTLEMENT_SERVICE_TB_SEQ.nextval, #{id}, #{settleNum})
     </insert>
     <update id="updateSettleCheck">
-    	update SETTLEMENT set SETTLE_CHECK = #{settleMember} where SETTLE_NUM_PK = #{settleNum}
+    	update SETTLEMENT_TB set SETTLE_CHECK = #{settleMember} where SETTLE_NUM_PK = #{settleNum}
     </update>
     <select id="getSettlement" resultMap="settle">
     	select * from SETTLEMENT_TB where ROOM_NUM_FK = #{roomNum}
+    </select>
+    <select id="getSettlementService" resultMap="settleService">
+    	select * from SETTLEMENT_SERVICE_TB where SETTLEMENT_NUM_FK = #{settleNum} 
     </select>
     <insert id="makeBank">
     	insert into BANK_TB values(#{roomNum}, #{bankName}, 0, #{target}, 'f')

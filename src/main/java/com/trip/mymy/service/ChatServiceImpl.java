@@ -30,6 +30,17 @@ public class ChatServiceImpl implements ChatService{
 		return chatList;
 	}
 	
+	public boolean checkMember(String member, int roomNum) {
+		List<ChatMemberDTO> memberList = cm.findRoomMember(roomNum);
+		
+		for (ChatMemberDTO chatMemberDTO : memberList) {
+			if(chatMemberDTO.getNick().equals(member)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public ChatResDTO joinRoom(long roomNum) {
 		ChatDTO chat = cm.findChatRoom(roomNum);
 		List<ChatMemberDTO> member = cm.findRoomMember(roomNum);

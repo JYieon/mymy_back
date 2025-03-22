@@ -44,8 +44,8 @@ public class BoardDTO {
 	public int getBoardLikes() {
 		return boardLikes;
 	}
-	public void setBoardLikes(int boardLikes) {
-		this.boardLikes = boardLikes;
+	public void setBoardLikes(Integer boardLikes) {
+		this.boardLikes = (boardLikes == null) ? 0 : boardLikes;
 	}
 	public String getTitle() {
 		return title;

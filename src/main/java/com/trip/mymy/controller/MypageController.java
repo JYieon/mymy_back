@@ -1,5 +1,7 @@
 package com.trip.mymy.controller;
 
+import com.trip.mymy.common.jwt.TokenProvider;
+import com.trip.mymy.dto.MemberDTO;
 import com.trip.mymy.dto.MypageDTO;
 import com.trip.mymy.service.MypageService;
 
@@ -10,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,6 +24,7 @@ public class MypageController {
 
     @Autowired
     MypageService mypageService;
+    @Autowired TokenProvider tp;
     
 //    //로그인 없이 aaa계정 테스트, 합친 뒤 삭제
 //    @GetMapping("/test/setDummyUser")
@@ -67,4 +71,17 @@ public class MypageController {
             ? ResponseEntity.ok("회원 정보 수정 성공!")
             : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 정보 수정 실패!");
     }
+    
+    // 여행자 테스트 결과 저장
+    @PostMapping("/userinfo/updateTestResult")
+    public ResponseEntity<String> updateTestResult(@RequestParam String token, @RequestParam String testResult) {
+        
+    	Authentication authentication = tp.getAuthentication(token);
+ 		MemberDTO member = (MemberDTO) authentication.getPrincipal();
+ 		String id = member.getId();
+ 		
+    	mypageService.updateTestResult(id, testResult);
+        return ResponseEntity.ok("여행자 테스트 결과 저장 완료!");
+    }
+    
 }

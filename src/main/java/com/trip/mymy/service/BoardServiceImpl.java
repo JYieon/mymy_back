@@ -47,6 +47,7 @@ public class BoardServiceImpl implements BoardService {
 
 	// 댓글 저장
 	public void addReply(BoardRepDTO replyDTO) {
+		System.out.println(replyDTO.getBoardNo());
 		// PARENT_NO가 NULL이면 기본값 0 설정
 		System.out.println("reply" + replyDTO.getParentNo());
 		if (replyDTO.getParentNo() == null) {
@@ -92,6 +93,11 @@ public class BoardServiceImpl implements BoardService {
 		}else {
 			mapper.removeLike(params);
 		}
+		mapper.updateBoardLikes(boardNo);
+		
+		int updatedLikes= mapper.getBoardLikes(boardNo);
+		
+		// System.out.println("좋아요 변경 후 개수: " + updatedLikes);
 		return liked == 0;
 	}
 
@@ -121,6 +127,11 @@ public class BoardServiceImpl implements BoardService {
 			boardList = mapper.getBoardList(params);
 		}
 		
+//		 System.out.println("[Service] 게시글 목록 응답 데이터:");
+//		    for (BoardDTO post : boardList) {
+//		        System.out.println("게시글 No." + post.getBoardNo() + " - 좋아요 수: " + post.getBoardLikes());
+//		    }
+		    
 		//System.out.println("조회된 게시글 개수:"+boardList.size());
 		List<Map<String, Object>> responseList = new ArrayList<>();
 		

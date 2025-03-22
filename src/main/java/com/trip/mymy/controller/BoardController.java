@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,37 +100,51 @@ public class BoardController {
 		}
 	}
 
-	// 이미지 업로드 처리uploadSummernoteImageFile
 	@PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
-	public Map<String, String> uploadSummernoteImageFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-		Map<String, String> response = new HashMap<>();
+	public ResponseEntity<Map<String, String>> uploadSummernoteImageFile(
+	        @RequestParam("file") MultipartFile file, 
+	        HttpServletRequest request) {
 
-		// 파일 저장 경로 설정 (여기서는 resources/upload 디렉토리로 설정)
-		String uploadDir = "C:/summernote_image/"; 
-		File uploadFolder = new File(uploadDir);
-		if (!uploadFolder.exists()) {
-			uploadFolder.mkdirs(); // 폴더가 없으면 생성
-		}
-		//파일 저장
-		String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-		String filePath = uploadDir + fileName;
+	    Map<String, String> response = new HashMap<>();
 
+	    if (file.isEmpty()) {
+	        System.out.println("업로드된 파일이 없습니다.");
+	        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "파일이 비어 있습니다."));
+	    }
 
-		try {
-			File serverFile = new File(filePath);
-			file.transferTo(serverFile);
-			System.out.println("저장된 파일경로 "+filePath);
-			//절대 url 반환
-			String fullUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/" + fileName;
-			response.put("fileName", fileName); // 파일명 저장
-			response.put("url", fullUrl); // 절대 URL 저장
-		} catch (IOException e) {
-			e.printStackTrace();
-			response.put("error", "파일 업로드 실패");
-		}
-		return response;
+	    // 업로드 경로 설정
+	    String uploadDir = "C:/summernote_image/";
+	    File uploadFolder = new File(uploadDir);
+
+	    // 업로드 폴더 없으면 생성
+	    if (!uploadFolder.exists()) {
+	        uploadFolder.mkdirs();
+	    }
+
+	    // 저장할 파일 이름 생성
+	    String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+	    String filePath = uploadDir + fileName;
+
+	    try {
+	        // 파일 저장
+	        File serverFile = new File(filePath);
+	        file.transferTo(serverFile);
+
+	        // URL 반환
+	        String fullUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/" + fileName;
+	        response.put("fileName", fileName);
+	        response.put("url", fullUrl);
+
+	        // System.out.println("이미지 업로드 성공: " + fullUrl);
+	        return ResponseEntity.ok(response);
+	    } catch (IOException e) {
+	        System.out.println("파일 저장 실패: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body(Collections.singletonMap("error", "파일 업로드 실패: " + e.getMessage()));
+	    }
 	}
+
 
 	// 게시글 목록
 	// category - 1: 계획, 2: 기록)
@@ -141,12 +155,10 @@ public class BoardController {
 			@RequestParam(value = "category", defaultValue = "1") int category
 
 			) {
-
-
 		// 페이지 처리
 		int totalPosts = 0;
 		List<Map<String, Object>> boardList = new ArrayList<>();
-
+		
 		if (category == 1) {
 			Authentication authentication = tp.getAuthentication(token);
 			MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
@@ -159,11 +171,11 @@ public class BoardController {
 			totalPosts = bs.getTotalPosts(category); // 전체 게시글 수 (category 2)
 			boardList = bs.getBoardList(page, category, "none"); // 전체 게시글 목록 (category 2)
 		}
-
+	    
 		// 페이지 계산
 		int pageSize = 6;
 		int totalPages = (totalPosts + pageSize - 1) / pageSize;
-
+		
 		// 응답 데이터 구성
 		Map<String, Object> response = new HashMap<>();
 		response.put("boardList", boardList); // 게시글 목록
@@ -180,9 +192,12 @@ public class BoardController {
 		BoardDTO post = bs.getPost(boardNo);
 		List<String> hashtags = bs.tagList(boardNo);  // 해시태그 조회
 
+		// System.out.println(post);
+	
 		Map<String, Object> response = new HashMap<>();
 		response.put("post", post);
 		response.put("hashtags", hashtags);
+		
 
 		return ResponseEntity.ok(response);
 	}
@@ -196,26 +211,74 @@ public class BoardController {
 
 	// 게시글 수정
 	@PostMapping("/modify")
-	public ResponseEntity<String> modify(@RequestBody BoardDTO dto) {
-		if (bs.modify(dto)) {
-			bs.deleteTags(dto.getBoardNo());  // 기존 태그 삭제
-			if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-				bs.addTags(dto.getBoardNo(), dto.getHashtags());  // 새로운 태그 추가
-			}
-			return ResponseEntity.ok("게시글이 성공적으로 수정되었습니다.");
-		} else {
-			return ResponseEntity.badRequest().body("게시글 수정에 실패했습니다.");
-		}
+	public ResponseEntity<String> modify(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
+	        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+	        
+	        // 토큰을 통해 인증 정보 가져오기
+	        Authentication authentication = tp.getAuthentication(jwtToken);
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal();
+	        String loggedInUserId = member.getId();
+
+//	        // 백엔드에서 로그인한 사용자 ID 자동 설정
+//	        dto.setId(loggedInUserId);
+
+	        // 게시글 작성자와 로그인한 사용자 비교
+	        BoardDTO existingPost = bs.getPost(dto.getBoardNo());
+	        
+	        if (!existingPost.getId().equals(loggedInUserId)) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("작성자만 수정할 수 있습니다.");
+	        }
+
+	        // 게시글 수정
+	        boolean success = bs.modify(dto);
+	        if (success) {
+	            return ResponseEntity.ok("게시글이 성공적으로 수정되었습니다.");
+	        } else {
+	            return ResponseEntity.badRequest().body("게시글 수정에 실패했습니다.");
+	        }
 	}
 
 	// 게시글 삭제
 	@DeleteMapping("/delete/{boardNo}")
-	public ResponseEntity<String> delete(@PathVariable int boardNo) {
-		if (bs.delete(boardNo)) {
-			return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
-		} else {
-			return ResponseEntity.badRequest().body("게시글 삭제에 실패했습니다.");
-		}
+	public ResponseEntity<String> delete(@PathVariable int boardNo, @RequestHeader("Authorization") String token) {
+	    if (token == null || token.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 토큰이 비어 있습니다.");
+	    }
+
+	    try {
+	        // "Bearer " 부분 제거
+	        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+	        // 토큰을 통해 인증 정보 가져오기
+	        Authentication authentication = tp.getAuthentication(jwtToken);
+	        if (authentication == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
+	        }
+
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal();
+	        String loggedInUserId = member.getId();
+
+	        // 게시글 정보 가져오기
+	        BoardDTO existingPost = bs.getPost(boardNo);
+	        if (existingPost == null) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+	        }
+
+	        // 게시글 작성자와 로그인된 사용자가 동일한지 확인
+	        if (!existingPost.getId().equals(loggedInUserId)) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("작성자만 삭제할 수 있습니다.");
+	        }
+
+	        // 게시글 삭제
+	        boolean success = bs.delete(boardNo);
+	        if (success) {
+	            return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
+	        } else {
+	            return ResponseEntity.badRequest().body("게시글 삭제에 실패했습니다.");
+	        }
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+	    }
 	}
 
 	// 좋아요 토글
@@ -251,7 +314,7 @@ public class BoardController {
 	// 특정 사용자가 해당 게시글에 좋아요를 눌렀는지 확인하는 API
 	@GetMapping("/likes/check")
 	public ResponseEntity<Map<String, Object>> checkUserLike(@RequestParam String token, @RequestParam int boardNo) {
-	    System.out.println("🔥 좋아요 확인 요청 - boardNo: " + boardNo + ", token: " + token);
+	    // System.out.println("좋아요 확인 요청 - boardNo: " + boardNo + ", token: " + token);
 
 	    // 토큰 검증
 	    Authentication authentication = tp.getAuthentication(token);
