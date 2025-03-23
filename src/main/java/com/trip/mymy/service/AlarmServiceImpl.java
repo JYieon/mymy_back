@@ -49,6 +49,11 @@ public class AlarmServiceImpl implements AlarmService {
      */
     @Override
     public void insertAlarm(AlarmDTO a_dto) {
+    	// 🔔 로그 추가
+        System.out.println("🔔 알람 저장 - senderId: " + a_dto.getSenderId() 
+            + ", memberId: " + a_dto.getMemberId()
+            + ", alarmTypeId: " + a_dto.getAlarmTypeId()
+            + ", addr: " + a_dto.getAddr());
     	//알람을 DB에 저장
         alarmMapper.insertAlarm(a_dto);
         

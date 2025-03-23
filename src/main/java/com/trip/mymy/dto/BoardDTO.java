@@ -5,8 +5,14 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class BoardDTO {
-	int boardNo, boardCnt, boardLikes;
-	int boardCategory;
+	int boardNo, boardCnt, boardLikes, repCnt;
+	public int getRepCnt() {
+		return repCnt;
+	}
+	public void setRepCnt(int repCnt) {
+		this.repCnt = repCnt;
+	}
+	private Integer boardCategory;
 	private Integer boardOpen;
 	String title, content, id, date; 
 	private List<String> hashtags;
@@ -23,10 +29,10 @@ public class BoardDTO {
 	public void setBoardOpen(Integer boardOpen) {
 		this.boardOpen = (boardOpen == null) ? 1 : boardOpen; // null이면 1로 설정
 	}
-	public int getBoardCategory() {
+	public Integer getBoardCategory() {
 		return boardCategory;
 	}
-	public void setBoardCategory(int boardCategory) {
+	public void setBoardCategory(Integer boardCategory) {
 		this.boardCategory = boardCategory;
 	}	
 	public int getBoardNo() {

@@ -2,6 +2,7 @@ package com.trip.mymy.service;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.jsoup.Jsoup;
@@ -64,6 +65,7 @@ public class BoardServiceImpl implements BoardService {
 
 		// 댓글 추가
 		mapper.addReply(replyDTO);
+		mapper.updateReplyCnt(replyDTO.getBoardNo(), 1);
 	}
 
 	// 댓글 목록 조회
@@ -74,10 +76,34 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	// 댓글 삭제 (대댓글 포함)
-	public String deleteReply(int replyNo, String path) {
-		int result = mapper.deleteReply(replyNo);
-		return (result == 1) ? "댓글이 성공적으로 삭제되었습니다." : "댓글 삭제에 실패했습니다.";
+	@Override
+	public int deleteReply(int replyNo, String id) {
+	    // 댓글 작성자 조회
+	    String writerId = mapper.getReplyWriter(replyNo);
+
+	    // 댓글이 존재하지 않는 경우
+	    if (writerId == null) {
+	        return 0;
+	    }
+
+	    // 댓글 작성자와 로그인한 사용자 비교
+	    if (!writerId.equals(id)) {
+	        throw new RuntimeException("해당 댓글을 삭제할 권한이 없습니다.");
+	    }
+	    
+	    int boardNo = mapper.getBoardNoByReplyNo(replyNo);
+	    
+	   
+	    int result= mapper.deleteReply(replyNo);
+	    
+	    // 게시글의 댓글 개수 감소
+	    if (result > 0) {
+	        mapper.updateReplyCnt(boardNo, -1);
+	    }
+
+	    return result;
 	}
+
 
 	//게시글 좋아요
 	public boolean toggleLike(String id, int boardNo) {
@@ -144,6 +170,7 @@ public class BoardServiceImpl implements BoardService {
 			postMap.put("boardLikes", post.getBoardLikes());
 			postMap.put("boardOpen", post.getBoardOpen());
 			postMap.put("date", post.getDate().toString());
+			postMap.put("repCnt", post.getRepCnt());
 
 			// 첫 번째 이미지 추출
 			String content = post.getContent();
@@ -187,40 +214,61 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	// 게시글 저장 (HTML 정리 + 첫 번째 이미지 자동 추출)
-	public boolean writeSave(BoardDTO dto) {
-		//	공개 범위 기본값 설정
-		if (dto.getBoardOpen() == 0 || dto.getBoardOpen() == 1) {
-		} else {
-			dto.setBoardOpen(1); // 기본값 1 (공개) 설정
-		}
+	public int writeSave(BoardDTO dto) {
+	    System.out.println("📌 writeSave 호출됨!");
 
-		try {
-			// HTML 내용 정리
-			Document doc = Jsoup.parse(dto.getContent());
-			doc.select("script, style").remove();
+	    if (dto == null) {
+	        System.out.println("❌ dto가 null입니다!");
+	        return 0;
+	    }
+	    if (dto.getTitle() == null) {
+	        System.out.println("❌ dto.getTitle()이 null입니다!");
+	    }
+	    if (dto.getContent() == null) {
+	        System.out.println("❌ dto.getContent()이 null입니다!");
+	    }
+	    if (dto.getBoardOpen() == null) {
+	        System.out.println("❌ dto.getBoardOpen()이 null입니다! 기본값(1) 설정");
+	        dto.setBoardOpen(1);
+	    }
+	    if (dto.getBoardCategory() == null) {
+	        System.out.println("❌ dto.getBoardCategory()가 null입니다! 기본값(1) 설정");
+	        dto.setBoardCategory(1);
+	    }
 
-			// <br> 태그를 (\n)로 변환
-			String formattedContent = doc.body().html().replace("<br>", "\n").replace("<br/>", "\n");
+	    try {
+	        // HTML 내용 정리
+	        Document doc = Jsoup.parse(dto.getContent());
+	        doc.select("script, style").remove();
 
-			// <img> 태그만 유지
-			formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
-			dto.setContent(formattedContent); // 변경된 내용을 DTO에 적용
+	        // <br> 태그를 (\n)로 변환
+	        String formattedContent = doc.body().html().replace("<br>", "\n").replace("<br/>", "\n");
 
-			// DB에 저장
-			int result = mapper.writeSave(dto);
+	        // <img> 태그만 유지
+	        formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
+	        dto.setContent(formattedContent); // 변경된 내용을 DTO에 적용
 
-			// 해시태그 저장
+	        // 게시글 저장
+	        int result = mapper.writeSave(dto);
+	        
+	        // 저장된 boardNo 확인
+	        int boardNo = dto.getBoardNo();
+	        System.out.println("✅ 저장된 boardNo: " + boardNo);
+
+	        // 해시태그 저장
 	        if (result == 1 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-	            addTags(dto.getBoardNo(), dto.getHashtags());
+	            addTags(boardNo, dto.getHashtags());
 	        }
-	        return result == 1;
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false; // 실패 시 false 반환
-		}
+	        return boardNo;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return -1; // 실패 시 -1 반환
+	    }
 	}
 
+
+	
 	// 게시글 수정 (태그 포함)
 	public boolean modify(BoardDTO dto) {
 		try {
@@ -249,38 +297,42 @@ public class BoardServiceImpl implements BoardService {
 
 	// 게시글 삭제
 	@Transactional
-	public boolean delete(int boardNo) {
-	    try {
-	        // 1️ 해시태그 연결 데이터 삭제
-	        deleteTags(boardNo);
-
-	        // 2️ 게시글과 연결된 모든 데이터 삭제
-	        mapper.deleteAllByBoardNo(boardNo);
-	        
-	       // System.out.println("모든 데이터 삭제 완료! (게시글 번호: " + boardNo + ")");
-	        return true;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        // System.out.println("게시글 삭제 중 오류 발생: " + e.getMessage());
-	        return false;
-	    }
+	public boolean deleteBoard(int boardNo) {
+		deleteTags(boardNo); 
+	    int result = mapper.deleteBoard(boardNo);
+	    //System.out.println("삭제된 행 개수: " + result);
+	    mapper.cleanupUnusedTags(); 
+	    return result > 0;
 	}
 
 	// 특정 게시글과 연결된 해시태그 삭제
 	public void deleteTags(int boardNo) {
 		mapper.deleteBoardTags(boardNo);
 	}
-
-	// 게시글과 연결된 해시태그 추가
+	
+	// 여행자 테스트 결과 태그 이름 리스트 (TAG_TYPE = 1)
+		private static final List<String> TEST_TAGS = Arrays.asList(
+		    "고독한 방랑자", "자연 속 낭만주의자", "즉흥적인 모험가", "축제의 아이콘",
+		    "미래 건축가", "지식 수집가", "여행 정복자", "혁신적인 탐험가",
+		    "평화로운 나그네", "별을 좇는 시인", "세상을 밝히는 등불", "무지개 비행자",
+		    "시간 설계자", "시간의 선장", "별빛의 수호자", "추억 수집가"
+		);
+		
+	// 해시태그 추가
 	public void addTags(int boardNo, List<String> tags) {
 	    if (tags != null && !tags.isEmpty()) {
 	        for (String tag : tags) {
 	            if (tag != null && !tag.trim().isEmpty()) {
 	                try {
-	                    // 태그 삽입 (중복 방지)
-	                    mapper.insertTag(tag.trim());
+	                    int tagType = TEST_TAGS.contains(tag.trim()) ? 1 : 0;
 
-	                    // 게시글과 태그 연결
+	                    Map<String, Object> tagParam = new HashMap<>();
+	                    tagParam.put("tagName", tag.trim());
+	                    tagParam.put("tagType", tagType);
+
+	                    mapper.insertTag(tagParam); // 태그 저장 (TAG_TYPE 포함)
+
+	                    // 게시글-태그 연결
 	                    Map<String, Object> params = new HashMap<>();
 	                    params.put("boardNo", boardNo);
 	                    params.put("tagName", tag.trim());
@@ -294,16 +346,32 @@ public class BoardServiceImpl implements BoardService {
 	    }
 	}
 
+
 	// 특정 게시글의 해시태그 조회
 	public List<String> tagList(int boardNo) {
 	    List<String> tags = mapper.getTagsByBoardNo(boardNo);
 	    // System.out.println("가져온 해시태그: " + tags);
 	    return tags;
 	}
+	
+	// 일반 해시태그만 조회
+	public List<Map<String, Object>> getNormalTags() {
+	    return mapper.getTagsByType(0); // 일반 해시태그 (TAG_TYPE = 0)
+	}
+
+	// 여행자 테스트 결과 해시태그만 조회
+	public List<Map<String, Object>> getTestTags() {
+	    return mapper.getTagsByType(1); // 여행자 해시태그 (TAG_TYPE = 1)
+	}
+
 
 	public void updateTags(int boardNo, List<String> tags) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public List<Map<String, Object>> getAllTagsCnt() {
+	    return mapper.getAllTagsCnt();
 	}
 	
 	// 여행 메이트 게시글 작성
@@ -343,7 +411,7 @@ public class BoardServiceImpl implements BoardService {
 	// 여행 메이트 게시글 삭제
 	public boolean deleteMateBoard(int boardNo) {
 	    try {
-	        mapper.deleteAllByBoardNo(boardNo); // 게시글 삭제
+	        mapper.deleteBoard(boardNo); // 게시글 삭제
 	        return true;
 	    } catch (Exception e) {
 	        e.printStackTrace();

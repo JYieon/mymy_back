@@ -72,18 +72,43 @@ public class BoardRepController {
 			    
 	            return ResponseEntity.ok("댓글 작성 성공!");
 	        }
-	// 댓글 목록 조회
-	@GetMapping("/replyList/{boardNo}")
-	public List<BoardRepDTO> getReplyList(@PathVariable int boardNo) {
-		return bs.getRepliesByBoardNo(boardNo);
-	}
+	 @GetMapping("/replyList/{boardNo}")
+	 public ResponseEntity<List<BoardRepDTO>> getReplyList(@PathVariable int boardNo) {
+	     System.out.println("🔍 댓글 가져오기 요청: boardNo = " + boardNo);
+	     List<BoardRepDTO> replies = bs.getRepliesByBoardNo(boardNo);
+	     System.out.println("✅ 조회된 댓글: " + replies);
+	     return ResponseEntity.ok(replies);
+	 }
 
-	// 댓글 삭제
+
 	@DeleteMapping("/deleteReply/{replyNo}")
 	public ResponseEntity<String> deleteReply(@PathVariable int replyNo, @RequestHeader("Authorization") String token) {
-		bs.deleteReply(replyNo, null);
-		return ResponseEntity.ok("댓글 삭제 성공!");
+		if (token == null || token.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JWT 토큰이 비어 있습니다.");
+		}
+
+		String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+		Authentication authentication = tp.getAuthentication(jwtToken);
+		if (authentication == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
+		}
+
+		MemberDTO member = (MemberDTO) authentication.getPrincipal();
+		String loggedInUserId = member.getId();
+
+		try {
+			
+			int deletedCount = bs.deleteReply(replyNo, loggedInUserId);
+
+			if (deletedCount > 0) {
+				return ResponseEntity.ok("댓글 삭제 성공!");
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제할 댓글이 존재하지 않습니다.");
+			}
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다");
+		}
+
 	}
 
-
-}
+	}

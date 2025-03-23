@@ -46,19 +46,22 @@ public class BoardController {
 	@Autowired private FollowService followService;
 
 	@PostMapping("/writeSave")
-	public ResponseEntity<String> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<?> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
+		Map<String, Object> response = new HashMap<>();
+	
 		// 토큰이 비어 있거나 null일 경우 처리
 		if (token == null || token.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JWT 토큰이 비어 있거나 null입니다.");
 		}
-		try {
-//			// "Bearer " 부분을 제거하고 실제 토큰만 사용
-//			String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+//		// "Bearer " 부분을 제거하고 실제 토큰만 사용
+//		String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
 
-			// 토큰을 통해 인증 정보를 가져옴
-			Authentication authentication = tp.getAuthentication(token);
-			MemberDTO member = (MemberDTO) authentication.getPrincipal();
-			dto.setId(member.getId()); // 사용자 ID 설정
+		// 토큰을 통해 인증 정보를 가져옴
+		Authentication authentication = tp.getAuthentication(token);
+		MemberDTO member = (MemberDTO) authentication.getPrincipal();
+		dto.setId(member.getId()); // 사용자 ID 설정
+		try {
+
 
 			// 계획 게시글이면 공개 여부 및 해시태그 제거
 			if (dto.getBoardCategory() == 1) {
@@ -67,13 +70,23 @@ public class BoardController {
 			}
 
 			// 게시글 저장
-			boolean success = bs.writeSave(dto);
-			if (success) {
-				// 기록 게시글에만 해시태그 추가
-				if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-					bs.addTags(dto.getBoardNo(), dto.getHashtags());
-				}
-				
+//			boolean success = bs.writeSave(dto);
+//			if (success) {
+//				// 기록 게시글에만 해시태그 추가
+//				if (dto.getBoardCategory() == 2 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
+//					bs.addTags(dto.getBoardNo(), dto.getHashtags());
+//				}
+			
+			// 게시글 저장 후 boardNo 반환
+	        int boardNo = bs.writeSave(dto);
+	        System.out.println("✅ 반환된 boardNo: " + boardNo); // ✅ 로그 추가
+
+	        if (boardNo > 0) {
+	            response.put("status", 200);
+	            response.put("message", "게시글이 성공적으로 저장되었습니다.");
+	            response.put("boardNo", boardNo); // ✅ boardNo 프론트로 반환
+	            
+	            
 //				팔로우 불러오기
 				List<FollowerDTO> followers = followService.getFollowerList(member.getId());
 
@@ -89,16 +102,23 @@ public class BoardController {
 				    System.out.println("🔔 알람 전송: " + alarm);
 				    alramController.sendNotification(alarm);
 				}
-
-				return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
-			} else {
-				return ResponseEntity.badRequest().body("게시글 저장에 실패했습니다.");
-			}
-		} catch (Exception e) {
-			// 예외 처리
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
-		}
+				    
+				    
+	            return ResponseEntity.ok(response);
+	        } else {
+	            response.put("status", 400);
+	            response.put("message", "게시글 저장 실패");
+	            return ResponseEntity.badRequest().body(response);
+	        }
+	    } catch (Exception e) {
+	    	 // ✅ 오류 메시지 콘솔에 출력
+	        e.printStackTrace();
+	        response.put("status", 500);
+	        response.put("message", "서버 오류 발생: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
 	}
+
 
 	@PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
@@ -270,7 +290,7 @@ public class BoardController {
 	        }
 
 	        // 게시글 삭제
-	        boolean success = bs.delete(boardNo);
+	        boolean success = bs.deleteBoard(boardNo);
 	        if (success) {
 	            return ResponseEntity.ok("게시글이 성공적으로 삭제되었습니다.");
 	        } else {
@@ -353,6 +373,22 @@ public class BoardController {
 		response.put("totalPages", totalPages);
 
 		return ResponseEntity.ok(response);
+	}
+	
+	@GetMapping("/hashtags")
+	public ResponseEntity<List<Map<String, Object>>> getAllTagsCnt() {
+	    List<Map<String, Object>> hashtags = bs.getAllTagsCnt();
+	    return ResponseEntity.ok(hashtags);
+	}
+	
+	
+	// 해시태그 게시판 정렬
+	@GetMapping("/hashtags/split")
+	public ResponseEntity<Map<String, List<Map<String, Object>>>> getSplitHashtags() {
+	    Map<String, List<Map<String, Object>>> result = new HashMap<>();
+	    result.put("testTags", bs.getTestTags());
+	    result.put("normalTags", bs.getNormalTags());
+	    return ResponseEntity.ok(result);
 	}
 
 

@@ -2,7 +2,7 @@ package com.trip.mymy.dto;
 
 public class MapDTO {
     public int markerId, boardNo; 
-    public double latitude, longitude; // 위도
+    public double latitude, longitude; 
     public String info;
 	public int getMarkerId() {
 		return markerId;
