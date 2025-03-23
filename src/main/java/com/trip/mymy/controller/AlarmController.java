@@ -54,10 +54,10 @@ public class AlarmController {
 	}
 	
 	//알림 읽음 처리
-	   @PostMapping("/alarm/mark-read")
-	   public ResponseEntity<String> markAlarmsAsRead(@RequestHeader("Authorization") String token, @RequestBody Map<String, Integer> requestBody) {
+	   @PostMapping("/alarm/mark/read")
+	   public ResponseEntity<String> markAlarmsAsRead(@RequestHeader("Authorization") String token, @RequestParam int no) {
 	        System.out.println(" 알림 읽음 처리 API 호출됨!");
-	        int no = requestBody.get("no");
+//	        int no = requestBody.get("no");
 	        
 	        Authentication authentication = tp.getAuthentication(token);
 			MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
