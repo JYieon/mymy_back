@@ -11,9 +11,10 @@ public class BankServiceDTO {
 
 	int bankSerNum;
 	int roomNum;
+	String member;
 	String type;
 	int money;
-	String member;
 	int personalTotal;
 	String date;
+	int bankTotal;
 }

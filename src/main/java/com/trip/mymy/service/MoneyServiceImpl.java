@@ -1,8 +1,10 @@
 package com.trip.mymy.service;
 
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.trip.mymy.dto.money.BankDTO;
@@ -46,7 +48,27 @@ public class MoneyServiceImpl implements MoneyService {
 	
 	//모임통장
 	public void makeBank(BankDTO bank) {
-		mm.makeBank(bank);
+	    Random random = new Random();
+	    String formattedBankNumber;
+	    String bankNum;
+	    
+	    // 유효한 은행 번호가 나올 때까지 반복
+	    do {
+	        long bankNumber = (long)(random.nextDouble() * 9000000000L) + 1000000000L;
+
+	        formattedBankNumber = String.format("%03d-%04d-%03d", 
+	                bankNumber / 10000000,               // 첫 번째 세 자리
+	                (bankNumber / 10000) % 10000,       // 두 번째 네 자리
+	                bankNumber % 10000);                // 세 번째 세 자리
+
+	        // 통장번호 유효성 검사
+	        bankNum = mm.checkBankNum(formattedBankNumber);
+
+	    } while (bankNum != null);  // 이미 존재하는 번호가 있으면 계속 반복
+
+	    // 유효한 bankNum을 찾으면 setBankNum 및 makeBank 호출
+	    bank.setBankNum(formattedBankNumber);
+	    mm.makeBank(bank);
 	}
 	
 	public BankDTO getBank(int roomNum) {
@@ -59,9 +81,33 @@ public class MoneyServiceImpl implements MoneyService {
 		return bankInfo;
 	}
 	
-	public int addBankService(BankServiceDTO bankSer) {
-		bankSer.setPersonalTotal(bankSer.getPersonalTotal() + bankSer.getMoney());
-		int result = mm.addBankService(bankSer);
+	public int addBankService(BankServiceDTO bankSer, BankDTO bank) {
+		int result = 0;
+		if(bankSer.getType().equals("+")) {
+			Integer personalTotal = mm.getPersonalTotal(bankSer.getMember());
+			personalTotal = (personalTotal != null) ? personalTotal : 0;
+			bankSer.setPersonalTotal(personalTotal + bankSer.getMoney());			
+			bankSer.setBankTotal(bank.getTotal() + bankSer.getMoney());
+			try {
+				result = mm.addBankService(bankSer);
+				bank.setTotal(bank.getTotal() + bankSer.getMoney());
+				if(bank.getTotal() >= bank.getTarget()) {
+					bank.setCheck("y");
+				}
+				result += mm.updateBank(bank);
+			}catch(Exception e){
+				System.out.println(e);
+			}
+		}else {
+			try {
+				bankSer.setBankTotal(bank.getTotal() - bankSer.getMoney());
+				result = mm.addBankService(bankSer);
+				bank.setTotal(bank.getTotal() - bankSer.getMoney());
+				result += mm.updateBank(bank);
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
 		return result;
 	}
 }

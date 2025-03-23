@@ -17,5 +17,5 @@ public interface MoneyService {
 	public void makeBank(BankDTO bank);
 	public BankDTO getBank(int roomNum);
 	public List<BankServiceDTO> getBankService(int roomNum);
-	public int addBankService(BankServiceDTO bankSer);
+	public int addBankService(BankServiceDTO bankSer, BankDTO bank);
 }

@@ -196,10 +196,9 @@ public class ChatController {
     //여기부터 확인하기!!
     //모임통장 
     @GetMapping("/bank/check")
-    public void getBank(@RequestParam int roomNum) {
+    public ResponseEntity<BankDTO> getBank(@RequestParam int roomNum) {
     	BankDTO bank = ms.getBank(roomNum);
-    	
-    	//bank리턴
+    	return ResponseEntity.ok(bank);
     }
     
     @PostMapping("/bank/make")
@@ -214,16 +213,31 @@ public class ChatController {
     
     //모임통장 내용
     @GetMapping("/bank/service/info")
-    public void getBankService(@RequestParam int roomNum) {
+    public ResponseEntity<List<BankServiceDTO>> getBankService(@RequestParam int roomNum) {
     	List<BankServiceDTO> bankInfo = ms.getBankService(roomNum);
     	
-    	//그대로 프론트로 전달해서 프론트가 누적 알아서 찾아서 정렬
+    	return ResponseEntity.ok(bankInfo);
     }
     
     
-    //이체, 송금
+    //이체
     @PostMapping("/bank/service")
-    public void bankService(@RequestParam BankServiceDTO bankSer) {
-    	ms.addBankService(bankSer);
+    public ResponseEntity<?> bankService(@RequestHeader("Authorization") String token, @RequestParam int roomNum, String type, int money) {
+    	Authentication authentication = tp.getAuthentication(token);
+		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
+		BankServiceDTO bankSer = BankServiceDTO.builder()
+				.roomNum(roomNum)
+				.type(type)
+				.money(money)
+				.build();
+    	 if(member != null) {
+    		 bankSer.setMember(member.getId());
+    		 BankDTO bank = ms.getBank(bankSer.getRoomNum());
+    		 int result = ms.addBankService(bankSer, bank);
+    		 return ResponseEntity.ok(result);
+    	 }else {
+    		 return ResponseEntity.status(400).build();
+    	 }
+    	
     }
 }

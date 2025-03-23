@@ -13,4 +13,5 @@ public class BankDTO {
 	int total;
 	int target;
 	String check;
+	String bankNum;
 }
