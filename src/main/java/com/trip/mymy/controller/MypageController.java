@@ -113,7 +113,30 @@ public class MypageController {
 	    System.out.println("여행자 테스트 결과 반환: " + testResult);
 	    return ResponseEntity.ok(testResult);
 	}
+	//회원 탈퇴
+	@PostMapping("/userinfo/delete")
+    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token,
+                                             @RequestParam boolean keepPosts) {
+        // 인증된 사용자 ID 가져오기
+        Authentication authentication = tp.getAuthentication(token);
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 실패");
+        }
 
+        MemberDTO member = (MemberDTO) authentication.getPrincipal();
+        String id = member.getId();  // 사용자 ID
 
+        MypageDTO dto = new MypageDTO();
+        dto.setId(id);
 
+        try {
+            // 회원 탈퇴 처리
+            mypageService.deleteUser(dto, keepPosts);
+            return ResponseEntity.ok("회원 탈퇴 완료!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 탈퇴 실패!");
+        }
+    }
+	
+	
 }

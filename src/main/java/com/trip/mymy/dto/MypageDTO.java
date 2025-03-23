@@ -12,6 +12,7 @@ public class MypageDTO {
 	private String profile;
 	private String testResult;
 	
+	
 	public String getTestResult() {
 		return testResult;
 	}

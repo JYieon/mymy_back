@@ -3,8 +3,11 @@ package com.trip.mymy.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import com.trip.mymy.common.jwt.TokenProvider;
+import com.trip.mymy.dto.MemberDTO;
 import com.trip.mymy.dto.MyBoardDTO;
 import com.trip.mymy.service.MyBoardService;
 
@@ -15,19 +18,25 @@ public class MyBoardController {
 
     @Autowired 
     private MyBoardService myBoardService;
+    @Autowired TokenProvider tp;
 
     // 내가 쓴 글 목록 조회
-    @GetMapping("/my-posts/{userId}")  // ✅ @PathVariable 사용
-    public ResponseEntity<List<MyBoardDTO>> getMyPosts(@PathVariable("userId") String userId) {
-        List<MyBoardDTO> myPosts = myBoardService.getMyPosts(userId);
+    @GetMapping("/my-posts")  // ✅ @PathVariable 사용
+    public ResponseEntity<List<MyBoardDTO>> getMyPosts(@RequestHeader("Authorization") String token) {
+    	Authentication authentication = tp.getAuthentication(token);
+		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
+		
+        List<MyBoardDTO> myPosts = myBoardService.getMyPosts(member.getId());
         return ResponseEntity.ok(myPosts);
     }
 
     
     // 내가 쓴 댓글 조회 API
-    @GetMapping("/my-comments/{userId}")
-    public ResponseEntity<List<MyBoardDTO>> getMyComments(@PathVariable("userId") String userId) {
-        List<MyBoardDTO> myComments = myBoardService.getMyComments(userId);
+    @GetMapping("/my-comments")
+    public ResponseEntity<List<MyBoardDTO>> getMyComments(@RequestHeader("Authorization") String token) {
+    	Authentication authentication = tp.getAuthentication(token);
+		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
+        List<MyBoardDTO> myComments = myBoardService.getMyComments(member.getId());
         return ResponseEntity.ok(myComments);
     }
 

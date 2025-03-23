@@ -14,6 +14,7 @@
     	<result property="level" column="MEMBER_LEVEL" />
     	<result property="bank" column="MEMBER_BANK" />
     	<result property="profile"  column="MEMBER_PROFILE" />
+    	<result property="testResult" column="MEMBER_TEST_RESULT"/>
     </resultMap>
     <select id="getUser" resultMap="member">
     	select * from MEMBER_TB where MEMBER_ID_PK = #{id}

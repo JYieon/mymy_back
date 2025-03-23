@@ -13,7 +13,7 @@
 		BOARD_TITLE AS title,
 		BOARD_CONTENT AS content,
 		MEMBER_ID_PK AS id,
-		TO_CHAR(BOARD_DT, 'YYYY-MM-DD HH24:MI:SS') AS boardDate,  <!-- ✅ 'date' 대신 'boardDate' 사용 -->
+		TO_CHAR(BOARD_DT, 'YYYY-MM-DD HH24:MI:SS') AS boardDate, 
 		BOARD_CATEGORY AS boardCategory,
 		BOARD_CNT AS boardCnt,
 		BOARD_LIKES AS boardLikes
@@ -24,8 +24,7 @@
 
 
 	<!-- 내가 쓴 댓글 조회 -->
-	<select id="findMyComments" parameterType="String"
-		resultType="com.trip.mymy.dto.MyBoardDTO">
+	<select id="findMyComments" resultType="com.trip.mymy.dto.MyBoardDTO">
 		SELECT
 		R.BOARD_NO_PK AS boardNo,
 		R.REPLY_CONTENT AS content,
@@ -42,4 +41,20 @@
 		WHERE R.MEMBER_ID_PK = #{userId}
 		ORDER BY R.REPLY_NO_PK DESC
 	</select>
+	
+	<!-- 내가 쓴 글 조회 (토큰 기반) -->
+<select id="findMyPostsByToken" resultType="com.trip.mymy.dto.MyBoardDTO">
+    SELECT
+        BOARD_NO_PK AS boardNo,
+        BOARD_TITLE AS title,
+        BOARD_CONTENT AS content,
+        MEMBER_ID_PK AS id,
+        TO_CHAR(BOARD_DT, 'YYYY-MM-DD HH24:MI:SS') AS boardDate, 
+        BOARD_CATEGORY AS boardCategory,
+        BOARD_CNT AS boardCnt,
+        BOARD_LIKES AS boardLikes
+    FROM BOARD_TB
+    WHERE MEMBER_ID_PK = (SELECT MEMBER_ID_PK FROM MEMBER_TB WHERE ACCESS_TOKEN = #{token})
+    ORDER BY BOARD_NO_PK DESC
+</select>
 </mapper>

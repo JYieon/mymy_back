@@ -49,5 +49,34 @@ public class MypageServiceImpl implements MypageService {
     public String getTestResult(String id) {
         return mypageMapper.getTestResult(id);
     }
+    
+    //회원 탈퇴
+    public void deleteUser(MypageDTO dto, boolean keepPosts) {
+    	System.out.println("회원 탈퇴 요청됨 - ID: " + dto.getId() + ", keepPosts: " + keepPosts);
 
+        try {
+            //회원 상태를 '탈퇴'로 변경
+            mypageMapper.updateMemberStatusToDeleted(dto);  // 회원 상태 '탈퇴'로 변경
+
+            if (keepPosts) {
+                // 게시글 작성자 'anonymous'로 변경
+                System.out.println("게시글 작성자를 'anonymous'로 변경 중...");
+                mypageMapper.anonymizeUserPosts(dto); // 게시글 익명화
+                mypageMapper.anonymizeUserComments(dto); // 댓글 익명화
+            } else {
+                // 게시글 삭제
+                System.out.println("게시글 삭제 중...");
+                mypageMapper.deleteUserPosts(dto);    // 게시글 삭제
+            }
+
+            // 회원 삭제 (완전히 삭제)
+            mypageMapper.deleteMember(dto);  // 회원 삭제
+            System.out.println("회원 탈퇴 완료!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("회원 탈퇴 중 오류 발생!");
+        }
+    	
+    }
+    
 }
