@@ -34,7 +34,7 @@
             <if test="pwd != null and pwd != ''">MEMBER_PWD = #{pwd},</if>
             <if test="nick != null and nick != ''">MEMBER_NICK = #{nick},</if>
             <if test="phone != null and phone != ''">MEMBER_PHONE = #{phone},</if>
-            <if test="email != null and email != ''">MEMBER_EMAIL = #{email}</if>
+            <if test="email != null and email != ''">MEMBER_EMAIL = #{email},</if>
             <if test="testResult != null and testResult != ''">MEMBER_TEST_RESULT = #{testResult}</if>
         </set>
         WHERE MEMBER_ID_PK = #{id}

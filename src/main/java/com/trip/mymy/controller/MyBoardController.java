@@ -39,5 +39,13 @@ public class MyBoardController {
         List<MyBoardDTO> myComments = myBoardService.getMyComments(member.getId());
         return ResponseEntity.ok(myComments);
     }
+    
+    // 특정 유저의 게시글 목록 조회
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<MyBoardDTO>> getUserPosts(@PathVariable String userId) {
+        List<MyBoardDTO> posts = myBoardService.getUserPosts(userId);
+        return ResponseEntity.ok(posts);
+    }
+
 
 }
