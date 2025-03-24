@@ -270,30 +270,30 @@ public class BoardServiceImpl implements BoardService {
 
 	
 	// 게시글 수정 (태그 포함)
-	public boolean modify(BoardDTO dto) {
-		try {
-			// 게시글 수정
-			int result = mapper.modify(dto);
+   public boolean modify(BoardDTO dto) {
+       try {
+           // 게시글 수정
+           int result = mapper.modify(dto);
 
-			if (result == 1) {
-	            // 계획 게시글이면 해시태그 제거
-	            if (dto.getBoardCategory() == 1) {
-	                deleteTags(dto.getBoardNo());
-	                dto.setHashtags(null); // DTO에서도 제거
-	            } else {
-	                // 기록 게시글만 태그 저장
-	                deleteTags(dto.getBoardNo());
-	                if (dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
-	                    addTags(dto.getBoardNo(), dto.getHashtags());
-	                }
-	            }
-	            return true;
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return false;
-	}
+           if (result == 1) {
+               deleteTags(dto.getBoardNo());
+
+               // 계획 게시글이면 해시태그 제거
+               if (dto.getBoardCategory() != null && dto.getBoardCategory() == 1) {
+                   dto.setHashtags(null); // DTO에서도 제거
+               } else {
+                   List<String> tags = dto.getHashtags();
+                   if (tags != null && !tags.isEmpty()) {
+                       addTags(dto.getBoardNo(), tags);
+                   }
+               }
+               return true;
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       return false;
+   }
 
 	// 게시글 삭제
 	@Transactional

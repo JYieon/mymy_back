@@ -5,14 +5,14 @@
 
 <mapper namespace="com.trip.mymy.mybatis.MoneyMapper">
     <resultMap type="com.trip.mymy.dto.money.SettlementDTO" id="settle">
-    	<id property="settleNum" column="SETTLE_NUM_PK"/>
-    	<result property="roomNum" column="ROOM_NUM_FK" />
-    	<result property="toMember" column="TO_MEMBER_NICK_FK" />
-    	<result property="money" column="MONEY" />
-    	<result property="check" column="SETTLE_CHECK"/>
+    	<id property="settleNum" column="SETTLEMENT_NUM_PK"/>
+    	<result property="roomNum" column="CHATROOM_NUM_FK" />
+    	<result property="toMember" column="SETTLEMENT_TO_MEMBER_NICK_FK" />
+    	<result property="money" column="SETTLEMENT_MONEY" />
+    	<result property="check" column="SETTLEMENT_MONEY"/>
     </resultMap>
     <resultMap type="com.trip.mymy.dto.money.SettlementServiceDTO" id="settleService">
-    	<id property="serviceNum" column="SETTLEMENT_SERVICE_NUM"/>
+    	<id property="serviceNum" column="SETTLEMENT_SERVICE_NUM_PK"/>
     	<result property="sender" column="SEND_MEMBER_NICK_FK"/>
     	<result property="settleNum" column="SETTLEMENT_NUM_FK"/>
     </resultMap>
@@ -21,17 +21,17 @@
     	<result property="bankName" column="BANK_NAME" />
     	<result property="total" column="BANK_TOTAL_MONEY" />
     	<result property="target" column="BANK_TARGET_MONEY"/>
-    	<result property="check" column="TARGET_CHECK"/>
+    	<result property="check" column="BNAK_TARGET_CHECK"/>
     	<result property="bankNum" column="BANK_NUM"/>
     </resultMap>
     <resultMap type="com.trip.mymy.dto.money.BankServiceDTO" id="bankSer">
     	<id property="bankSerNum" column="BANK_SERVICE_NUM_PK"/>
     	<result property="roomNum" column="ROOM_NUM_FK" />
     	<result property="member" column="MEMBER_ID_FK"/>
-    	<result property="type" column="SERVICE_TYPE" />
-    	<result property="money" column="MONEY" />
-    	<result property="personalTotal" column="PERSONAL_TOTAL"/>
-    	<result property="date" column="UPDATE_DATE"/>
+    	<result property="type" column="BANK_SERVICE_TYPE" />
+    	<result property="money" column="BANK_SERVICE_MONEY" />
+    	<result property="personalTotal" column="BANK_PERSONAL_TOTAL"/>
+    	<result property="date" column="BANK_UPDATE_DATE"/>
     	<result property="bankTotal" column="BANK_TOTAL" />
     </resultMap>
 
@@ -46,13 +46,13 @@
     	insert into SETTLEMENT_SERVICE_TB values(SETTLEMENT_SERVICE_TB_SEQ.nextval, #{id}, #{settleNum})
     </insert>
     <update id="updateSettleCheck">
-    	update SETTLEMENT_TB set SETTLE_CHECK = #{settleMember} where SETTLE_NUM_PK = #{settleNum}
+    	update SETTLEMENT_TB set SETTLEMENT_CHECK = #{settleMember} where SETTLEMENT_NUM_PK = #{settleNum}
     </update>
     <select id="getSettlement" resultMap="settle">
-    	select * from SETTLEMENT_TB where ROOM_NUM_FK = #{roomNum}
+    	select * from SETTLEMENT_TB where CHATROOM_NUM_FK = #{roomNum}
     </select>
     <select id="getSettlementService" resultMap="settleService">
-    	select * from SETTLEMENT_SERVICE_TB where SETTLEMENT_NUM_FK = #{settleNum} 
+    	select * from SETTLEMENT_SERVICE_TB where SETTLEMENT_SERVICE_NUM_PK = #{settleNum} 
     </select>
     <insert id="makeBank">
     	insert into BANK_TB values(#{roomNum}, #{bankName}, 0, #{target}, 'f', #{bankNum})
@@ -61,7 +61,7 @@
     	select * from BANK_TB where ROOM_NUM_PK = #{roomNum}
     </select>
     <select id="getBankService" resultMap="bankSer">
-    	select * from BANK_SERVICE_TB where ROOM_NUM_FK = #{roomNum} order by UPDATE_DATE desc
+    	select * from BANK_SERVICE_TB where ROOM_NUM_FK = #{roomNum} order by BANK_UPDATE_DATE desc
     </select>
     <insert id="addBankService">
     	insert into BANK_SERVICE_TB values(BANK_SERVICE_TB_SEQ.nextval, #{roomNum}, #{member}, #{type}, #{money}, #{personalTotal}, CURRENT_TIMESTAMP, #{bankTotal})
@@ -70,9 +70,9 @@
     	select BANK_NUM from BANK_TB where BANK_NUM = #{bankNum}
     </select>
     <update id="updateBank">
-    	update BANK_TB set BANK_TOTAL_MONEY = #{total}, TARGET_CHECK = #{check} where ROOM_NUM_PK = #{roomNum}
+    	update BANK_TB set BANK_TOTAL_MONEY = #{total}, BNAK_TARGET_CHECK = #{check} where ROOM_NUM_PK = #{roomNum}
     </update>
     <select id="getPersonalTotal" resultType="Integer">
-    	select PERSONAL_TOTAL PERSONAL_TOTAL from BANK_SERVICE_TB where MEMBER_ID_FK = #{id} order by PERSONAL_TOTAL desc fetch first 1 rows only
+    	select BANK_PERSONAL_TOTAL from BANK_SERVICE_TB where MEMBER_ID_FK = #{id} order by BANK_PERSONAL_TOTAL desc fetch first 1 rows only
     </select>
 </mapper>

@@ -75,7 +75,10 @@ public class ChatController {
    
    @GetMapping("join") //모든 채팅 정보 리턴
    public ResponseEntity<ChatResDTO> getRoom(@RequestParam Long roomNum) {
-      ChatResDTO res =  cs.joinRoom(roomNum);
+      ChatResDTO res = cs.joinRoom(roomNum);
+      if(res.getMember().isEmpty()) {
+    	  return ResponseEntity.noContent().build();
+      }
       return ResponseEntity.ok(res);
    }
    

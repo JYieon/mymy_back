@@ -6,16 +6,16 @@
 <mapper namespace="com.trip.mymy.mybatis.FollowMapper">
 
     <resultMap id="FollowingResultMap" type="com.trip.mymy.dto.FollowingDTO">
-	    <id property="followId" column="FOLLOW_ID_PK"/>
+	    <id property="followId" column="FOLLOW_NUM_PK"/>
 	    <result property="followerId" column="FOLLOWER_ID"/>
 	    <result property="followingId" column="FOLLOWING_ID"/>
-	    <result property="createdAt" column="CREATED_AT" jdbcType="TIMESTAMP"/>
+	    <result property="createdAt" column="FOLLOW_CREATED_AT" jdbcType="TIMESTAMP"/>
 	</resultMap>
 
 	<resultMap id="FollowerResultMap" type="com.trip.mymy.dto.FollowerDTO">
-    	<id property="followId" column="FOLLOW_ID_PK"/>
+    	<id property="followId" column="FOLLOW_NUM_PK"/>
     	<result property="followerId" column="FOLLOWER_ID"/>
-    	<result property="createdAt" column="CREATED_AT"/>
+    	<result property="createdAt" column="FOLLOW_CREATED_AT"/>
 	</resultMap>
 
 
@@ -54,7 +54,7 @@
 	
 	<!-- 팔로우 요청 -->
 	<insert id="followUser">
-    	INSERT INTO FOLLOW_TB (FOLLOWER_ID, FOLLOWING_ID, CREATED_AT)
+    	INSERT INTO FOLLOW_TB (FOLLOWER_ID, FOLLOWING_ID, FOLLOW_CREATED_AT)
     	VALUES (#{followerId}, #{followingId}, SYSDATE)
 	</insert>
 	

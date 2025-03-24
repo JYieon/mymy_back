@@ -31,13 +31,13 @@ public class AuthServiceImpl implements AuthService {
 	public Map<String, String> loginCheck(LoginReqDTO loginData) { 
 		Map<String, String> result = new HashMap<String, String>();
 		MemberDTO dto = mapper.getUser(loginData.getId());
-		if(dto == null) {
+		if(dto == null || dto.getId().equals("anonymous")) {
 			result.put("msg", "아이디가 존재하지 않습니다.");
 		}else {
 			if(dto.getPwd().equals(loginData.getPwd())) {
 				result.put("status", "200");
 			}else {
-				result.put("msg", "비밀번호가 존재하지 않습니다.");
+				result.put("msg", "비밀번호를 다시 확인해주세요.");
 			}
 		}
 		return result;

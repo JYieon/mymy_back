@@ -87,21 +87,24 @@ public class BoardController {
 	            response.put("boardNo", boardNo); // ✅ boardNo 프론트로 반환
 	            
 	            
-//				팔로우 불러오기
-				List<FollowerDTO> followers = followService.getFollowerList(member.getId());
+	            if(dto.getBoardOpen() == 1) {
+//					팔로우 불러오기
+					List<FollowerDTO> followers = followService.getFollowerList(member.getId());
 
-				// 팔로워들에게 알람 전송
-				for (FollowerDTO follower : followers) {
-				    AlarmDTO alarm = AlarmDTO.builder()
-				            .senderId(member.getNick())      
-				            .memberId(follower.getFollowerId()) 
-				            .alarmTypeId(1)    
-				            .addr(dto.getBoardNo())
-				            .build();
+					// 팔로워들에게 알람 전송
+					for (FollowerDTO follower : followers) {
+					    AlarmDTO alarm = AlarmDTO.builder()
+					            .senderId(member.getNick())      
+					            .memberId(follower.getFollowerId()) 
+					            .alarmTypeId(1)    
+					            .addr(dto.getBoardNo())
+					            .build();
 
-				    System.out.println("🔔 알람 전송: " + alarm);
-				    alramController.sendNotification(alarm);
-				}
+					    System.out.println("🔔 알람 전송: " + alarm);
+					    alramController.sendNotification(alarm);
+					}
+	            }
+
 				    
 				    
 	            return ResponseEntity.ok(response);
