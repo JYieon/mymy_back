@@ -17,7 +17,7 @@
     	<result property="settleNum" column="SETTLEMENT_NUM_FK"/>
     </resultMap>
     <resultMap type="com.trip.mymy.dto.money.BankDTO" id="bank">
-    	<id property="roomNum" column="ROOM_NUM_PK" />
+    	<id property="roomNum" column="CHATROOM_NUM_FK_PK" />
     	<result property="bankName" column="BANK_NAME" />
     	<result property="total" column="BANK_TOTAL_MONEY" />
     	<result property="target" column="BANK_TARGET_MONEY"/>
@@ -26,7 +26,7 @@
     </resultMap>
     <resultMap type="com.trip.mymy.dto.money.BankServiceDTO" id="bankSer">
     	<id property="bankSerNum" column="BANK_SERVICE_NUM_PK"/>
-    	<result property="roomNum" column="ROOM_NUM_FK" />
+    	<result property="roomNum" column="CHATROOM_NUM_FK" />
     	<result property="member" column="MEMBER_ID_FK"/>
     	<result property="type" column="BANK_SERVICE_TYPE" />
     	<result property="money" column="BANK_SERVICE_MONEY" />
@@ -58,10 +58,10 @@
     	insert into BANK_TB values(#{roomNum}, #{bankName}, 0, #{target}, 'f', #{bankNum})
     </insert>
     <select id="getBank" resultMap="bank">
-    	select * from BANK_TB where ROOM_NUM_PK = #{roomNum}
+    	select * from BANK_TB where CHATROOM_NUM_FK_PK = #{roomNum}
     </select>
     <select id="getBankService" resultMap="bankSer">
-    	select * from BANK_SERVICE_TB where ROOM_NUM_FK = #{roomNum} order by BANK_UPDATE_DATE desc
+    	select * from BANK_SERVICE_TB where CHATROOM_NUM_FK = #{roomNum} order by BANK_UPDATE_DATE desc
     </select>
     <insert id="addBankService">
     	insert into BANK_SERVICE_TB values(BANK_SERVICE_TB_SEQ.nextval, #{roomNum}, #{member}, #{type}, #{money}, #{personalTotal}, CURRENT_TIMESTAMP, #{bankTotal})
