@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.trip.mymy.mybatis.LevelMapper">
+
+	<!--  여행 기록 글 개수 가져오기 -->
+    <select id="getTravelRecordPostCount" resultType="int">
+        SELECT COUNT(*) 
+        FROM BOARD_TB 
+        WHERE MEMBER_ID_FK = #{id}
+          AND BOARD_CATEGORY = 2
+    </select>
+
+	<!--  댓글 개수 가져오기 -->
+    <select id="getCommentCount" resultType="int">
+        SELECT COUNT(*) 
+        FROM REPLY_TB 
+        WHERE MEMBER_ID_FK = #{id}
+    </select>
+
+	<!-- MEMBER 테이블에 LEVEL 업데이트 -->
+    <update id="updateMemberLevel">
+        UPDATE MEMBER_TB
+        SET MEMBER_LEVEL = #{level}
+        WHERE MEMBER_ID_FK = #{id}
+    </update>
+</mapper>

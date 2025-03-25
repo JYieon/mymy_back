@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trip.mymy.mybatis.ChatMapper">
+    <resultMap type="com.trip.mymy.dto.chat.ChatDTO" id="chat">
+    	<id property="roomNum" column="CHATROOM_NUM_PK"/>
+    	<result property="member" column="MEMBER_ID_FK" />
+    	<result property="roomName" column="CHATROOM_NAME" />
+    	<result property="lastChat" column="CHATROOM_LAST_CHAT"/>
+    </resultMap>
+    <resultMap type="com.trip.mymy.dto.chat.ChatMemberDTO" id="chatMember">
+	    <id property="roomNum" column="CHATROOM_NUM_FK_PK"/>
+	    <id property="member" column="MEMBER_ID_FK_PK" jdbcType="VARCHAR"/>
+	    <result property="enterDate" column="CHATMEMBER_ENTER_DT" jdbcType="VARCHAR"/>
+	    <result property="leaveDate" column="CHATMEMBER_LEAVE_DT" jdbcType="VARCHAR"/>
+	    <result property="role" column="CHATMEMBER_ROLE"/>
+	    <result property="nick" column="MEMBER_NICK"/>
+	</resultMap>
+	<resultMap  type="com.trip.mymy.dto.chat.ChatMessageDTO" id="message">
+	    <id property="msgNum" column="MESSAGE_NUM_PK"/>
+	    <result property="roomNum" column="CHATROOM_NUM_FK"/>
+	    <result property="member" column="MEMBER_ID_FK"/>
+	    <result property="msgDate" column="MESSAGE_DT"/>
+	    <result property="msg" column="MESSAGE"/>
+	    <result property="type" column="MESSAGE_TYPE"/>	 
+	    <result property="nick" column="MEMBER_NICK"/>   
+	    <result property="profile" column="MEMBER_PROFILE"/>   
+	</resultMap>
+	<resultMap id="chatRoomResultMap" type="com.trip.mymy.dto.chat.ChatDTO">
+	    <result column="ROOM_NAME" property="roomName"/>
+	</resultMap>
+    
+    <select id="findChatList" resultMap="chat">
+    	select room.* from CHAT_ROOM_TB room, CHAT_MEMBER_TB mem WHERE room.CHATROOM_NUM_PK = mem.CHATROOM_NUM_FK_PK and MEMBER_ID_FK = #{member}
+    </select>
+    <insert id="createRoom" useGeneratedKeys="true" keyProperty="roomNum" keyColumn="ROOM_NUM_PK">
+    	insert into CHAT_ROOM_TB(MEMBER_ID_FK, CHATROOM_NAME, CHATROOM_LAST_CHAT)  values(#{member}, #{roomName}, CURRENT_TIMESTAMP)
+    </insert>
+    <insert id="insertChatMember">
+    	insert into CHAT_MEMBER_TB(CHATROOM_NUM_FK_PK, MEMBER_ID_FK_PK, CHATMEMBER_ENTER_DT, CHATMEMBER_ROLE) values(#{roomNum}, #{member}, CURRENT_TIMESTAMP, #{role})
+    </insert>
+    <delete id="removeRoom">
+    	delete from CHAT_ROOM_TB where CHATROOM_NUM_PK = #{roomNum}
+    </delete>
+    <delete id="removeRoomMember">
+    	delete from CHAT_MEMBER_TB where CHATROOM_NUM_FK_PK = #{roomNum}
+    </delete>
+    <delete id="deleteMember">
+    	delete from CHAT_MEMBER_TB where CHATROOM_NUM_FK_PK = #{roomNum} and MEMBER_ID_FK_PK = #{member}
+    </delete>
+    <delete id="deleteMessage">
+    	delete from MESSAGE_TB where CHATROOM_NUM_FK = #{roomNum}
+    </delete>
+    <insert id="saveMsg">
+    	insert into MESSAGE_TB(CHATROOM_NUM_FK, MEMBER_ID_FK, MESSAGE_DT, MESSAGE, MESSAGE_TYPE) values (#{roomNum}, #{member}, CURRENT_TIMESTAMP, #{msg}, #{type})
+    </insert>
+    <select id="getRoomMessages" resultMap="message">
+    	select msg.*, m.MEMBER_NICK, m.MEMBER_PROFILE from MESSAGE_TB msg left join MEMBER_TB m on msg.MEMBER_ID_FK = m.MEMBER_ID_PK where CHATROOM_NUM_FK = #{roomNum}  order by msg.MESSAGE_DT ASC
+    </select>
+    <select id="findRoomMember" resultMap="chatMember">
+    	select c.*, m.MEMBER_NICK, m.MEMBER_PROFILE from CHAT_MEMBER_TB c left join MEMBER_TB m on c.MEMBER_ID_FK_PK = m.MEMBER_ID_PK where CHATROOM_NUM_FK_PK = #{roomNum}
+    </select>
+    <select id="findChatRoom" resultMap="chat">
+    	select * from CHAT_ROOM_TB where CHATROOM_NUM_PK = #{roomNum}
+    </select>
+    <select id="getUserChatRole" resultType="string">
+    	select CHATMEMBER_ROLE from CHAT_MEMBER_TB where CHATROOM_NUM_FK_PK = #{roomNum} and MEMBER_ID_FK_PK = #{id}
+    </select>
+</mapper>
