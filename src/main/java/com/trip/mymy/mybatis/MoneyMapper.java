@@ -19,7 +19,7 @@ public interface MoneyMapper {
 	public List<SettlementServiceDTO> getSettlementService(int settleNum);
 	public int makeBank(BankDTO bank);
 	public BankDTO getBank(int roomNum);
-	public List<BankServiceDTO> getBankService(int roomNum);
+	public List<BankServiceDTO> getBankService(String bankNum);
 	public int addBankService(BankServiceDTO bankSer);
 	public String checkBankNum(String bankNum);
 	public int updateBank(BankDTO bank);

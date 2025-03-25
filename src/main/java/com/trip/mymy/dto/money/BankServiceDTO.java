@@ -8,9 +8,8 @@ import lombok.Getter;
 @Setter
 @Builder
 public class BankServiceDTO {
-
 	int bankSerNum;
-	int roomNum;
+	String bankNum;
 	String member;
 	String type;
 	int money;

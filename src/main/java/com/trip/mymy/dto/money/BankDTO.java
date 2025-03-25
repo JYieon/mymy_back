@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 @Builder
 public class BankDTO {
+	String bankNum;
 	int roomNum;
 	String bankName;
 	int total;
 	int target;
 	String check;
-	String bankNum;
 }

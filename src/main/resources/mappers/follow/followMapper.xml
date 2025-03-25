@@ -55,7 +55,7 @@
    <!-- 팔로우 요청 -->
    <insert id="followUser">
        INSERT INTO FOLLOW_TB (FOLLOWER_ID_FK, FOLLOWING_ID_FK, FOLLOW_CREATED_AT)
-       VALUES (#{followerId}, #{followingId}, SYSDATE)
+       VALUES (#{followerId}, #{followingId}, NOW())
    </insert>
    
    
