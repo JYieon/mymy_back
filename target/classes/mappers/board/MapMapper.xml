@@ -4,29 +4,36 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.trip.mymy.mybatis.MapMapper">
+   <resultMap type="com.trip.mymy.dto.MapDTO" id="map">
+       <id property="markerId" column="MARKER_NUM_PK"/>
+       <result property="boardNo" column="BOARD_NUM_FK" />
+       <result property="latitude" column="MARKER_LATITUDE" />
+       <result property="longitude" column="MARKER_LONGITUDE" />
+       <result property="info" column="MARKER_PLACE"/>
+    </resultMap>
     
     <!-- 마커 추가 -->
     <insert id="insertMarker">
-        INSERT INTO MAP_TB (MARKER_ID, BOARD_NO_PK, LATITUDE, LONGITUDE, INFO)
+        INSERT INTO MAP_TB (MARKER_NUM_PK, BOARD_NUM_FK, MARKER_LATITUDE, MARKER_LONGITUDE, MARKER_PLACE)
         VALUES (MAP_TB_SEQ.NEXTVAL, #{boardNo}, #{latitude}, #{longitude}, #{info})
     </insert>
 
     <!-- 특정 게시판(boardNo)의 마커 조회 -->
-    <select id="getMarkersByBoard" resultType="com.trip.mymy.dto.MapDTO">
-        SELECT MARKER_ID, BOARD_NO_PK, LATITUDE, LONGITUDE, INFO 
+    <select id="getMarkersByBoard" resultMap="map">
+        SELECT MARKER_NUM_PK, BOARD_NUM_FK, MARKER_LATITUDE, MARKER_LONGITUDE, MARKER_PLACE 
         FROM MAP_TB
-        WHERE BOARD_NO_PK = #{boardNo}
-        ORDER BY MARKER_ID ASC
+        WHERE BOARD_NUM_FK = #{boardNo}
+        ORDER BY MARKER_NUM_PK ASC
     </select>
 
     <!-- 특정 마커 삭제 -->
     <delete id="deleteMarker">
-        DELETE FROM MAP_TB WHERE MARKER_ID = #{markerId}
+        DELETE FROM MAP_TB WHERE MARKER_NUM_PK = #{markerId}
     </delete>
 
     <!-- 특정 게시판(boardNo)의 모든 마커 삭제 -->
     <delete id="deleteMarkersByBoard">
-        DELETE FROM MAP_TB WHERE BOARD_NO_PK = #{boardNo}
+        DELETE FROM MAP_TB WHERE BOARD_NUM_FK = #{boardNo}
     </delete>
 
 </mapper>

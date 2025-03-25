@@ -4,71 +4,71 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.trip.mymy.mybatis.BookmarkMapper">
-	<resultMap type="com.trip.mymy.dto.BookmarkDTO"
-		id="BOOKMARK_TB">
-		<id property="bookNo" column="BOOK_NO_PK" />
-		<result property="boardNo" column="BOARD_NO_PK" />
-		<result property="id" column="MEMBER_ID_PK" />
-		<result property="date" column="CREATE_DT"
-			javaType="java.sql.Timestamp" />
-		<result property="status" column="STATUS" />
-	</resultMap>
+   <resultMap type="com.trip.mymy.dto.BookmarkDTO"
+      id="BOOKMARK_TB">
+      <id property="bookNo" column="BOOKMARK_NUM_PK" />
+      <result property="boardNo" column="BOARD_NUM_FK" />
+      <result property="id" column="MEMBER_ID_FK" />
+      <result property="date" column="BOOKMARK_CREATE_DT"
+         javaType="java.sql.Timestamp" />
+      <result property="status" column="BOOKMARK_STATUS" />
+   </resultMap>
 
-	<!-- BoardDTO와 매핑되는 resultMap 추가 -->
-	<resultMap id="BOARD_TB" type="com.trip.mymy.dto.BoardDTO">
-		<id property="boardNo" column="BOARD_NO_PK" />
-		<result property="id" column="MEMBER_ID_PK" />
-		<result property="title" column="BOARD_TITLE" />
-		<result property="content" column="BOARD_CONTENT" />
-		<result property="date" column="BOARD_DT"
-			javaType="java.sql.Timestamp" />
-	</resultMap>
+   <!-- BoardDTO와 매핑되는 resultMap 추가 -->
+   <resultMap id="BOARD_TB" type="com.trip.mymy.dto.BoardDTO">
+      <id property="boardNo" column="BOARD_NUM_PK" />
+      <result property="id" column="MEMBER_ID_FK" />
+      <result property="title" column="BOARD_TITLE" />
+      <result property="content" column="BOARD_CONTENT" />
+      <result property="date" column="BOARD_DT"
+         javaType="java.sql.Timestamp" />
+   </resultMap>
 
-	<!-- 북마크 추가 -->
-	<insert id="addBookmark">
-		<!-- MERGE INTO: 기존 북마크가 존재하는지 확인 후, 있으면 UPDATE, 없으면 INSERT -->
-		MERGE INTO BOOKMARK_TB B
-		USING (SELECT #{id} AS MEMBER_ID_PK,
-		#{boardNo} AS BOARD_NO_PK from dual) D
-		ON (B.MEMBER_ID_PK =
-		D.MEMBER_ID_PK AND B.BOARD_NO_PK = D.BOARD_NO_PK)
+   <!-- 북마크 추가 -->
+   <insert id="addBookmark">
+      <!-- MERGE INTO: 기존 북마크가 존재하는지 확인 후, 있으면 UPDATE, 없으면 INSERT -->
+      MERGE INTO BOOKMARK_TB B
+      USING (SELECT #{id} AS MEMBER_ID_FK,
+      #{boardNo} AS BOARD_NUM_FK from dual) D
+      ON (B.MEMBER_ID_FK =
+      D.MEMBER_ID_FK AND B.BOARD_NUM_FK = D.BOARD_NUM_FK)
 
-		<!-- 이미 북마크가 존재하는 경우, STATUS를 1로 변경 -->
-		WHEN MATCHED THEN
-		UPDATE SET B.STATUS = 1, B.CREATE_DT = SYSDATE
+      <!-- 이미 북마크가 존재하는 경우, STATUS를 1로 변경 -->
+      WHEN MATCHED THEN
+      UPDATE SET B.BOOKMARK_STATUS = 1, B.BOOKMARK_CREATE_DT = SYSDATE
 
-		<!-- 북마크한 적이 없는 경우, 새로운 북마크 추가 -->
-		WHEN NOT MATCHED THEN
-		INSERT (BOOK_NO_PK, MEMBER_ID_PK, BOARD_NO_PK,
-		STATUS, CREATE_DT)
-		VALUES (BOOKMARK_TB_SEQ.NEXTVAL, #{id}, #{boardNo},
-		1, SYSDATE)
-	</insert>
+      <!-- 북마크한 적이 없는 경우, 새로운 북마크 추가 -->
+      WHEN NOT MATCHED THEN
+      INSERT (BOOKMARK_NUM_PK, MEMBER_ID_FK, BOARD_NUM_FK,
+      BOOKMARK_STATUS, BOOKMARK_CREATE_DT)
+      VALUES (BOOKMARK_TB_SEQ.NEXTVAL, #{id}, #{boardNo},
+      1, SYSDATE)
+   </insert>
 
-	<!-- 북마크 삭제 -->
-	<delete id="deleteBookmark">
-		DELETE FROM BOOKMARK_TB WHERE MEMBER_ID_PK = #{id}
-		AND BOARD_NO_PK = #{boardNo}
-	</delete>
+   <!-- 북마크 삭제 -->
+   <delete id="deleteBookmark">
+      DELETE FROM BOOKMARK_TB WHERE MEMBER_ID_FK = #{id}
+      AND BOOKMARK_NUM_PK = #{boardNo}
+   </delete>
 
-	<!-- 북마크 확인 -->
-	<select id="checkBookmark" resultType="int">
-		SELECT COUNT(*) FROM
-		BOOKMARK_TB WHERE MEMBER_ID_PK = #{id} AND BOARD_NO_PK = #{boardNo}
-	</select>
+   <!-- 북마크 확인 -->
+   <select id="checkBookmark" resultType="int">
+      SELECT COUNT(*) FROM
+      BOOKMARK_TB WHERE MEMBER_ID_FK = #{id} AND BOARD_NUM_FK = #{boardNo}
+   </select>
 
-	<!-- 사용자의 북마크 목록 조회 -->
-	<select id="getBookmarkList" resultMap="BOARD_TB">
-		SELECT B.BOARD_NO_PK,
-		B.BOARD_TITLE,B.BOARD_CONTENT, B.MEMBER_ID_PK,
-		B.BOARD_DT
-		FROM BOARD_TB
-		B INNER JOIN BOOKMARK_TB BM ON B.BOARD_NO_PK =
-		BM.BOARD_NO_PK
-		WHERE
-		BM.MEMBER_ID_PK = #{id}
-		AND BM.STATUS = 1
-		ORDER BY BM.CREATE_DT DESC
-	</select>
+   <!-- 사용자의 북마크 목록 조회 -->
+   <select id="getBookmarkList" resultMap="BOARD_TB">
+      SELECT B.BOARD_NUM_PK,
+      B.BOARD_TITLE,B.BOARD_CONTENT, B.MEMBER_ID_FK,
+      B.BOARD_DT
+      FROM BOARD_TB
+      B INNER JOIN BOOKMARK_TB BM ON B.BOARD_NUM_PK =
+      BM.BOARD_NUM_FK
+      WHERE
+      BM.MEMBER_ID_FK = #{id}
+      AND BM.BOOKMARK_STATUS = 1
+      ORDER BY BM.BOOKMARK_CREATE_DT DESC
+   </select>
 
 </mapper>

@@ -28,7 +28,7 @@ public class TimelineController {
 		// 토큰을 통해 인증 정보를 가져옴
 		MemberDTO member = (MemberDTO) authentication.getPrincipal();
 		timeline.setId(member.getId());  // 타임라인에 사용자 ID 설정
-
+		System.out.println("📦 저장 요청된 todo 값: " + timeline.getTodo());
 		ts.insertTimeline(timeline);
 		 return ResponseEntity.ok("타임라인 추가 성공");
 	}

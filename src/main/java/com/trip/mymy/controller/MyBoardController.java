@@ -23,9 +23,9 @@ public class MyBoardController {
     // 내가 쓴 글 목록 조회
     @GetMapping("/my-posts")  // ✅ @PathVariable 사용
     public ResponseEntity<List<MyBoardDTO>> getMyPosts(@RequestHeader("Authorization") String token) {
-    	Authentication authentication = tp.getAuthentication(token);
-		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
-		
+       Authentication authentication = tp.getAuthentication(token);
+      MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
+      
         List<MyBoardDTO> myPosts = myBoardService.getMyPosts(member.getId());
         return ResponseEntity.ok(myPosts);
     }
@@ -34,10 +34,18 @@ public class MyBoardController {
     // 내가 쓴 댓글 조회 API
     @GetMapping("/my-comments")
     public ResponseEntity<List<MyBoardDTO>> getMyComments(@RequestHeader("Authorization") String token) {
-    	Authentication authentication = tp.getAuthentication(token);
-		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
+       Authentication authentication = tp.getAuthentication(token);
+      MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
         List<MyBoardDTO> myComments = myBoardService.getMyComments(member.getId());
         return ResponseEntity.ok(myComments);
     }
+    
+    // 특정 유저의 게시글 목록 조회
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<MyBoardDTO>> getUserPosts(@PathVariable String userId) {
+        List<MyBoardDTO> posts = myBoardService.getUserPosts(userId);
+        return ResponseEntity.ok(posts);
+    }
+
 
 }

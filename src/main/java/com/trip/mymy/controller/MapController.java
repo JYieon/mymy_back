@@ -28,6 +28,7 @@ public class MapController {
     @GetMapping("/list/{boardNo}")
     public ResponseEntity<List<MapDTO>> getMarkersByBoard(@PathVariable int boardNo) {
         List<MapDTO> markers = mapService.getMarkersByBoard(boardNo);
+        System.out.println("📍 [백엔드] 마커 리스트 조회 결과: " + markers);
         return ResponseEntity.ok(markers);
     }
 
