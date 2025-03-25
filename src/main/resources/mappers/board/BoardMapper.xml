@@ -31,10 +31,10 @@
 
 	<!-- 댓글 저장 -->
 	<insert id="addReply">
-		INSERT INTO REPLY_TB(REPLY_NUM_PK, MEMBER_ID_FK,
+		INSERT INTO REPLY_TB(MEMBER_ID_FK,
 		BOARD_NUM_FK, REPLY_CONTENT,PARENT_NUM, REPLY_DT)
 		VALUES
-		(REPLY_TB_SEQ.NEXTVAL, #{id}, #{boardNo}, #{repContent}, #{parentNo},
+		(#{id}, #{boardNo}, #{repContent}, #{parentNo},
 		sysdate)
 	</insert>
 
@@ -85,18 +85,26 @@
 	</select>
 
 	<!-- 게시글 저장 -->
-	<insert id="writeSave"
+	<!-- <insert id="writeSave"
 		parameterType="com.trip.mymy.dto.BoardDTO">
 		<selectKey keyProperty="boardNo" resultType="int"
 			order="AFTER">
 			SELECT BOARD_TB_SEQ.CURRVAL FROM DUAL
 		</selectKey>
-		INSERT INTO BOARD_TB (BOARD_NUM_PK, MEMBER_ID_FK, BOARD_TITLE,
+		INSERT INTO BOARD_TB (MEMBER_ID_FK, BOARD_TITLE,
 		BOARD_CONTENT, BOARD_DT, BOARD_OPEN, BOARD_CATEGORY)
 		VALUES
-		(BOARD_TB_SEQ.nextval, #{id}, #{title}, #{content}, sysdate,
+		(#{id}, #{title}, #{content}, NOW(),
 		#{boardOpen}, #{boardCategory})
+	</insert> -->
+	<insert id="writeSave" parameterType="com.trip.mymy.dto.BoardDTO">
+	    INSERT INTO BOARD_TB (MEMBER_ID_FK, BOARD_TITLE, BOARD_CONTENT, BOARD_DT, BOARD_OPEN, BOARD_CATEGORY)
+	    VALUES (#{id}, #{title}, #{content}, NOW(), #{boardOpen}, #{boardCategory})
+	    <selectKey keyProperty="boardNo" resultType="int" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
 	</insert>
+	
 
 	<select id="getBoardList" resultMap="BOARD_TB">
 		SELECT
@@ -138,7 +146,7 @@
 		WHERE BOARD_CATEGORY = #{category} AND MEMBER_ID_FK = #{id}
 		ORDER BY
 		BOARD_NUM_PK DESC
-		OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
+		LIMIT #{limit} OFFSET #{offset}
 	</select>
 
 	<!-- 게시글 상세 조회 -->
@@ -198,9 +206,8 @@
 	<!-- 좋아요 추가 -->
 	<insert id="addLike" parameterType="map">
 		INSERT INTO LIKE_TB
-		(LIKE_NUM_PK, MEMBER_ID_FK, BOARD_NUM_FK)
-		VALUES (LIKE_TB_SEQ.NEXTVAL,
-		#{id}, #{boardNo})
+		(MEMBER_ID_FK, BOARD_NUM_FK)
+		VALUES (#{id}, #{boardNo})
 	</insert>
 
 	<!-- 각 id별 좋아요 삭제 -->
@@ -222,18 +229,17 @@
 	<!-- 태그 추가 -->
 	<insert id="insertTag" parameterType="map">
 		INSERT INTO TAG_TB
-		(TAG_NUM_PK, TAG_NAME, TAG_TYPE)
-		SELECT TAG_TB_SEQ.NEXTVAL, #{tagName}, #{tagType}
-		FROM DUAL
+		(TAG_NAME, TAG_TYPE)
+		SELECT #{tagName}, #{tagType}
+		FROM TAG_TB
 		WHERE NOT EXISTS (SELECT 1 FROM TAG_TB WHERE TAG_NAME = #{tagName})
 	</insert>
 
 	<!-- 게시글과 태그 연결 -->
 	<insert id="insertBoardTag" parameterType="map">
 		INSERT INTO
-		BOARD_TAG_TB (BOARD_TAG_NUM_PK, BOARD_NUM_FK, TAG_NUM_FK)
-		SELECT
-		BOARD_TAG_SEQ.NEXTVAL, #{boardNo}, t.TAG_NUM_PK
+		BOARD_TAG_TB (BOARD_NUM_FK, TAG_NUM_FK)
+		SELECT #{boardNo}, t.TAG_NUM_PK
 		FROM TAG_TB t
 		WHERE
 		t.TAG_NAME = #{tagName} AND NOT EXISTS (SELECT 1
@@ -294,45 +300,45 @@
 	<!-- 검색된 게시글 리스트 조회 -->
 	<select id="searchBoardList" resultMap="BOARD_TB">
 		SELECT b.BOARD_NUM_PK, b.MEMBER_ID_FK, b.BOARD_TITLE, b.BOARD_CONTENT,
-		b.BOARD_DT, b.BOARD_OPEN, b.BOARD_CATEGORY, b.BOARD_CNT,
-		b.BOARD_LIKES, m.MEMBER_NICK
+		       b.BOARD_DT, b.BOARD_OPEN, b.BOARD_CATEGORY, b.BOARD_CNT,
+		       b.BOARD_LIKES, m.MEMBER_NICK
 		FROM BOARD_TB b
-		JOIN MEMBER_TB m ON
-		b.MEMBER_ID_FK = m.MEMBER_ID_PK
-
+		JOIN MEMBER_TB m ON b.MEMBER_ID_FK = m.MEMBER_ID_PK
+		
 		<!-- 기록 게시판(2)에서만 해시태그 검색 적용 -->
 		<if test="category == 2 and searchType == 'tag'">
-			JOIN BOARD_TAG_TB bt ON b.BOARD_NUM_PK = bt.BOARD_NUM_FK
-			JOIN TAG_TB t ON bt.TAG_NUM_FK = t.TAG_NUM_PK
+		    JOIN BOARD_TAG_TB bt ON b.BOARD_NUM_PK = bt.BOARD_NUM_FK
+		    JOIN TAG_TB t ON bt.TAG_NUM_FK = t.TAG_NUM_PK
 		</if>
-
+		
 		WHERE b.BOARD_CATEGORY = #{category}
-
+		
 		<if test="searchType == 'title'">
-			AND b.BOARD_TITLE LIKE '%' || #{keyword} || '%'
+		    AND b.BOARD_TITLE LIKE CONCAT('%', #{keyword}, '%')
 		</if>
+		
 		<if test="searchType == 'content'">
-			AND b.BOARD_CONTENT LIKE '%' || #{keyword} || '%'
+		    AND b.BOARD_CONTENT LIKE CONCAT('%', #{keyword}, '%')
 		</if>
+		
 		<if test="searchType == 'titleContent'">
-			AND (b.BOARD_TITLE LIKE '%' || #{keyword} || '%' OR
-			b.BOARD_CONTENT LIKE
-			'%' || #{keyword} || '%')
+		    AND (b.BOARD_TITLE LIKE CONCAT('%', #{keyword}, '%') OR
+		         b.BOARD_CONTENT LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
+		
 		<if test="searchType == 'user'">
-			AND (b.MEMBER_ID_FK LIKE '%' || #{keyword} || '%' OR
-			m.MEMBER_NICK LIKE
-			'%' || #{keyword} || '%')
+		    AND (b.MEMBER_ID_FK LIKE CONCAT('%', #{keyword}, '%') OR
+		         m.MEMBER_NICK LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
-
-		<!-- 기록 에서만 태그 검색 허용 -->
+		
+		<!-- 기록에서만 태그 검색 허용 -->
 		<if test="category == 2 and searchType == 'tag'">
-			AND t.TAG_NAME LIKE '%' || #{keyword} || '%'
+		    AND t.TAG_NAME LIKE CONCAT('%', #{keyword}, '%')
 		</if>
-
+		
 		ORDER BY b.BOARD_NUM_PK DESC
-		OFFSET #{offset} ROWS FETCH NEXT #{limit}
-		ROWS ONLY
+		LIMIT #{limit} OFFSET #{offset}
+
 	</select>
 
 
@@ -373,21 +379,28 @@
 	</select>
 
 	<!-- 여행 메이트 게시글 작성 -->
-	<insert id="insertMateBoard"
+	<!-- <insert id="insertMateBoard"
 		parameterType="com.trip.mymy.dto.BoardDTO">
-		<!-- INSERT 후 BOARD_NO_PK 가져오기 -->
+		INSERT 후 BOARD_NO_PK 가져오기
 		<selectKey keyProperty="boardNo" resultType="int"
 			order="AFTER">
 			SELECT BOARD_TB_SEQ.CURRVAL FROM DUAL
 		</selectKey>
 		INSERT INTO BOARD_TB
-		(BOARD_NUM_PK, MEMBER_ID_FK, BOARD_TITLE,
+		(MEMBER_ID_FK, BOARD_TITLE,
 		BOARD_CONTENT, BOARD_DT,
 		BOARD_OPEN, BOARD_CNT, BOARD_CATEGORY,
 		BOARD_LIKES)
-		VALUES (BOARD_TB_SEQ.NEXTVAL,
-		#{id}, #{title}, #{content},
-		SYSDATE, 1, 0, 3, 0)
+		VALUES (#{id}, #{title}, #{content}, SYSDATE, 1, 0, 3, 0)
+	</insert> -->
+	<insert id="insertMateBoard" parameterType="com.trip.mymy.dto.BoardDTO">
+    <!-- INSERT 후 BOARD_NO_PK 가져오기 -->
+	    <selectKey keyProperty="boardNo" resultType="int" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+	    INSERT INTO BOARD_TB
+	    (MEMBER_ID_FK, BOARD_TITLE, BOARD_CONTENT, BOARD_DT, BOARD_OPEN, BOARD_CNT, BOARD_CATEGORY, BOARD_LIKES)
+	    VALUES (#{id}, #{title}, #{content}, NOW(), 1, 0, 3, 0)
 	</insert>
 
 	<!-- 여행 메이트 게시글 목록 조회 -->

@@ -62,7 +62,8 @@
 
     <!-- 알람 추가 -->
     <insert id="insertAlarm">
-    	INSERT INTO ALARM_TB VALUES (ALARM_TB_SEQ.NEXTVAL, #{senderId}, SYSDATE, #{memberId}, #{alarmTypeId}, 0, #{addr})
+    	INSERT INTO ALARM_TB (ALARM_SENDER_ID, ALARM_CREATED_AT_DT, MEMBER_ID_FK, ALARM_TYPE_ID_FK, ALARM_IS_READ, ALARM_ADDR) 
+    	VALUES (#{senderId}, NOW(), #{memberId}, #{alarmTypeId}, 0, #{addr})
 	</insert>
 
 

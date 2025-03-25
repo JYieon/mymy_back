@@ -61,26 +61,26 @@
     <!-- 게시글 작성자 anonymous로 변경 -->
     <update id="anonymizeUserPosts" parameterType="com.trip.mymy.dto.MypageDTO">
         UPDATE BOARD_TB
-        SET MEMBER_ID_PK = 'anonymous'
-        WHERE MEMBER_ID_PK = #{id}
+        SET MEMBER_ID_FK = 'anonymous'
+        WHERE MEMBER_ID_FK = #{id}
     </update>
     
     <!-- 댓글 작성자 anonymous로 변경 -->
     <update id="anonymizeUserComments">
   		UPDATE REPLY_TB
-  		SET MEMBER_ID_PK = 'anonymous'
-  		WHERE MEMBER_ID_PK = #{id}
+  		SET MEMBER_ID_FK = 'anonymous'
+  		WHERE MEMBER_ID_FK = #{id}
 	</update>
     
 
     <!-- 게시글 삭제 -->
     <delete id="deleteUserPosts" parameterType="com.trip.mymy.dto.MypageDTO">
-        DELETE FROM BOARD_TB WHERE MEMBER_ID_PK = #{id}
+        DELETE FROM BOARD_TB WHERE MEMBER_ID_FK = #{id}
     </delete>
 
     <!-- 회원 삭제 -->
     <delete id="deleteMember" parameterType="com.trip.mymy.dto.MypageDTO">
-        DELETE FROM MEMBER_TB WHERE MEMBER_ID_PK = #{id}
+        DELETE FROM MEMBER_TB WHERE MEMBER_ID_FK = #{id}
     </delete>
 	
 

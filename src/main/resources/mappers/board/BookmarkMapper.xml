@@ -25,24 +25,32 @@
 	</resultMap>
 
 	<!-- 북마크 추가 -->
-	<insert id="addBookmark">
-		<!-- MERGE INTO: 기존 북마크가 존재하는지 확인 후, 있으면 UPDATE, 없으면 INSERT -->
+<!-- 	<insert id="addBookmark">
+		MERGE INTO: 기존 북마크가 존재하는지 확인 후, 있으면 UPDATE, 없으면 INSERT
 		MERGE INTO BOOKMARK_TB B
 		USING (SELECT #{id} AS MEMBER_ID_FK,
 		#{boardNo} AS BOARD_NUM_FK from dual) D
 		ON (B.MEMBER_ID_FK =
 		D.MEMBER_ID_FK AND B.BOARD_NUM_FK = D.BOARD_NUM_FK)
 
-		<!-- 이미 북마크가 존재하는 경우, STATUS를 1로 변경 -->
+		이미 북마크가 존재하는 경우, STATUS를 1로 변경
 		WHEN MATCHED THEN
 		UPDATE SET B.BOOKMARK_STATUS = 1, B.BOOKMARK_CREATE_DT = SYSDATE
 
-		<!-- 북마크한 적이 없는 경우, 새로운 북마크 추가 -->
+		북마크한 적이 없는 경우, 새로운 북마크 추가
 		WHEN NOT MATCHED THEN
-		INSERT (BOOKMARK_NUM_PK, MEMBER_ID_FK, BOARD_NUM_FK,
+		INSERT (MEMBER_ID_FK, BOARD_NUM_FK,
 		BOOKMARK_STATUS, BOOKMARK_CREATE_DT)
-		VALUES (BOOKMARK_TB_SEQ.NEXTVAL, #{id}, #{boardNo},
+		VALUES (#{id}, #{boardNo},
 		1, SYSDATE)
+	</insert> -->
+	<insert id="addBookmark">
+	    <!-- 기존 북마크가 존재하는지 확인 후, 있으면 UPDATE, 없으면 INSERT -->
+	    INSERT INTO BOOKMARK_TB (MEMBER_ID_FK, BOARD_NUM_FK, BOOKMARK_STATUS, BOOKMARK_CREATE_DT)
+	    VALUES (#{id}, #{boardNo}, 1, NOW())
+	    ON DUPLICATE KEY UPDATE 
+	        BOOKMARK_STATUS = 1, 
+	        BOOKMARK_CREATE_DT = NOW();
 	</insert>
 
 	<!-- 북마크 삭제 -->

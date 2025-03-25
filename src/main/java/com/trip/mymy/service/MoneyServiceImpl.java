@@ -76,16 +76,18 @@ public class MoneyServiceImpl implements MoneyService {
 		return bank;
 	}
 	
-	public List<BankServiceDTO> getBankService(int roomNum) {
-		List<BankServiceDTO> bankInfo = mm.getBankService(roomNum);
+	public List<BankServiceDTO> getBankService(String bankNum) {
+		List<BankServiceDTO> bankInfo = mm.getBankService(bankNum);
 		return bankInfo;
 	}
 	
 	public int addBankService(BankServiceDTO bankSer, BankDTO bank) {
 		int result = 0;
+		Integer personalTotal = mm.getPersonalTotal(bankSer.getMember());
+		personalTotal = (personalTotal != null) ? personalTotal : 0;
+		
 		if(bankSer.getType().equals("+")) {
-			Integer personalTotal = mm.getPersonalTotal(bankSer.getMember());
-			personalTotal = (personalTotal != null) ? personalTotal : 0;
+			
 			bankSer.setPersonalTotal(personalTotal + bankSer.getMoney());			
 			bankSer.setBankTotal(bank.getTotal() + bankSer.getMoney());
 			try {
@@ -100,6 +102,7 @@ public class MoneyServiceImpl implements MoneyService {
 			}
 		}else {
 			try {
+				bankSer.setPersonalTotal(personalTotal);
 				bankSer.setBankTotal(bank.getTotal() - bankSer.getMoney());
 				result = mm.addBankService(bankSer);
 				bank.setTotal(bank.getTotal() - bankSer.getMoney());

@@ -148,10 +148,10 @@ public class AuthController {
 		
 		System.out.println("*******카카오 유저 정보" + userInfo);
 		MemberDTO member = MemberDTO.builder()
-			    .nick((String) userInfo.get("nickname"))  // 형 변환 필요
+			    .name((String) userInfo.get("nickname"))  // 형 변환 필요
 			    .email((String) userInfo.get("email"))    // 형 변환 필요
 			    .id(String.valueOf(userInfo.get("id")))   // 숫자일 수도 있으므로 String 변환
-			    .name("")
+			    .nick("")
 			    .phone("")
 			    .pwd("")
 			    .build();
@@ -168,7 +168,7 @@ public class AuthController {
 			}
 		}
 		 // 로그인 성공 시 토큰 생성
-		Authentication authentication = new UsernamePasswordAuthenticationToken(existingMember.getEmail(), null, existingMember.getAuthorities());
+		Authentication authentication = new UsernamePasswordAuthenticationToken(existingMember.getId(), null, existingMember.getAuthorities());
 	    return ResponseEntity.ok(tp.generateTokenDto(authentication)); // 로그인 성공, 토큰 반환
 	}
 	

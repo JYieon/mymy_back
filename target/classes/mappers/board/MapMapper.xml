@@ -14,8 +14,8 @@
     
     <!-- 마커 추가 -->
     <insert id="insertMarker">
-        INSERT INTO MAP_TB (MARKER_NUM_PK, BOARD_NUM_FK, MARKER_LATITUDE, MARKER_LONGITUDE, MARKER_PLACE)
-        VALUES (MAP_TB_SEQ.NEXTVAL, #{boardNo}, #{latitude}, #{longitude}, #{info})
+        INSERT INTO MAP_TB (BOARD_NUM_FK, MARKER_LATITUDE, MARKER_LONGITUDE, MARKER_PLACE)
+        VALUES (#{boardNo}, #{latitude}, #{longitude}, #{info})
     </insert>
 
     <!-- 특정 게시판(boardNo)의 마커 조회 -->
@@ -23,7 +23,7 @@
         SELECT MARKER_NUM_PK, BOARD_NUM_FK, MARKER_LATITUDE, MARKER_LONGITUDE, MARKER_PLACE 
         FROM MAP_TB
         WHERE BOARD_NUM_FK = #{boardNo}
-        ORDER BY MARKER_ID ASC
+        ORDER BY MARKER_NUM_PK ASC
     </select>
 
     <!-- 특정 마커 삭제 -->

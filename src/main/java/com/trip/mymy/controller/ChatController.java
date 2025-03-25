@@ -166,7 +166,7 @@ public class ChatController {
     	boolean member = cs.checkMember(toMember, roomNum); //채팅방 멤버의 아이디가 맞는지 확인
 	    int result = 0;
 	    if (member) {
-	    	System.out.println(toMember + roomNum);
+	    	System.out.println(money);
 	    	result = ms.insertSettlement(roomNum, toMember, money, --roomMember);
 	    }else {//없는 아이디
 	    	System.out.println("없는 아이디 입니다.");
@@ -215,8 +215,8 @@ public class ChatController {
     
     //모임통장 내용
     @GetMapping("/bank/service/info")
-    public ResponseEntity<List<BankServiceDTO>> getBankService(@RequestParam int roomNum) {
-    	List<BankServiceDTO> bankInfo = ms.getBankService(roomNum);
+    public ResponseEntity<List<BankServiceDTO>> getBankService(@RequestParam String bankNum) {
+    	List<BankServiceDTO> bankInfo = ms.getBankService(bankNum);
     	
     	return ResponseEntity.ok(bankInfo);
     }
@@ -224,17 +224,17 @@ public class ChatController {
     
     //이체
     @PostMapping("/bank/service")
-    public ResponseEntity<?> bankService(@RequestHeader("Authorization") String token, @RequestParam int roomNum, String type, int money) {
+    public ResponseEntity<?> bankService(@RequestHeader("Authorization") String token, @RequestParam String bankNum, int roomNum, String type, int money) {
     	Authentication authentication = tp.getAuthentication(token);
 		MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
 		BankServiceDTO bankSer = BankServiceDTO.builder()
-				.roomNum(roomNum)
+				.bankNum(bankNum)
 				.type(type)
 				.money(money)
 				.build();
     	 if(member != null) {
     		 bankSer.setMember(member.getId());
-    		 BankDTO bank = ms.getBank(bankSer.getRoomNum());
+    		 BankDTO bank = ms.getBank(roomNum);
     		 int result = ms.addBankService(bankSer, bank);
     		 return ResponseEntity.ok(result);
     	 }else {

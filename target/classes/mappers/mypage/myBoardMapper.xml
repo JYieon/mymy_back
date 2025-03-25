@@ -9,52 +9,52 @@
 	<select id="findMyPosts" parameterType="String"
 		resultType="com.trip.mymy.dto.MyBoardDTO">
 		SELECT
-		BOARD_NO_PK AS boardNo,
+		BOARD_NUM_PK AS boardNo,
 		BOARD_TITLE AS title,
 		BOARD_CONTENT AS content,
-		MEMBER_ID_PK AS id,
-		TO_CHAR(BOARD_DT, 'YYYY-MM-DD HH24:MI:SS') AS boardDate, 
+		MEMBER_ID_FK AS id,
+		DATE_FORMAT(BOARD_DT, '%Y-%m-%d %H:%i:%s') AS boardDate, 
 		BOARD_CATEGORY AS boardCategory,
 		BOARD_CNT AS boardCnt,
 		BOARD_LIKES AS boardLikes
 		FROM BOARD_TB
-		WHERE MEMBER_ID_PK = #{userId}
-		ORDER BY BOARD_NO_PK DESC
+		WHERE MEMBER_ID_FK = #{userId}
+		ORDER BY BOARD_NUM_PK DESC
 	</select>
 
 
 	<!-- 내가 쓴 댓글 조회 -->
 	<select id="findMyComments" resultType="com.trip.mymy.dto.MyBoardDTO">
 		SELECT
-		R.BOARD_NO_PK AS boardNo,
-		R.REPLY_CONTENT AS content,
-		B.BOARD_TITLE AS originalPost,
-		R.MEMBER_ID_PK AS id,
-		TO_CHAR(R.REPLY_DT, 'YYYY-MM-DD HH24:MI:SS') AS boardDate,
-		B.BOARD_CATEGORY AS boardCategory,
-		B.BOARD_CNT AS boardCnt,
-		(SELECT COUNT(*) FROM REPLY_TB WHERE BOARD_NO_PK = R.BOARD_NO_PK) AS
-		replyCount,
-		B.BOARD_LIKES AS boardLikes
+			R.BOARD_NUM_PK AS boardNo,
+			R.REPLY_CONTENT AS content,
+			B.BOARD_TITLE AS originalPost,
+			R.MEMBER_ID_FK AS id,
+			DATE_FORMAT(R.REPLY_DT, '%Y-%m-%d %H:%i:%s') AS boardDate,
+			B.BOARD_CATEGORY AS boardCategory,
+			B.BOARD_CNT AS boardCnt,
+			(SELECT COUNT(*) FROM REPLY_TB WHERE BOARD_NUM_FK = R.BOARD_NUM_FK) AS replyCount,
+			B.BOARD_LIKES AS boardLikes
 		FROM REPLY_TB R
-		JOIN BOARD_TB B ON R.BOARD_NO_PK = B.BOARD_NO_PK
-		WHERE R.MEMBER_ID_PK = #{userId}
-		ORDER BY R.REPLY_NO_PK DESC
+		JOIN BOARD_TB B ON R.BOARD_NUM_FK = B.BOARD_NUM_PK
+		WHERE R.MEMBER_ID_FK = #{userId}
+		ORDER BY R.REPLY_NUM_FK DESC
 	</select>
 	
 	<!-- 내가 쓴 글 조회 (토큰 기반) -->
-<select id="findMyPostsByToken" resultType="com.trip.mymy.dto.MyBoardDTO">
-    SELECT
-        BOARD_NO_PK AS boardNo,
-        BOARD_TITLE AS title,
-        BOARD_CONTENT AS content,
-        MEMBER_ID_PK AS id,
-        TO_CHAR(BOARD_DT, 'YYYY-MM-DD HH24:MI:SS') AS boardDate, 
-        BOARD_CATEGORY AS boardCategory,
-        BOARD_CNT AS boardCnt,
-        BOARD_LIKES AS boardLikes
-    FROM BOARD_TB
-    WHERE MEMBER_ID_PK = (SELECT MEMBER_ID_PK FROM MEMBER_TB WHERE ACCESS_TOKEN = #{token})
-    ORDER BY BOARD_NO_PK DESC
-</select>
+	<select id="findMyPostsByToken" resultType="com.trip.mymy.dto.MyBoardDTO">
+	    SELECT
+	        BOARD_NUM_PK AS boardNo,
+	        BOARD_TITLE AS title,
+	        BOARD_CONTENT AS content,
+	        MEMBER_ID_FK AS id,
+	        DATE_FORMAT(BOARD_DT, '%Y-%m-%d %H:%i:%s') AS boardDate, 
+	        BOARD_CATEGORY AS boardCategory,
+	        BOARD_CNT AS boardCnt,
+	        BOARD_LIKES AS boardLikes
+	    FROM BOARD_TB
+	    WHERE MEMBER_ID_FK = (SELECT MEMBER_ID_FK FROM MEMBER_TB WHERE ACCESS_TOKEN = #{token})
+	    ORDER BY BOARD_NUM_FK DESC
+	</select>
+
 </mapper>

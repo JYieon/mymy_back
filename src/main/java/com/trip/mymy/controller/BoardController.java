@@ -59,6 +59,7 @@ public class BoardController {
 		// 토큰을 통해 인증 정보를 가져옴
 		Authentication authentication = tp.getAuthentication(token);
 		MemberDTO member = (MemberDTO) authentication.getPrincipal();
+		System.out.println("카카오"+member.getId());
 		dto.setId(member.getId()); // 사용자 ID 설정
 		try {
 

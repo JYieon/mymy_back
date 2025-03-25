@@ -7,7 +7,7 @@
     <select id="getTravelRecordPostCount" resultType="int">
         SELECT COUNT(*) 
         FROM BOARD_TB 
-        WHERE MEMBER_ID_PK = #{id}
+        WHERE MEMBER_ID_FK = #{id}
           AND BOARD_CATEGORY = 2
     </select>
 
@@ -15,13 +15,13 @@
     <select id="getCommentCount" resultType="int">
         SELECT COUNT(*) 
         FROM REPLY_TB 
-        WHERE MEMBER_ID_PK = #{id}
+        WHERE MEMBER_ID_FK = #{id}
     </select>
 
 	<!-- MEMBER 테이블에 LEVEL 업데이트 -->
     <update id="updateMemberLevel">
         UPDATE MEMBER_TB
         SET MEMBER_LEVEL = #{level}
-        WHERE MEMBER_ID_PK = #{id}
+        WHERE MEMBER_ID_FK = #{id}
     </update>
 </mapper>

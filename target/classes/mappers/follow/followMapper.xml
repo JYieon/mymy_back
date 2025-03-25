@@ -7,14 +7,14 @@
 
     <resultMap id="FollowingResultMap" type="com.trip.mymy.dto.FollowingDTO">
 	    <id property="followId" column="FOLLOW_NUM_PK"/>
-	    <result property="followerId" column="FOLLOWER_ID"/>
-	    <result property="followingId" column="FOLLOWING_ID"/>
+	    <result property="followerId" column="FOLLOWER_ID_FK"/>
+	    <result property="followingId" column="FOLLOWING_ID_FK"/>
 	    <result property="createdAt" column="FOLLOW_CREATED_AT" jdbcType="TIMESTAMP"/>
 	</resultMap>
 
 	<resultMap id="FollowerResultMap" type="com.trip.mymy.dto.FollowerDTO">
     	<id property="followId" column="FOLLOW_NUM_PK"/>
-    	<result property="followerId" column="FOLLOWER_ID"/>
+    	<result property="followerId" column="FOLLOWER_ID_FK"/>
     	<result property="createdAt" column="FOLLOW_CREATED_AT"/>
 	</resultMap>
 
@@ -23,7 +23,7 @@
     <select id="getFollowingList" resultMap="FollowingResultMap">
     	SELECT * 
     	FROM FOLLOW_TB 
-    	WHERE FOLLOWER_ID = #{followerId}
+    	WHERE FOLLOWER_ID_FK = #{followerId}
 	</select>
 
 
@@ -31,31 +31,31 @@
     <select id="getFollowerList" resultMap="FollowerResultMap">
         SELECT *
         FROM FOLLOW_TB 
-        WHERE FOLLOWING_ID = #{followingId}
+        WHERE FOLLOWING_ID_FK = #{followingId}
     </select>
     
    <!-- ✅ 팔로우 여부 확인 -->
     <select id="isFollowing" parameterType="map" resultType="int">
         SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
         FROM FOLLOW_TB
-        WHERE FOLLOWER_ID = #{followerId} AND FOLLOWING_ID = #{followingId}
+        WHERE FOLLOWER_ID_FK = #{followerId} AND FOLLOWING_ID_FK = #{followingId}
     </select>
     
     <!-- 언팔로우 요청 -->
     <delete id="unfollowUser" parameterType="map">  <!-- ✅ 올바른 방식 -->
-    	DELETE FROM FOLLOW_TB WHERE FOLLOWER_ID = #{followerId} AND FOLLOWING_ID = #{followingId}
+    	DELETE FROM FOLLOW_TB WHERE FOLLOWER_ID_FK = #{followerId} AND FOLLOWING_ID_FK = #{followingId}
 	</delete>
 	
 	<delete id="deleteFollow">
    		DELETE FROM FOLLOW_TB 
-    	WHERE FOLLOWER_ID = #{followerId} 
-    	AND FOLLOWING_ID = #{followingId}
+    	WHERE FOLLOWER_ID_FK = #{followerId} 
+    	AND FOLLOWING_ID_FK = #{followingId}
 	</delete>
 	
 	<!-- 팔로우 요청 -->
 	<insert id="followUser">
-    	INSERT INTO FOLLOW_TB (FOLLOWER_ID, FOLLOWING_ID, FOLLOW_CREATED_AT)
-    	VALUES (#{followerId}, #{followingId}, SYSDATE)
+    	INSERT INTO FOLLOW_TB (FOLLOWER_ID_FK, FOLLOWING_ID_FK, FOLLOW_CREATED_AT)
+    	VALUES (#{followerId}, #{followingId}, NOW())
 	</insert>
 	
 	
