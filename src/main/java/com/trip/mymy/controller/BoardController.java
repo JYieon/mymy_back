@@ -44,6 +44,7 @@ public class BoardController {
 	@Autowired TokenProvider tp;
 	@Autowired AlarmController alramController;
 	@Autowired private FollowService followService;
+	@Autowired private S3Uploader s3Uploader;
 
 	@PostMapping("/writeSave")
 	public ResponseEntity<?> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
@@ -126,48 +127,26 @@ public class BoardController {
 
 	@PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
-	public ResponseEntity<Map<String, String>> uploadSummernoteImageFile(
-	        @RequestParam("file") MultipartFile file, 
-	        HttpServletRequest request) {
-
+	public ResponseEntity<Map<String, String>> uploadSummernoteImageFile(@RequestParam("file") MultipartFile file) {
 	    Map<String, String> response = new HashMap<>();
 
 	    if (file.isEmpty()) {
-	        System.out.println("업로드된 파일이 없습니다.");
 	        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "파일이 비어 있습니다."));
 	    }
 
-	    // 업로드 경로 설정
-	    String uploadDir = "C:/summernote_image/";
-	    File uploadFolder = new File(uploadDir);
-
-	    // 업로드 폴더 없으면 생성
-	    if (!uploadFolder.exists()) {
-	        uploadFolder.mkdirs();
-	    }
-
-	    // 저장할 파일 이름 생성
-	    String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-	    String filePath = uploadDir + fileName;
-
 	    try {
-	        // 파일 저장
-	        File serverFile = new File(filePath);
-	        file.transferTo(serverFile);
+	        // s3Uploader를 통해 summernote 디렉토리에 업로드
+	        String url = s3Uploader.upload(file, "summernote");
 
-	        // URL 반환
-	        String fullUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/" + fileName;
-	        response.put("fileName", fileName);
-	        response.put("url", fullUrl);
-
-	        // System.out.println("이미지 업로드 성공: " + fullUrl);
+	        response.put("url", url); // Summernote는 "url" 키를 요구함
 	        return ResponseEntity.ok(response);
+
 	    } catch (IOException e) {
-	        System.out.println("파일 저장 실패: " + e.getMessage());
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                             .body(Collections.singletonMap("error", "파일 업로드 실패: " + e.getMessage()));
+	        response.put("error", "S3 업로드 실패: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	    }
 	}
+
 
 
 	// 게시글 목록

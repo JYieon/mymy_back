@@ -47,18 +47,20 @@ public class TimelineController {
 
 	@PostMapping("/updateTodo")
 	public ResponseEntity<String> updateTimelineTodo(@RequestBody Map<String, String> updateData) {
-		try {
-			//System.out.println("받은 데이터:"+updateData);
-			int boardNo = Integer.parseInt(updateData.get("boardNo")); 
-			String updatedTodo = updateData.get("todo");
+	    try {
+	        int boardNo = Integer.parseInt(updateData.get("boardNo"));
+	        String updatedTodo = updateData.get("todo");
+	        String location = updateData.get("location");
+	        String startDt = updateData.get("startDt");
+	        String endDt = updateData.get("endDt");
 
-			//System.out.println("boardNo: "+ boardNo);
-			//System.out.println("updatetodo:"+ updatedTodo);
-			ts.updateTimelineTodo(boardNo, updatedTodo);
-			return ResponseEntity.ok("타임라인 수정 성공");
-		} catch (Exception e) {
-			return ResponseEntity.status(500).body("수정 오류: " + e.getMessage());
-		}
+	        ts.updateTimelineTodo(boardNo, updatedTodo, location, startDt, endDt);
+
+	        return ResponseEntity.ok("타임라인 수정 성공");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(500).body("수정 오류: " + e.getMessage());
+	    }
 	}
+
 
 }

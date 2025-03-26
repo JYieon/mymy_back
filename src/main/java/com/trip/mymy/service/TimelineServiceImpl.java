@@ -1,5 +1,8 @@
 package com.trip.mymy.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +28,7 @@ public class TimelineServiceImpl implements TimelineService{
 	        timelineMapper.deleteTimeline(timelineId);
 	    }
 	    
-	    public void updateTimelineTodo(int boardNo, String updatedTodo) {
-	        timelineMapper.updateTimelineTodo(boardNo, updatedTodo);
+	    public void updateTimelineTodo(int boardNo, String todo, String location, String startDt, String endDt) {
+	        timelineMapper.updateTimelineTodo(boardNo, todo, location, startDt, endDt);
 	    }
 	}

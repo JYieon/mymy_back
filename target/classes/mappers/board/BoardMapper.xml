@@ -231,21 +231,24 @@
       INSERT INTO TAG_TB
       (TAG_NAME, TAG_TYPE)
       SELECT #{tagName}, #{tagType}
-      FROM TAG_TB
+      FROM DUAL
       WHERE NOT EXISTS (SELECT 1 FROM TAG_TB WHERE TAG_NAME = #{tagName})
    </insert>
 
    <!-- 게시글과 태그 연결 -->
    <insert id="insertBoardTag" parameterType="map">
-      INSERT INTO
-      BOARD_TAG_TB (BOARD_NUM_FK, TAG_NUM_FK)
-      SELECT #{boardNo}, t.TAG_NUM_PK
-      FROM TAG_TB t
-      WHERE
-      t.TAG_NAME = #{tagName} AND NOT EXISTS (SELECT 1
-      FROM BOARD_TAG_TB
-      WHERE BOARD_NUM_FK = #{boardNo} AND TAG_NUM_FK = t.TAG_NUM_PK)
-   </insert>
+    INSERT INTO BOARD_TAG_TB (BOARD_NUM_FK, TAG_NUM_FK)
+    SELECT #{boardNo}, t.TAG_NUM_PK
+    FROM TAG_TB t
+    WHERE
+    t.TAG_NAME = #{tagName}
+    AND NOT EXISTS (
+        SELECT 1
+        FROM BOARD_TAG_TB
+        WHERE BOARD_NUM_FK = #{boardNo} AND TAG_NUM_FK = t.TAG_NUM_PK
+    )
+</insert>
+
 
    <!-- 특정 게시글의 태그 조회 -->
    <select id="getTagsByBoardNo" parameterType="int"

@@ -6,6 +6,7 @@ public interface TimelineService {
 	public void insertTimeline(TimelineDTO timeline);
 	public TimelineDTO getTimeline(int boardNo);
 	public void deleteTimeline(int timelineId);
-	public void updateTimelineTodo(int boardNo, String updatedTodo);
+	public void updateTimelineTodo(int boardNo, String todo, String location, String startDt, String endDt);
+
 
 }
