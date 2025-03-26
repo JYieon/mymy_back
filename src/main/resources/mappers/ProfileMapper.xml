@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.trip.mymy.mybatis.ProfileMapper">
+
+    <!-- 프로필 이미지 업데이트 -->
+    <update id="updateProfileImage">
+       UPDATE MEMBER_TB
+       SET MEMBER_PROFILE = #{imageUrl}
+       WHERE MEMBER_ID_PK = #{memberId}
+   </update>
+
+    <!-- 프로필 정보 조회 -->
+    <select id="getProfileById" resultType="com.trip.mymy.dto.ProfileDTO">
+       SELECT
+           MEMBER_ID_PK AS member_id,
+           MEMBER_NICK AS member_nickname,
+           MEMBER_PROFILE AS member_profile
+       FROM MEMBER_TB
+       WHERE MEMBER_ID_PK = #{memberId}
+   </select>
+
+</mapper>

@@ -32,10 +32,40 @@ public class BoardServiceImpl implements BoardService {
 	    params.put("limit", limit);
 	    params.put("category", category);
 	    params.put("searchType", searchType);
-	    params.put("keyword", "%" + keyword + "%"); // LIKE 검색을 위해 % 추가
+	    params.put("keyword", "%" + keyword + "%");
 
-	    return mapper.searchBoardList(params);
+	    List<BoardDTO> boardList = mapper.searchBoardList(params);
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    for (BoardDTO post : boardList) {
+	        Map<String, Object> postMap = new HashMap<>();
+	        postMap.put("boardNo", post.getBoardNo());
+	        postMap.put("title", post.getTitle());
+	        postMap.put("id", post.getId());
+	        postMap.put("boardCnt", post.getBoardCnt());
+	        postMap.put("boardLikes", post.getBoardLikes());
+	        postMap.put("boardOpen", post.getBoardOpen());
+	        postMap.put("date", post.getDate().toString());
+	        postMap.put("repCnt", post.getRepCnt());
+
+	        // 썸네일 처리
+	        String content = post.getContent();
+	        if (content != null) {
+	            Document doc = Jsoup.parse(content);
+	            Element imgTag = doc.selectFirst("img");
+	            String thumbnail = (imgTag != null)
+	                    ? imgTag.attr("src")
+	                    : "http://localhost:8080/mymy/resources/images/default-thumbnail.jpg";
+	            postMap.put("thumbnail", thumbnail);
+	        }
+
+	        responseList.add(postMap);
+	    }
+
+	    return responseList;
 	}
+
 
 	public int getSearchTotalPosts(int category, String searchType, String keyword) {
 	    Map<String, Object> params = new HashMap<>();

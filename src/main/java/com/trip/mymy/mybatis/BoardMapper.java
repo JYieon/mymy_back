@@ -48,7 +48,7 @@ public interface BoardMapper {
 	
 	
 	// 검색
-	public List<Map<String, Object>> searchBoardList(Map<String, Object> params);
+	public List<BoardDTO> searchBoardList(Map<String, Object> params);
 	public int getSearchTotalPosts(Map<String, Object> params);
 
 	// 여행
