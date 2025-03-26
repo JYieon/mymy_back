@@ -214,7 +214,8 @@ public class BoardServiceImpl implements BoardService {
 				Element imgTag = doc.selectFirst("img");
 				String thumbnail = (imgTag != null) 
 						? imgTag.attr("src") 
-								: "http://localhost:8080/mymy/resources/images/default-thumbnail.jpg";
+								: "https://mymtbucket0124.s3.ap-northeast-2.amazonaws.com/summernote/%EC%A7%80%EC%A7%80.jpeg";
+				System.out.println("썸네일 url"+ thumbnail);
 				postMap.put("thumbnail", thumbnail); // 썸네일만 Map에 추가
 			}
 
@@ -287,9 +288,10 @@ public class BoardServiceImpl implements BoardService {
 
 	        // <br> 태그를 (\n)로 변환
 	        String formattedContent = doc.body().html().replace("<br>", "\n").replace("<br/>", "\n");
-
+	        
+	        
 	        // <img> 태그만 유지
-	        formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
+//	        formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
 	        dto.setContent(formattedContent); // 변경된 내용을 DTO에 적용
 	        System.out.println("정리된 content (저장 직전): " + dto.getContent());
 	        // 게시글 저장
@@ -314,30 +316,50 @@ public class BoardServiceImpl implements BoardService {
 
 	
 	// 게시글 수정 (태그 포함)
-   public boolean modify(BoardDTO dto) {
-       try {
-           // 게시글 수정
-           int result = mapper.modify(dto);
+	public boolean modify(BoardDTO dto) {
+	    try {
+	        // 🔧 HTML 내용 정리 (style 유지)
+	        Document doc = Jsoup.parse(dto.getContent());
+	        doc.select("script, style").remove();
 
-           if (result == 1) {
-               deleteTags(dto.getBoardNo());
+	        String formattedContent = doc.body().html().replace("<br>", "\n").replace("<br/>", "\n");
 
-               // 계획 게시글이면 해시태그 제거
-               if (dto.getBoardCategory() != null && dto.getBoardCategory() == 1) {
-                   dto.setHashtags(null); // DTO에서도 제거
-               } else {
-                   List<String> tags = dto.getHashtags();
-                   if (tags != null && !tags.isEmpty()) {
-                       addTags(dto.getBoardNo(), tags);
-                   }
-               }
-               return true;
-           }
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-       return false;
-   }
+	        // style 허용
+	        org.jsoup.safety.Safelist safelist = org.jsoup.safety.Safelist.basicWithImages();
+	        safelist.addAttributes("img", "style");
+
+	        formattedContent = Jsoup.clean(
+	            formattedContent,
+	            "",
+	            safelist,
+	            new Document.OutputSettings().prettyPrint(false)
+	        );
+
+	        dto.setContent(formattedContent); // 정리된 content 저장
+
+	        // 게시글 수정
+	        int result = mapper.modify(dto);
+
+	        if (result == 1) {
+	            deleteTags(dto.getBoardNo());
+
+	            // 계획 게시글이면 해시태그 제거
+	            if (dto.getBoardCategory() != null && dto.getBoardCategory() == 1) {
+	                dto.setHashtags(null); // DTO에서도 제거
+	            } else {
+	                List<String> tags = dto.getHashtags();
+	                if (tags != null && !tags.isEmpty()) {
+	                    addTags(dto.getBoardNo(), tags);
+	                }
+	            }
+	            return true;
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
+
 
 	// 게시글 삭제
 	@Transactional
