@@ -135,7 +135,7 @@ public class BoardController {
 	    }
 
 	    try {
-	        // s3Uploader를 통해 summernote 디렉토리에 업로드
+	        // 👉 s3Uploader를 통해 summernote 디렉토리에 업로드
 	        String url = s3Uploader.upload(file, "summernote");
 
 	        response.put("url", url); // Summernote는 "url" 키를 요구함
@@ -153,7 +153,7 @@ public class BoardController {
 	// category - 1: 계획, 2: 기록)
 	@GetMapping("/list")
 	public ResponseEntity<Map<String, Object>> list(
-			@RequestParam String token,
+			@RequestParam(required = false) String token,
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "category", defaultValue = "1") int category
 
@@ -171,8 +171,10 @@ public class BoardController {
 
 		} else {
 			// category = 2일 때 모든 게시글 조회
+			Authentication authentication = tp.getAuthentication(token);
+			MemberDTO member = (MemberDTO) authentication.getPrincipal(); 
 			totalPosts = bs.getTotalPosts(category); // 전체 게시글 수 (category 2)
-			boardList = bs.getBoardList(page, category, "none"); // 전체 게시글 목록 (category 2)
+			boardList = bs.getBoardList(page, category, member.getId()); // 전체 게시글 목록 (category 2)
 		}
 	    
 		// 페이지 계산

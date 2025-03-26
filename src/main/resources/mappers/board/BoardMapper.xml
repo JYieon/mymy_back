@@ -107,39 +107,48 @@
    
 
    <select id="getBoardList" resultMap="BOARD_TB">
+  SELECT
+    b.BOARD_NUM_PK,
+    b.MEMBER_ID_FK,
+    b.BOARD_TITLE,
+    b.BOARD_CONTENT,
+    b.BOARD_DT,
+    b.BOARD_OPEN,
+    b.BOARD_CATEGORY,
+    b.BOARD_CNT,
+    COALESCE(l.LIKE_COUNT, 0) AS BOARD_LIKES,
+    COALESCE(r.REPLY_CNT, 0) AS BOARD_REPLY_CNT
+  FROM (
+    SELECT * FROM BOARD_TB
+    WHERE BOARD_CATEGORY = #{category}
+    <if test="category == 1">
+      AND MEMBER_ID_FK = #{id}  <!-- 계획 게시판은 내 글만 -->
+    </if>
+    <if test="category == 2">
+      AND (BOARD_OPEN = 1 OR MEMBER_ID_FK = #{id}) <!-- 기록은 공개 + 내 글 -->
+    </if>
+  ) b
+  LEFT JOIN (
+    SELECT BOARD_NUM_FK, COUNT(*) AS LIKE_COUNT
+    FROM LIKE_TB GROUP BY BOARD_NUM_FK
+  ) l ON b.BOARD_NUM_PK = l.BOARD_NUM_FK
+  LEFT JOIN (
+    SELECT BOARD_NUM_FK, COUNT(*) AS REPLY_CNT
+    FROM REPLY_TB GROUP BY BOARD_NUM_FK
+  ) r ON b.BOARD_NUM_PK = r.BOARD_NUM_FK
+  ORDER BY b.BOARD_NUM_PK DESC
+  LIMIT #{limit} OFFSET #{offset}
+</select>
+
+
+<select id="getPost" parameterType="int" resultMap="BOARD_TB">
       SELECT
-      b.BOARD_NUM_PK,
-      b.MEMBER_ID_FK,
-      b.BOARD_TITLE,
-      b.BOARD_CONTENT,
-      b.BOARD_DT,
-      b.BOARD_OPEN,
-      b.BOARD_CATEGORY,
-      b.BOARD_CNT,
-      COALESCE(l.LIKE_COUNT, 0) AS BOARD_LIKES,
-      -- NULL 방지
-      COALESCE(r.REPLY_CNT, 0) AS BOARD_REPLY_CNT -- 댓글 개수 추가
-      FROM (
-      SELECT * FROM BOARD_TB WHERE BOARD_CATEGORY = #{category}
-      ) b
-      LEFT OUTER
-      JOIN (
-      SELECT BOARD_NUM_FK, COUNT(*) AS LIKE_COUNT
-      FROM LIKE_TB
-      GROUP BY
-      BOARD_NUM_FK
-      ) l ON b.BOARD_NUM_PK = l.BOARD_NUM_FK
-      LEFT OUTER JOIN (
-      SELECT BOARD_NUM_FK, COUNT(*) AS REPLY_CNT
-      FROM REPLY_TB
-      GROUP BY
-      BOARD_NUM_FK
-      ) r ON b.BOARD_NUM_PK = r.BOARD_NUM_FK
-      ORDER BY b.BOARD_NUM_PK
-      DESC
+      BOARD_NUM_PK, MEMBER_ID_FK, BOARD_TITLE,
+     BOARD_CONTENT, BOARD_DT,
+      BOARD_OPEN,BOARD_CATEGORY, BOARD_CNT, BOARD_LIKES
+      FROM BOARD_TB WHERE
+      BOARD_NUM_PK = #{boardNo}
    </select>
-
-
 
    <select id="getUserBoardList" resultMap="BOARD_TB">
       SELECT * FROM BOARD_TB
@@ -149,16 +158,24 @@
       LIMIT #{limit} OFFSET #{offset}
    </select>
 
+<select id="getUserTotalPosts" resultType="int">
+  SELECT COUNT(*) FROM BOARD_TB
+  WHERE BOARD_CATEGORY = #{category}
+  AND MEMBER_ID_FK = #{id}
+</select>
+
    <!-- 게시글 상세 조회 -->
-   <select id="getPost" parameterType="int" resultMap="BOARD_TB">
-      SELECT
-      BOARD_NUM_PK, MEMBER_ID_FK, BOARD_TITLE,
-      REPLACE(BOARD_CONTENT,',',',\n')
-      AS BOARD_CONTENT, BOARD_DT,
-      BOARD_OPEN,BOARD_CATEGORY, BOARD_CNT, BOARD_LIKES
-      FROM BOARD_TB WHERE
-      BOARD_NUM_PK = #{boardNo}
-   </select>
+   <select id="getFilteredTotalPosts" resultType="int">
+  SELECT COUNT(*) FROM BOARD_TB
+  WHERE BOARD_CATEGORY = #{category}
+  <if test="category == 1">
+    AND MEMBER_ID_FK = #{id}
+  </if>
+  <if test="category == 2">
+    AND (BOARD_OPEN = 1 OR MEMBER_ID_FK = #{id})
+  </if>
+</select>
+
 
    <!-- 게시글 조회수 -->
    <update id="boardCnt">

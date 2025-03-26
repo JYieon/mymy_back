@@ -141,10 +141,11 @@ public class BoardServiceImpl implements BoardService {
 		int offset = (page - 1) * limit;
 		List<BoardDTO> boardList = new ArrayList<BoardDTO>();
 
-		Map<String, Integer> params = new HashMap<>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("offset", offset);
 		params.put("limit", limit);
 		params.put("category", category);  // 카테고리 추가
+		params.put("id", id);
 		
 		if(category == 1) {
 			boardList = mapper.getUserBoardList(offset, limit, category, id);
@@ -192,6 +193,14 @@ public class BoardServiceImpl implements BoardService {
 	public int getTotalPosts(int category) {
 		return mapper.getTotalPosts(category);
 	}
+	
+	public int getFilteredTotalPosts(int category, String id) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("category", category);
+	    params.put("id", id);
+	    return mapper.getFilteredTotalPosts(params);
+	}
+
 	//게시글 조회수 증가
 	private void boardCnt(int boardNo) {
 		try {
@@ -209,6 +218,7 @@ public class BoardServiceImpl implements BoardService {
 			post.setHashtags(tagList(boardNo));  // 해시태그 조회 및 설정
 			// 웹페이지에서 보일 때 다시 `<br>` 태그로 변환
 			post.setContent(post.getContent().replace("\n", "<br>"));
+			System.out.println("📤 화면에 보여줄 최종 content: " + post.getContent());
 		}
 		return post;
 	}
@@ -247,13 +257,13 @@ public class BoardServiceImpl implements BoardService {
 	        // <img> 태그만 유지
 	        formattedContent = Jsoup.clean(formattedContent, "", org.jsoup.safety.Safelist.basicWithImages(), new Document.OutputSettings().prettyPrint(false));
 	        dto.setContent(formattedContent); // 변경된 내용을 DTO에 적용
-
+	        System.out.println("정리된 content (저장 직전): " + dto.getContent());
 	        // 게시글 저장
 	        int result = mapper.writeSave(dto);
 	        
 	        // 저장된 boardNo 확인
 	        int boardNo = dto.getBoardNo();
-	        System.out.println("✅ 저장된 boardNo: " + boardNo);
+	        System.out.println("저장된 boardNo: " + boardNo);
 
 	        // 해시태그 저장
 	        if (result == 1 && dto.getHashtags() != null && !dto.getHashtags().isEmpty()) {
