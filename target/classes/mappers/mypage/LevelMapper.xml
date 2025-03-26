@@ -22,6 +22,6 @@
     <update id="updateMemberLevel">
         UPDATE MEMBER_TB
         SET MEMBER_LEVEL = #{level}
-        WHERE MEMBER_ID_FK = #{id}
+        WHERE MEMBER_ID_PK = #{id}
     </update>
 </mapper>
