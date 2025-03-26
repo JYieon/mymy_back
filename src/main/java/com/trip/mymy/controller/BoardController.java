@@ -45,6 +45,19 @@ public class BoardController {
 	@Autowired AlarmController alramController;
 	@Autowired private FollowService followService;
 	@Autowired private S3Uploader s3Uploader;
+	
+	@GetMapping("/plans/all")
+	public ResponseEntity<List<BoardDTO>> getMyPlans(@RequestParam("token") String token) {
+	    try {
+	        Authentication authentication = tp.getAuthentication(token);
+	        MemberDTO member = (MemberDTO) authentication.getPrincipal();
+	        List<BoardDTO> plans = bs.getAllUserPlans(member.getId());
+	        return ResponseEntity.ok(plans);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
 
 	@PostMapping("/writeSave")
 	public ResponseEntity<?> writeSave(@RequestBody BoardDTO dto, @RequestHeader("Authorization") String token) {
@@ -116,7 +129,7 @@ public class BoardController {
 	            return ResponseEntity.badRequest().body(response);
 	        }
 	    } catch (Exception e) {
-	    	 // ✅ 오류 메시지 콘솔에 출력
+	    	 // 오류 메시지 콘솔에 출력
 	        e.printStackTrace();
 	        response.put("status", 500);
 	        response.put("message", "서버 오류 발생: " + e.getMessage());
@@ -135,7 +148,7 @@ public class BoardController {
 	    }
 
 	    try {
-	        // 👉 s3Uploader를 통해 summernote 디렉토리에 업로드
+	        // s3Uploader를 통해 summernote 디렉토리에 업로드
 	        String url = s3Uploader.upload(file, "summernote");
 
 	        response.put("url", url); // Summernote는 "url" 키를 요구함

@@ -14,6 +14,7 @@ public interface BoardService {
 	public boolean deleteBoard(int boardNo);
 	public int getTotalPosts(int category);
 	public int getFilteredTotalPosts(int category, String id);
+	List<BoardDTO> getAllUserPlans(String id);
 
 	// 좋아요
 	public boolean toggleLike(String id, int boardNo);

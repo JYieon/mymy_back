@@ -18,6 +18,7 @@ public interface BoardMapper {
 	public void boardCnt(@Param("boardNo") int boardNo);
 	public int deleteBoard(@Param("boardNo") int boardNo);
 	public void cleanupUnusedTags();
+	public List<BoardDTO> getAllUserPlans(String id);
 
 	// 좋아요
 	public int getBoardLikes(@Param("boardNo") int boardNo);

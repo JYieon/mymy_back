@@ -23,6 +23,10 @@ public class BoardServiceImpl implements BoardService {
 
 	@Autowired BoardMapper mapper;
 	
+	public List<BoardDTO> getAllUserPlans(String id) {
+	    return mapper.getAllUserPlans(id);
+	}
+
 	public List<Map<String, Object>> searchBoardList(int page, int category, String searchType, String keyword) {
 	    int limit = 6;
 	    int offset = (page - 1) * limit;
