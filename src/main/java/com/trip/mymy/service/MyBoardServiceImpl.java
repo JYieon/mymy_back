@@ -27,5 +27,11 @@ public class MyBoardServiceImpl implements MyBoardService {
 	 	public List<MyBoardDTO> getMyComments(String userId) {
 	 	    return myBoardMapper.findMyComments(userId);
 	 	}
+	 	
+	 	@Override
+	      public List<MyBoardDTO> getUserPosts(String userId) {
+	         return myBoardMapper.getUserPosts(userId);
+	      }
+
 
 	}

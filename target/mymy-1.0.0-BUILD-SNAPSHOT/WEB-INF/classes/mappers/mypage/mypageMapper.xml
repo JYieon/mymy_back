@@ -45,13 +45,13 @@
         UPDATE MEMBER_TB SET MEMBER_TEST_RESULT = #{testResult}
         WHERE MEMBER_ID_PK = #{id}
     </update>
-	
-	<!-- 여행자 테스트 결과 조회 -->
-	<select id="getTestResult" parameterType="string" resultType="string">
-    	SELECT MEMBER_TEST_RESULT FROM MEMBER_TB WHERE MEMBER_ID_PK = #{id}
-	</select>
-	
-	<!-- 회원 상태 탈퇴로 변경 -->
+   
+   <!-- 여행자 테스트 결과 조회 -->
+   <select id="getTestResult" parameterType="string" resultType="string">
+       SELECT MEMBER_TEST_RESULT FROM MEMBER_TB WHERE MEMBER_ID_PK = #{id}
+   </select>
+   
+   <!-- 회원 상태 탈퇴로 변경 -->
     <update id="updateMemberStatusToDeleted" parameterType="com.trip.mymy.dto.MypageDTO">
         UPDATE MEMBER_TB
         SET MEMBER_STATUS = '탈퇴'
@@ -67,10 +67,10 @@
     
     <!-- 댓글 작성자 anonymous로 변경 -->
     <update id="anonymizeUserComments">
-  		UPDATE REPLY_TB
-  		SET MEMBER_ID_FK = 'anonymous'
-  		WHERE MEMBER_ID_FK = #{id}
-	</update>
+        UPDATE REPLY_TB
+        SET MEMBER_ID_FK = 'anonymous'
+        WHERE MEMBER_ID_FK = #{id}
+   </update>
     
 
     <!-- 게시글 삭제 -->
@@ -82,6 +82,6 @@
     <delete id="deleteMember" parameterType="com.trip.mymy.dto.MypageDTO">
         DELETE FROM MEMBER_TB WHERE MEMBER_ID_FK = #{id}
     </delete>
-	
+   
 
 </mapper>

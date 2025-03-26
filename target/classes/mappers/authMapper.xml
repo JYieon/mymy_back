@@ -5,37 +5,37 @@
 
 <mapper namespace="com.trip.mymy.mybatis.AuthMapper">
     <resultMap type="com.trip.mymy.dto.MemberDTO" id="member">
-    	<id property="id" column="MEMBER_ID_PK" />
-    	<result property="pwd" column="MEMBER_PWD" />
-    	<result property="name" column="MEMBER_NAME" />
-    	<result property="nick" column="MEMBER_NICK" />
-    	<result property="phone" column="MEMBER_PHONE" />
-    	<result property="email" column="MEMBER_EMAIL" />
-    	<result property="level" column="MEMBER_LEVEL" />
-    	<result property="bank" column="MEMBER_BANK" />
-    	<result property="profile"  column="MEMBER_PROFILE" />
-    	<result property="testResult" column="MEMBER_TEST_RESULT"/>
+       <id property="id" column="MEMBER_ID_PK" />
+       <result property="pwd" column="MEMBER_PWD" />
+       <result property="name" column="MEMBER_NAME" />
+       <result property="nick" column="MEMBER_NICK" />
+       <result property="phone" column="MEMBER_PHONE" />
+       <result property="email" column="MEMBER_EMAIL" />
+       <result property="level" column="MEMBER_LEVEL" />
+       <result property="bank" column="MEMBER_BANK" />
+       <result property="profile"  column="MEMBER_PROFILE" />
+       <result property="testResult" column="MEMBER_TEST_RESULT"/>
     </resultMap>
     <select id="getUser" resultMap="member">
-    	select * from MEMBER_TB where MEMBER_ID_PK = #{id}
+       select * from MEMBER_TB where MEMBER_ID_PK = #{id}
     </select>
     <select id="findId" resultMap="member">
-    	select * from MEMBER_TB where MEMBER_NAME = #{name} AND MEMBER_EMAIL = #{email}
+       select * from MEMBER_TB where MEMBER_NAME = #{name} AND MEMBER_EMAIL = #{email}
     </select>
     <select id="checkEmail" resultMap="member">
-    	select * from MEMBER_TB where MEMBER_EMAIL = #{email}
+       select * from MEMBER_TB where MEMBER_EMAIL = #{email}
     </select>
     <select id="findPwd" resultMap="member">
-    	select * from MEMBER_TB where MEMBER_ID_PK = #{id} and MEMBER_EMAIL = #{email}
+       select * from MEMBER_TB where MEMBER_ID_PK = #{id} and MEMBER_EMAIL = #{email}
     </select>
     <update id="resetPwd">
-    	update MEMBER_TB set MEMBER_PWD = #{pwd} where MEMBER_ID_PK = #{id}
+       update MEMBER_TB set MEMBER_PWD = #{pwd} where MEMBER_ID_PK = #{id}
     </update>
     <insert id="insertUser">
-    	insert into MEMBER_TB (MEMBER_ID_PK, MEMBER_PWD, MEMBER_NAME, MEMBER_NICK, MEMBER_PHONE, MEMBER_EMAIL)
-    		values(#{id}, #{pwd}, #{name}, #{nick}, #{phone}, #{email})
+       insert into MEMBER_TB (MEMBER_ID_PK, MEMBER_PWD, MEMBER_NAME, MEMBER_NICK, MEMBER_PHONE, MEMBER_EMAIL)
+          values(#{id}, #{pwd}, #{name}, #{nick}, #{phone}, #{email})
     </insert>
     <select id="checkNick" resultMap="member">
-    	select * from MEMBER_TB where MEMBER_NICK = #{nick}
+       select * from MEMBER_TB where MEMBER_NICK = #{nick}
     </select>
 </mapper>

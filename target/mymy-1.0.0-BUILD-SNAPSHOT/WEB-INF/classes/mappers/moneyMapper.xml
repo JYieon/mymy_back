@@ -5,74 +5,74 @@
 
 <mapper namespace="com.trip.mymy.mybatis.MoneyMapper">
     <resultMap type="com.trip.mymy.dto.money.SettlementDTO" id="settle">
-    	<id property="settleNum" column="SETTLEMENT_NUM_PK"/>
-    	<result property="roomNum" column="CHATROOM_NUM_FK" />
-    	<result property="toMember" column="SETTLEMENT_TO_MEMBER_NICK_FK" />
-    	<result property="money" column="SETTLEMENT_MONEY" />
-    	<result property="check" column="SETTLEMENT_CHECK"/>
+       <id property="settleNum" column="SETTLEMENT_NUM_PK"/>
+       <result property="roomNum" column="CHATROOM_NUM_FK" />
+       <result property="toMember" column="SETTLEMENT_TO_MEMBER_NICK_FK" />
+       <result property="money" column="SETTLEMENT_MONEY" />
+       <result property="check" column="SETTLEMENT_CHECK"/>
     </resultMap>
     <resultMap type="com.trip.mymy.dto.money.SettlementServiceDTO" id="settleService">
-    	<id property="serviceNum" column="SETTLEMENT_SERVICE_NUM_PK"/>
-    	<result property="sender" column="SETTLEMENT_SENDER_NICK_FK"/>
-    	<result property="settleNum" column="SETTLEMENT_NUM_FK"/>
+       <id property="serviceNum" column="SETTLEMENT_SERVICE_NUM_PK"/>
+       <result property="sender" column="SETTLEMENT_SENDER_NICK_FK"/>
+       <result property="settleNum" column="SETTLEMENT_NUM_FK"/>
     </resultMap>
     <resultMap type="com.trip.mymy.dto.money.BankDTO" id="bank">
-    	<id property="bankNum" column="BANK_NUM_PK"/>
-    	<result property="roomNum" column="CHATROOM_NUM_FK" />
-    	<result property="bankName" column="BANK_NAME" />
-    	<result property="total" column="BANK_TOTAL_MONEY" />
-    	<result property="target" column="BANK_TARGET_MONEY"/>
-    	<result property="check" column="BANK_TARGET_CHECK"/>
+       <id property="bankNum" column="BANK_NUM_PK"/>
+       <result property="roomNum" column="CHATROOM_NUM_FK" />
+       <result property="bankName" column="BANK_NAME" />
+       <result property="total" column="BANK_TOTAL_MONEY" />
+       <result property="target" column="BANK_TARGET_MONEY"/>
+       <result property="check" column="BANK_TARGET_CHECK"/>
     </resultMap>
     <resultMap type="com.trip.mymy.dto.money.BankServiceDTO" id="bankSer">
-    	<id property="bankSerNum" column="BANK_SERVICE_NUM_PK"/>
-    	<result property="bankNum" column="BANK_NUM_FK"/>
-    	<result property="member" column="MEMBER_ID_FK"/>
-    	<result property="type" column="BANK_SERVICE_TYPE" />
-    	<result property="money" column="BANK_SERVICE_MONEY" />
-    	<result property="personalTotal" column="BANK_PERSONAL_TOTAL"/>
-    	<result property="date" column="BANK_UPDATE_DT"/>
-    	<result property="bankTotal" column="BANK_TOTAL" />
+       <id property="bankSerNum" column="BANK_SERVICE_NUM_PK"/>
+       <result property="bankNum" column="BANK_NUM_FK"/>
+       <result property="member" column="MEMBER_ID_FK"/>
+       <result property="type" column="BANK_SERVICE_TYPE" />
+       <result property="money" column="BANK_SERVICE_MONEY" />
+       <result property="personalTotal" column="BANK_PERSONAL_TOTAL"/>
+       <result property="date" column="BANK_UPDATE_DT"/>
+       <result property="bankTotal" column="BANK_TOTAL" />
     </resultMap>
 
     
     <update id="insertMemberBank">
-    	update MEMBER_TB set MEMBER_BANK = #{bankNum} where MEMBER_ID_PK = #{memberId}
+       update MEMBER_TB set MEMBER_BANK = #{bankNum} where MEMBER_ID_PK = #{memberId}
     </update>
     <insert id="insertSettlement">
-    	insert into SETTLEMENT_TB(CHATROOM_NUM_FK, SETTLEMENT_TO_MEMBER_NICK_FK, SETTLEMENT_MONEY, SETTLEMENT_CHECK) values(#{roomNum}, #{toMember}, #{money}, #{roomMember})
+       insert into SETTLEMENT_TB(CHATROOM_NUM_FK, SETTLEMENT_TO_MEMBER_NICK_FK, SETTLEMENT_MONEY, SETTLEMENT_CHECK) values(#{roomNum}, #{toMember}, #{money}, #{roomMember})
     </insert>
     <insert id="settlement">
-    	insert into SETTLEMENT_SERVICE_TB(SETTLEMENT_SENDER_NICK_FK, SETTLEMENT_NUM_FK) values(#{id}, #{settleNum})
+       insert into SETTLEMENT_SERVICE_TB(SETTLEMENT_SENDER_NICK_FK, SETTLEMENT_NUM_FK) values(#{id}, #{settleNum})
     </insert>
     <update id="updateSettleCheck">
-    	update SETTLEMENT_TB set SETTLEMENT_CHECK = #{settleMember} where SETTLEMENT_NUM_PK = #{settleNum}
+       update SETTLEMENT_TB set SETTLEMENT_CHECK = #{settleMember} where SETTLEMENT_NUM_PK = #{settleNum}
     </update>
     <select id="getSettlement" resultMap="settle">
-    	select * from SETTLEMENT_TB where CHATROOM_NUM_FK = #{roomNum}
+       select * from SETTLEMENT_TB where CHATROOM_NUM_FK = #{roomNum}
     </select>
     <select id="getSettlementService" resultMap="settleService">
-    	select * from SETTLEMENT_SERVICE_TB where SETTLEMENT_SERVICE_NUM_PK = #{settleNum} 
+       select * from SETTLEMENT_SERVICE_TB where SETTLEMENT_SERVICE_NUM_PK = #{settleNum} 
     </select>
     <insert id="makeBank">
-    	insert into BANK_TB values(#{bankNum}, #{roomNum}, #{bankName}, 0, #{target}, 'f')
+       insert into BANK_TB values(#{bankNum}, #{roomNum}, #{bankName}, 0, #{target}, 'f')
     </insert>
     <select id="getBank" resultMap="bank">
-    	select * from BANK_TB where CHATROOM_NUM_FK = #{roomNum}
+       select * from BANK_TB where CHATROOM_NUM_FK = #{roomNum}
     </select>
     <select id="getBankService" resultMap="bankSer">
-    	select * from BANK_SERVICE_TB where BANK_NUM_FK = #{bankNum} order by BANK_UPDATE_DT desc
+       select * from BANK_SERVICE_TB where BANK_NUM_FK = #{bankNum} order by BANK_UPDATE_DT desc
     </select>
     <insert id="addBankService">
-    	insert into BANK_SERVICE_TB(BANK_NUM_FK, MEMBER_ID_FK, BANK_SERVICE_TYPE, BANK_SERVICE_MONEY, BANK_PERSONAL_TOTAL, BANK_UPDATE_DT, BANK_TOTAL) values(#{bankNum}, #{member}, #{type}, #{money}, #{personalTotal}, CURRENT_TIMESTAMP, #{bankTotal})
+       insert into BANK_SERVICE_TB(BANK_NUM_FK, MEMBER_ID_FK, BANK_SERVICE_TYPE, BANK_SERVICE_MONEY, BANK_PERSONAL_TOTAL, BANK_UPDATE_DT, BANK_TOTAL) values(#{bankNum}, #{member}, #{type}, #{money}, #{personalTotal}, CURRENT_TIMESTAMP, #{bankTotal})
     </insert>
     <select id="checkBankNum" resultType="String">
-    	select BANK_NUM_PK from BANK_TB where BANK_NUM_PK = #{bankNum}
+       select BANK_NUM_PK from BANK_TB where BANK_NUM_PK = #{bankNum}
     </select>
     <update id="updateBank">
-    	update BANK_TB set BANK_TOTAL_MONEY = #{total}, BANK_TARGET_CHECK = #{check} where CHATROOM_NUM_FK = #{roomNum}
+       update BANK_TB set BANK_TOTAL_MONEY = #{total}, BANK_TARGET_CHECK = #{check} where CHATROOM_NUM_FK = #{roomNum}
     </update>
     <select id="getPersonalTotal" resultType="Integer">
-    	select BANK_PERSONAL_TOTAL from BANK_SERVICE_TB where MEMBER_ID_FK = #{id} order by BANK_PERSONAL_TOTAL desc LIMIT 1
+       select BANK_PERSONAL_TOTAL from BANK_SERVICE_TB where MEMBER_ID_FK = #{id} order by BANK_PERSONAL_TOTAL desc LIMIT 1
     </select>
 </mapper>

@@ -9,6 +9,9 @@ public interface MyBoardService {
 	List<MyBoardDTO> getMyPosts(String userId);
 
 	List<MyBoardDTO> getMyComments(String userId);
+	
+	// 특정 유저의 게시글 목록 조회
+	List<MyBoardDTO> getUserPosts(String userId);
 
 
 }

@@ -83,6 +83,7 @@ public class BoardRepController {
 
 	@DeleteMapping("/deleteReply/{replyNo}")
 	public ResponseEntity<String> deleteReply(@PathVariable int replyNo, @RequestHeader("Authorization") String token) {
+		  System.out.println("✅ 댓글 삭제 요청 도착! replyNo = " + replyNo);
 		if (token == null || token.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JWT 토큰이 비어 있습니다.");
 		}

@@ -7,4 +7,5 @@ import com.trip.mymy.dto.MyBoardDTO;
 public interface MyBoardMapper {
 	List<MyBoardDTO> findMyPosts(@Param("userId") String userId);
     List<MyBoardDTO> findMyComments(@Param("userId") String userId);
+    List<MyBoardDTO> getUserPosts(@Param("userId") String userId);
 }
